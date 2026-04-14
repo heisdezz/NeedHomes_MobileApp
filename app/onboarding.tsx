@@ -46,7 +46,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
       style={tw`flex-1 items-center justify-center bg-[#3C3C44]`}
     >
       <Image
-        source={require('@/assets/need/logo_white.png')}
+        source={require('@/assets/need/logo.png')}
         style={tw`w-56 h-28`}
         resizeMode="contain"
       />
