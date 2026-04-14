@@ -75,7 +75,7 @@ export default function CorporateScreen() {
         phone: data.phone,
       },
       {
-        onSuccess: () => router.push(`/auth/verify?email=${data.email}`),
+        onSuccess: () => router.push(`/auth/verify?email=${encodeURIComponent(data.email)}`),
         onError: (e: any) => {
           showMessage({ message: extract_message(e as any), type: "danger" });
           console.log(e?.response?.data);

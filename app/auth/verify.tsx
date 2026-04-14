@@ -101,6 +101,8 @@ export default function VerifyScreen() {
         type: "warning",
       });
     }
+
+    // console.log(decodedEmail);
     verify();
   };
 
@@ -126,7 +128,7 @@ export default function VerifyScreen() {
           </Text>
           <Text style={tw`text-text-secondary text-sm leading-5 mb-8`}>
             An OTP has been sent to your email to be able to verify your
-            account. {decodedEmail} ss
+            account. {decodedEmail}
           </Text>
 
           {/* ── OTP boxes ── */}

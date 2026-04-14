@@ -5,64 +5,68 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import PhoneInput from 'react-native-phone-number-input';
-import { Ionicons } from '@expo/vector-icons';
-import tw from '@/lib/tw';
-import FormInput from '@/components/ui/form-input';
-import PasswordInput from '@/components/ui/password-input';
-import SelectInput from '@/components/ui/select-input';
-import { useRegisterMutation } from '@/lib/mutations/auth';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import PhoneInput from "react-native-phone-number-input";
+import { Ionicons } from "@expo/vector-icons";
+import tw from "@/lib/tw";
+import FormInput from "@/components/ui/form-input";
+import PasswordInput from "@/components/ui/password-input";
+import SelectInput from "@/components/ui/select-input";
+import { useRegisterMutation } from "@/lib/mutations/auth";
+import { showMessage } from "react-native-flash-message";
+import { extract_message } from "@/helpers/apihelpers";
 
 const HEAR_OPTIONS = [
-  { label: 'Social Media', value: 'social_media' },
-  { label: 'Friend / Family', value: 'friend_family' },
-  { label: 'Google', value: 'google' },
-  { label: 'TV / Radio', value: 'tv_radio' },
-  { label: 'Other', value: 'other' },
+  { label: "Social Media", value: "social_media" },
+  { label: "Friend / Family", value: "friend_family" },
+  { label: "Google", value: "google" },
+  { label: "TV / Radio", value: "tv_radio" },
+  { label: "Other", value: "other" },
 ];
 
 const RELATIONSHIP_OPTIONS = [
-  { label: 'Spouse', value: 'Spouse' },
-  { label: 'Sibling', value: 'Sibling' },
-  { label: 'Parent', value: 'Parent' },
-  { label: 'Guardian', value: 'Guardian' },
-  { label: 'Child', value: 'Child' },
-  { label: 'Friend', value: 'Friend' },
-  { label: 'Other', value: 'Other' },
+  { label: "Spouse", value: "Spouse" },
+  { label: "Sibling", value: "Sibling" },
+  { label: "Parent", value: "Parent" },
+  { label: "Guardian", value: "Guardian" },
+  { label: "Child", value: "Child" },
+  { label: "Friend", value: "Friend" },
+  { label: "Other", value: "Other" },
 ];
 
 const schema = z
   .object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1, 'Last name is required'),
-    email: z.string().email('Invalid email address'),
-    phone: z.string().min(7, 'Invalid phone number'),
-    password: z.string().min(8, 'Minimum 8 characters'),
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z.string().email("Invalid email address"),
+    phone: z.string().min(7, "Invalid phone number"),
+    password: z.string().min(8, "Minimum 8 characters"),
     confirmPassword: z.string(),
-    hearAboutUs: z.string().min(1, 'Please select an option'),
-    agreed: z.literal(true, { errorMap: () => ({ message: 'You must agree to the terms' }) }),
+    hearAboutUs: z.string().min(1, "Please select an option"),
+    agreed: z.literal(true, {
+      errorMap: () => ({ message: "You must agree to the terms" }),
+    }),
     // Next of kin
-    nokFullName: z.string().min(1, 'Full name is required'),
-    nokEmail: z.string().email('Invalid email address'),
-    nokPhone: z.string().min(7, 'Invalid phone number'),
-    nokRelationship: z.string().min(1, 'Please select a relationship'),
+    nokFullName: z.string().min(1, "Full name is required"),
+    nokEmail: z.string().email("Invalid email address"),
+    nokPhone: z.string().min(7, "Invalid phone number"),
+    nokRelationship: z.string().min(1, "Please select a relationship"),
   })
   .refine((d) => d.password === d.confirmPassword, {
     message: "Passwords don't match",
-    path: ['confirmPassword'],
+    path: ["confirmPassword"],
   });
 
 type FormData = z.infer<typeof schema>;
 
 export default function IndividualScreen() {
   const router = useRouter();
-  const { mutate, isPending } = useRegisterMutation('INDIVIDUAL');
+  const { mutate, isPending } = useRegisterMutation("INDIVIDUAL");
 
   const {
     control,
@@ -90,18 +94,24 @@ export default function IndividualScreen() {
         },
       },
       {
-        onSuccess: () => router.replace('/investor'),
-        onError: (e: any) => console.log(e?.response?.data),
-      }
+        onSuccess: () => router.push(`/auth/verify?email=${encodeURIComponent(data.email)}`),
+        onError: (e: any) => {
+          showMessage({
+            message: extract_message(e),
+            type: "danger",
+          });
+          console.log(e?.response?.data);
+        },
+      },
     );
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-bg`} edges={['top']}>
+    <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top"]}>
       {/* Header */}
       <View style={tw`items-center pt-4 pb-5`}>
         <Image
-          source={require('@/assets/need/logo.png')}
+          source={require("@/assets/need/logo.png")}
           style={tw`w-32 h-12`}
           resizeMode="contain"
         />
@@ -122,15 +132,21 @@ export default function IndividualScreen() {
         </Text>
 
         {/* Tab switcher */}
-        <View style={tw`flex-row bg-card rounded-xl p-1 mb-6 self-center border border-input-border`}>
+        <View
+          style={tw`flex-row bg-card rounded-xl p-1 mb-6 self-center border border-input-border`}
+        >
           <View style={tw`bg-brand rounded-lg px-6 py-2`}>
-            <Text style={tw`text-text-inverse text-sm font-semibold`}>Individual</Text>
+            <Text style={tw`text-text-inverse text-sm font-semibold`}>
+              Individual
+            </Text>
           </View>
           <TouchableOpacity
-            onPress={() => router.replace('/auth/investor/corporate')}
+            onPress={() => router.replace("/auth/investor/corporate")}
             style={tw`px-6 py-2`}
           >
-            <Text style={tw`text-text-muted text-sm font-semibold`}>Corporate</Text>
+            <Text style={tw`text-text-muted text-sm font-semibold`}>
+              Corporate
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -187,12 +203,14 @@ export default function IndividualScreen() {
 
           {/* Phone */}
           <View style={tw`gap-1.5`}>
-            <Text style={tw`text-text-primary text-sm font-medium`}>Phone Number</Text>
+            <Text style={tw`text-text-primary text-sm font-medium`}>
+              Phone Number
+            </Text>
             <PhoneInput
               defaultCode="NG"
               layout="first"
               onChangeFormattedText={(text) =>
-                setValue('phone', text, { shouldValidate: true })
+                setValue("phone", text, { shouldValidate: true })
               }
               containerStyle={tw`w-full bg-card border border-input-border rounded-xl`}
               textContainerStyle={tw`bg-card rounded-r-xl py-0`}
@@ -249,7 +267,9 @@ export default function IndividualScreen() {
 
           {/* ── Next of Kin ── */}
           <View style={tw`mt-2`}>
-            <Text style={tw`text-text-primary text-base font-bold mb-1`}>Next of Kin</Text>
+            <Text style={tw`text-text-primary text-base font-bold mb-1`}>
+              Next of Kin
+            </Text>
             <Text style={tw`text-text-muted text-xs mb-4`}>
               Required for individual accounts
             </Text>
@@ -286,12 +306,14 @@ export default function IndividualScreen() {
               />
 
               <View style={tw`gap-1.5`}>
-                <Text style={tw`text-text-primary text-sm font-medium`}>Phone Number</Text>
+                <Text style={tw`text-text-primary text-sm font-medium`}>
+                  Phone Number
+                </Text>
                 <PhoneInput
                   defaultCode="NG"
                   layout="first"
                   onChangeFormattedText={(text) =>
-                    setValue('nokPhone', text, { shouldValidate: true })
+                    setValue("nokPhone", text, { shouldValidate: true })
                   }
                   containerStyle={tw`w-full bg-card border border-input-border rounded-xl`}
                   textContainerStyle={tw`bg-card rounded-r-xl py-0`}
@@ -299,7 +321,9 @@ export default function IndividualScreen() {
                   placeholder="Enter phone number"
                 />
                 {errors.nokPhone && (
-                  <Text style={tw`text-error text-xs`}>{errors.nokPhone.message}</Text>
+                  <Text style={tw`text-error text-xs`}>
+                    {errors.nokPhone.message}
+                  </Text>
                 )}
               </View>
 
@@ -333,18 +357,28 @@ export default function IndividualScreen() {
                 >
                   <View
                     style={tw`w-4 h-4 mt-0.5 rounded border-2 items-center justify-center ${
-                      value ? 'bg-brand border-brand' : 'bg-card border-input-border'
+                      value
+                        ? "bg-brand border-brand"
+                        : "bg-card border-input-border"
                     }`}
                   >
-                    {value && <Ionicons name="checkmark" size={10} color="#fff" />}
+                    {value && (
+                      <Ionicons name="checkmark" size={10} color="#fff" />
+                    )}
                   </View>
-                  <Text style={tw`flex-1 text-xs text-text-secondary leading-5`}>
-                    By creating an account, you agree to Needhomes{' '}
-                    <Text style={tw`text-brand`}>Privacy Policy, Terms and Conditions</Text>
+                  <Text
+                    style={tw`flex-1 text-xs text-text-secondary leading-5`}
+                  >
+                    By creating an account, you agree to Needhomes{" "}
+                    <Text style={tw`text-brand`}>
+                      Privacy Policy, Terms and Conditions
+                    </Text>
                   </Text>
                 </TouchableOpacity>
                 {errors.agreed && (
-                  <Text style={tw`text-error text-xs mt-1`}>{errors.agreed.message}</Text>
+                  <Text style={tw`text-error text-xs mt-1`}>
+                    {errors.agreed.message}
+                  </Text>
                 )}
               </View>
             )}
@@ -354,20 +388,22 @@ export default function IndividualScreen() {
             onPress={handleSubmit(onSubmit)}
             disabled={isPending}
             activeOpacity={0.85}
-            style={tw`bg-brand rounded-xl py-4 items-center mt-2 ${isPending ? 'opacity-60' : ''}`}
+            style={tw`bg-brand rounded-xl py-4 items-center mt-2 ${isPending ? "opacity-60" : ""}`}
           >
             {isPending ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={tw`text-text-inverse text-base font-semibold`}>Done</Text>
+              <Text style={tw`text-text-inverse text-base font-semibold`}>
+                Done
+              </Text>
             )}
           </TouchableOpacity>
 
           <Text style={tw`text-text-secondary text-sm text-center`}>
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Text
               style={tw`text-brand font-semibold`}
-              onPress={() => router.push('/auth/login')}
+              onPress={() => router.push("/auth/login")}
             >
               Log In
             </Text>
