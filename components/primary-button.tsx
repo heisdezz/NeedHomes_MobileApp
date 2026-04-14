@@ -16,12 +16,12 @@ export default function PrimaryButton({ label, onPress, loading, disabled }: Pro
       onPress={onPress}
       disabled={isDisabled}
       activeOpacity={0.8}
-      style={tw`bg-[#F56821] rounded-xl py-4 px-6 items-center justify-center ${isDisabled ? 'opacity-50' : ''}`}
+      style={tw`bg-brand rounded-xl py-4 px-6 items-center justify-center ${isDisabled ? 'opacity-50' : ''}`}
     >
       {loading ? (
         <ActivityIndicator color="#fff" />
       ) : (
-        <Text style={tw`text-white text-base font-semibold`}>{label}</Text>
+        <Text style={tw`text-text-inverse text-base font-semibold`}>{label}</Text>
       )}
     </TouchableOpacity>
   );
