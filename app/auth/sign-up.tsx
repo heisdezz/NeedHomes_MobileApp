@@ -22,13 +22,13 @@ function AccountCard({ type, selected, icon, title, description, onPress }: Card
       onPress={onPress}
       activeOpacity={0.85}
       style={tw`w-full rounded-2xl p-5 flex-row items-center gap-4 ${
-        isOrange ? 'bg-[#F56821]' : 'bg-[#2E2E36]'
+        isOrange ? 'bg-brand' : 'bg-surface'
       }`}
     >
       {/* Icon circle */}
       <View
         style={tw`w-14 h-14 rounded-full items-center justify-center ${
-          isOrange ? 'bg-white/20' : 'bg-[#3C3C44]'
+          isOrange ? 'bg-white/20' : 'bg-bg'
         }`}
       >
         <Text style={tw`text-2xl`}>{icon}</Text>
@@ -56,7 +56,7 @@ export default function SignUpScreen() {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-[#3C3C44]`} edges={['top', 'bottom']}>
+    <SafeAreaView style={tw`flex-1 bg-bg`} edges={['top', 'bottom']}>
       {/* Logo */}
       <View style={tw`items-center pt-6 pb-8`}>
         <Image
@@ -99,7 +99,7 @@ export default function SignUpScreen() {
         <TouchableOpacity
           onPress={handleContinue}
           activeOpacity={0.85}
-          style={tw`bg-[#F56821] rounded-xl py-4 items-center`}
+          style={tw`bg-brand rounded-xl py-4 items-center`}
         >
           <Text style={tw`text-white text-base font-semibold`}>Continue</Text>
         </TouchableOpacity>
@@ -107,7 +107,7 @@ export default function SignUpScreen() {
         <Text style={tw`text-white/50 text-sm text-center`}>
           Already have an account?{' '}
           <Text
-            style={tw`text-[#F56821] font-semibold`}
+            style={tw`text-brand font-semibold`}
             onPress={() => router.push('/auth/login')}
           >
             Log in
