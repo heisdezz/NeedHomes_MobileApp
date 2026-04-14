@@ -49,7 +49,7 @@ export default function SignUpScreen() {
 
   const handleContinue = () => {
     if (selected === 'investor') {
-      router.push('/auth/investor-register');
+      router.push('/auth/investor/individual');
     } else {
       router.push('/auth/partner-register');
     }
