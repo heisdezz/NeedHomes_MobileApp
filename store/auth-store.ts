@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { expoSecureStorage } from '@/lib/storage';
 import type { USER, USER_KYC } from '@/types';
 
 export interface AUTHRECORD {
@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => expoSecureStorage),
     }
   )
 );

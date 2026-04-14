@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { expoSecureStorage } from "@/lib/storage";
 
 type OnboardingState = {
   hasSeenOnboarding: boolean;
@@ -14,8 +14,8 @@ export const useOnboardingStore = create<OnboardingState>()(
       setHasSeenOnboarding: (value) => set({ hasSeenOnboarding: value }),
     }),
     {
-      name: 'onboarding-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+      name: "onboarding-storage",
+      storage: createJSONStorage(() => expoSecureStorage),
+    },
+  ),
 );

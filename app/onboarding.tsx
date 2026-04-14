@@ -94,7 +94,7 @@ export default function OnboardingScreen() {
       setCurrentIndex(next);
     } else {
       setHasSeenOnboarding(true);
-      router.replace('/(tabs)');
+      router.replace('/auth/sign-up');
     }
   };
 
