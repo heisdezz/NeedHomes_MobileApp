@@ -14,6 +14,7 @@ export default function InvestorLayout() {
       }}
     >
       <Drawer.Screen name="(tabs)" />
+      <Drawer.Screen name="settings" options={{ headerShown: false, swipeEnabled: false }} />
     </Drawer>
   );
 }

@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { useAuth } from "@/store";
 import { logout } from "@/store/auth-store";
@@ -38,6 +39,7 @@ function IconCircle({ name }: { name: keyof typeof Ionicons.glyphMap }) {
 }
 
 export default function DrawerContent({ navigation }: DrawerContentComponentProps) {
+  const router = useRouter();
   const auth = useAuth();
   const user = auth?.user;
   const fullName = user
@@ -100,6 +102,10 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
         {/* Bottom */}
         <View style={tw`px-4 gap-1`}>
           <TouchableOpacity
+            onPress={() => {
+              navigation.closeDrawer();
+              router.push("/investor/settings");
+            }}
             activeOpacity={0.7}
             style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
           >
