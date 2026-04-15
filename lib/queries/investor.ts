@@ -1,5 +1,50 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import apiClient, { type ApiResponse } from "@/lib/api";
+import axios from "axios";
+import apiClient, { type ApiResponse, type ApiResponseV2, new_url } from "@/lib/api";
+
+// ─── Properties ───────────────────────────────────────────────────────────────
+
+export interface ApiProperty {
+  id: string;
+  title: string;
+  location?: string;
+  address?: string;
+  propertyType: "RESIDENTIAL" | "COMMERCIAL" | "LAND";
+  investmentModel: "OUTRIGHT_PURCHASE" | "CO_DEVELOPMENT" | "FRACTIONAL_OWNERSHIP";
+  developmentStage: "PLANNING" | "ONGOING" | "COMPLETED";
+  basePrice: number; // in kobo
+  images?: string[];
+}
+
+export interface PropertiesMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface PropertiesParams {
+  search?: string;
+  investmentModel?: "OUTRIGHT_PURCHASE" | "CO_DEVELOPMENT" | "FRACTIONAL_OWNERSHIP";
+  propertyType?: "RESIDENTIAL" | "COMMERCIAL" | "LAND";
+  developmentStage?: "PLANNING" | "ONGOING" | "COMPLETED";
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  limit?: number;
+}
+
+// No auth required — use a plain axios instance to avoid auth interceptors
+const publicClient = axios.create({ baseURL: new_url });
+
+export const useProperties = (params?: PropertiesParams) =>
+  useQuery<ApiResponseV2<ApiProperty[]>>({
+    queryKey: ["properties", params],
+    queryFn: async () => {
+      const resp = await publicClient.get("/properties", { params });
+      return resp.data;
+    },
+  });
 
 // ─── Investment Stats ────────────────────────────────────────────────────────
 

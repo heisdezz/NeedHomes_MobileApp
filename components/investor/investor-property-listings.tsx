@@ -5,51 +5,72 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
+import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
-import PropertyCard, { Property } from "./property-card";
+import PropertyCard from "./property-card";
+import type { Property } from "./property-card";
+import {
+  useProperties,
+  type ApiProperty,
+  type PropertiesParams,
+} from "@/lib/queries/investor";
 import tw from "@/lib/tw";
 
-const FILTER_TABS = ["Outright Purchase", "Installment", "Joint Venture"];
+// ─── Filter config ────────────────────────────────────────────────────────────
 
-const SAMPLE_PROPERTIES: Property[] = [
-  {
-    id: "1",
-    title: "3 Bedroom Block of Flats",
-    location: "Ikeja, Lagos",
-    propertyType: "Commercial",
-    price: "₦100,000,000",
-    status: "Ongoing",
-  },
-  {
-    id: "2",
-    title: "3 Bedroom Block of Flats",
-    location: "Ikeja, Lagos",
-    propertyType: "Commercial",
-    price: "₦100,000,000",
-    status: "Brand New",
-  },
-  {
-    id: "3",
-    title: "4 Bedroom Detached Duplex",
-    location: "Lekki, Lagos",
-    propertyType: "Residential",
-    price: "₦250,000,000",
-    status: "Off Plan",
-  },
-];
-
-type Props = {
-  properties?: Property[];
-  onSeeAll?: () => void;
+type FilterTab = {
+  label: string;
+  params: Partial<PropertiesParams>;
 };
 
-export default function InvestorPropertyListings({
-  properties = SAMPLE_PROPERTIES,
-  onSeeAll,
-}: Props) {
-  const [activeFilter, setActiveFilter] = useState(FILTER_TABS[0]);
+const FILTER_TABS: FilterTab[] = [
+  { label: "All", params: {} },
+  { label: "Outright Purchase", params: { investmentModel: "OUTRIGHT_PURCHASE" } },
+  { label: "Co-Development", params: { investmentModel: "CO_DEVELOPMENT" } },
+  { label: "Fractional", params: { investmentModel: "FRACTIONAL_OWNERSHIP" } },
+];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatKoboToNaira(kobo: number): string {
+  const naira = kobo / 100;
+  return `₦${naira.toLocaleString("en-NG")}`;
+}
+
+const STAGE_TO_STATUS: Record<string, Property["status"]> = {
+  ONGOING: "Ongoing",
+  COMPLETED: "Completed",
+  PLANNING: "Off Plan",
+};
+
+function mapToCard(p: ApiProperty): Property {
+  return {
+    id: p.id,
+    title: p.title,
+    location: p.location ?? p.address ?? "",
+    propertyType:
+      p.propertyType.charAt(0) + p.propertyType.slice(1).toLowerCase(),
+    price: formatKoboToNaira(p.basePrice),
+    status: STAGE_TO_STATUS[p.developmentStage],
+    imageUri: p.images?.[0],
+  };
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function InvestorPropertyListings() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const activeFilter = FILTER_TABS[activeIndex];
+  const { data, isLoading, isError } = useProperties({
+    ...activeFilter.params,
+    limit: 10,
+  });
+
+  const properties: Property[] = (data?.data?.data ?? []).map(mapToCard);
 
   return (
     <View>
@@ -59,7 +80,10 @@ export default function InvestorPropertyListings({
           <Text style={tw`text-white text-base font-bold`}>Properties</Text>
           <Ionicons name="chevron-down" size={16} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={onSeeAll} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={() => router.push("/investor/properties")}
+          activeOpacity={0.7}
+        >
           <Text style={[tw`text-sm font-semibold`, { color: Colors.brand }]}>
             See All
           </Text>
@@ -72,17 +96,19 @@ export default function InvestorPropertyListings({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={tw`px-4 gap-2 mb-4`}
       >
-        {FILTER_TABS.map((tab) => {
-          const isActive = tab === activeFilter;
+        {FILTER_TABS.map((tab, index) => {
+          const isActive = index === activeIndex;
           return (
             <TouchableOpacity
-              key={tab}
-              onPress={() => setActiveFilter(tab)}
+              key={tab.label}
+              onPress={() => setActiveIndex(index)}
               activeOpacity={0.7}
               style={[
                 tw`px-4 py-1.5 rounded-full`,
                 {
-                  backgroundColor: isActive ? Colors.brand : "rgba(255,255,255,0.1)",
+                  backgroundColor: isActive
+                    ? Colors.brand
+                    : "rgba(255,255,255,0.1)",
                   borderWidth: isActive ? 0 : 1,
                   borderColor: "rgba(255,255,255,0.2)",
                 },
@@ -94,22 +120,40 @@ export default function InvestorPropertyListings({
                   { color: isActive ? "#fff" : "rgba(255,255,255,0.6)" },
                 ]}
               >
-                {tab}
+                {tab.label}
               </Text>
             </TouchableOpacity>
           );
         })}
       </ScrollView>
 
-      {/* Property cards */}
-      <FlatList
-        horizontal
-        data={properties}
-        keyExtractor={(item) => item.id}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={tw`px-4 gap-3`}
-        renderItem={({ item }) => <PropertyCard {...item} />}
-      />
+      {/* Cards */}
+      {isLoading ? (
+        <View style={tw`items-center py-6`}>
+          <ActivityIndicator color={Colors.brand} />
+        </View>
+      ) : isError ? (
+        <View style={tw`items-center py-6`}>
+          <Text style={[tw`text-xs`, { color: Colors.textMuted }]}>
+            Could not load properties
+          </Text>
+        </View>
+      ) : properties.length === 0 ? (
+        <View style={tw`items-center py-6`}>
+          <Text style={[tw`text-xs`, { color: Colors.textMuted }]}>
+            No properties available
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          horizontal
+          data={properties}
+          keyExtractor={(item) => item.id}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={tw`px-4 gap-3`}
+          renderItem={({ item }) => <PropertyCard {...item} />}
+        />
+      )}
     </View>
   );
 }

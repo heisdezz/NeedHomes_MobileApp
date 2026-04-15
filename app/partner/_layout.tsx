@@ -1,7 +1,19 @@
+import { useEffect } from "react";
 import { Drawer } from "expo-router/drawer";
+import { useRouter } from "expo-router";
 import DrawerContent from "@/components/partner/drawer-menu";
+import { useAuth } from "@/store";
 
 export default function PartnerLayout() {
+  const router = useRouter();
+  const auth = useAuth();
+
+  useEffect(() => {
+    if (auth && auth.user.accountType !== "PARTNER") {
+      router.replace("/investor");
+    }
+  }, [auth]);
+
   return (
     <Drawer
       drawerContent={(props) => <DrawerContent {...props} />}

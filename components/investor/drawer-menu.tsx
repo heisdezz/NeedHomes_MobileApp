@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { useAuth } from "@/store";
-import { logout } from "@/store/auth-store";
+import { logout } from "@/lib/mutations/auth";
 import tw from "@/lib/tw";
 
 type MenuItem = {

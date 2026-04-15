@@ -1,4 +1,4 @@
-export type AccountType = 'investor' | 'partner';
+export type AccountType = 'INVESTOR' | 'PARTNER' | 'INDIVIDUAL' | 'ADMIN';
 
 export interface USER {
   id: string;

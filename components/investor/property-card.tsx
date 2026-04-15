@@ -12,6 +12,7 @@ export type Property = {
   status?: "Ongoing" | "Brand New" | "Completed" | "Off Plan";
   imageUri?: string;
   isBookmarked?: boolean;
+  cardWidth?: number;
   onBookmark?: () => void;
   onPress?: () => void;
 };
@@ -31,6 +32,7 @@ export default function PropertyCard({
   status,
   imageUri,
   isBookmarked,
+  cardWidth = 180,
   onBookmark,
   onPress,
 }: Property) {
@@ -40,7 +42,7 @@ export default function PropertyCard({
       activeOpacity={0.85}
       style={[
         tw`rounded-2xl overflow-hidden`,
-        { backgroundColor: "#fff", width: 180 },
+        { backgroundColor: "#fff", width: cardWidth },
       ]}
     >
       {/* Image */}

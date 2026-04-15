@@ -4,7 +4,7 @@ import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/theme";
 import { useAuth } from "@/store";
-import { logout } from "@/store/auth-store";
+import { logout } from "@/lib/mutations/auth";
 import tw from "@/lib/tw";
 
 type MenuItem = {
