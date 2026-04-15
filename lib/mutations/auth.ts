@@ -29,3 +29,20 @@ export const useRegisterMutation = (accountType: AccountSubType) =>
       router.push("/auth/verify");
     },
   });
+
+export type PartnerType = "REAL_ESTATE_AGENT" | "PROPERTY_DEVELOPER";
+
+export type PartnerRegisterPayload = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  partnerType: PartnerType;
+  password: string;
+};
+
+export const usePartnerRegisterMutation = () =>
+  useMutation({
+    mutationFn: (data: PartnerRegisterPayload) =>
+      apiClient.post("partners/register", data),
+  });

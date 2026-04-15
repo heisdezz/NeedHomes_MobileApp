@@ -155,7 +155,11 @@ export default function LoginScreen() {
                 <Text style={tw`text-text-primary text-sm font-medium`}>
                   Password
                 </Text>
-                <TouchableOpacity onPress={() => {}}>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/reset-password");
+                  }}
+                >
                   <Text style={tw`text-brand text-xs font-medium`}>
                     Forgot Password?
                   </Text>

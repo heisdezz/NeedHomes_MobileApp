@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -39,21 +39,19 @@ const SLIDES = [
 type Slide = (typeof SLIDES)[number];
 
 function SplashScreen({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onDone, 1500);
+    return () => clearTimeout(timer);
+  }, [onDone]);
+
   return (
-    <TouchableOpacity
-      activeOpacity={1}
-      onPress={onDone}
-      style={tw`flex-1 items-center justify-center bg-[#3C3C44]`}
-    >
+    <View style={tw`flex-1 items-center justify-center bg-[#3C3C44]`}>
       <Image
         source={require('@/assets/need/logo.png')}
         style={tw`w-56 h-28`}
         resizeMode="contain"
       />
-      <Text style={tw`text-white/50 text-sm mt-8 tracking-widest uppercase`}>
-        Tap to continue
-      </Text>
-    </TouchableOpacity>
+    </View>
   );
 }
 

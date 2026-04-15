@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ImageSourcePropType } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from '@/lib/tw';
@@ -8,30 +7,28 @@ import type { AccountType } from '@/types';
 type CardProps = {
   type: AccountType;
   selected: boolean;
-  icon: string;
+  icon: ImageSourcePropType;
   title: string;
   description: string;
   onPress: () => void;
 };
 
-function AccountCard({ type, selected, icon, title, description, onPress }: CardProps) {
-  const isOrange = selected;
-
+function AccountCard({ selected, icon, title, description, onPress }: CardProps) {
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.85}
       style={tw`w-full rounded-2xl p-5 flex-row items-center gap-4 ${
-        isOrange ? 'bg-brand' : 'bg-surface'
+        selected ? 'bg-brand' : 'bg-surface'
       }`}
     >
       {/* Icon circle */}
       <View
         style={tw`w-14 h-14 rounded-full items-center justify-center ${
-          isOrange ? 'bg-white/20' : 'bg-bg'
+          selected ? 'bg-white/20' : 'bg-bg'
         }`}
       >
-        <Text style={tw`text-2xl`}>{icon}</Text>
+        <Image source={icon} style={tw`w-8 h-8`} resizeMode="contain" />
       </View>
 
       {/* Text */}
@@ -45,15 +42,6 @@ function AccountCard({ type, selected, icon, title, description, onPress }: Card
 
 export default function SignUpScreen() {
   const router = useRouter();
-  const [selected, setSelected] = useState<AccountType>('investor');
-
-  const handleContinue = () => {
-    if (selected === 'investor') {
-      router.push('/auth/investor/individual');
-    } else {
-      router.push('/auth/partner-register');
-    }
-  };
 
   return (
     <SafeAreaView style={tw`flex-1 bg-bg`} edges={['top', 'bottom']}>
@@ -77,33 +65,25 @@ export default function SignUpScreen() {
         <View style={tw`gap-4`}>
           <AccountCard
             type="investor"
-            selected={selected === 'investor'}
-            icon="👤"
+            selected
+            icon={require('@/assets/sign-up/investor.png')}
             title="Investor"
             description="Invest on properties and make Profit"
-            onPress={() => setSelected('investor')}
+            onPress={() => router.push('/auth/investor/individual')}
           />
           <AccountCard
             type="partner"
-            selected={selected === 'partner'}
-            icon="🤝"
+            selected={false}
+            icon={require('@/assets/sign-up/partner.png')}
             title="Partner"
             description="Promote and Sell Properties to Earn Commission"
-            onPress={() => setSelected('partner')}
+            onPress={() => router.push('/auth/partner')}
           />
         </View>
       </View>
 
       {/* Footer */}
-      <View style={tw`px-6 pb-8 gap-4`}>
-        <TouchableOpacity
-          onPress={handleContinue}
-          activeOpacity={0.85}
-          style={tw`bg-brand rounded-xl py-4 items-center`}
-        >
-          <Text style={tw`text-white text-base font-semibold`}>Continue</Text>
-        </TouchableOpacity>
-
+      <View style={tw`px-6 pb-8`}>
         <Text style={tw`text-white/50 text-sm text-center`}>
           Already have an account?{' '}
           <Text

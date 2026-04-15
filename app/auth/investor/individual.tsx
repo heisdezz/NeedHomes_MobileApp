@@ -5,6 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -117,6 +119,10 @@ export default function IndividualScreen() {
         />
       </View>
 
+      <KeyboardAvoidingView
+        style={tw`flex-1`}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
       <ScrollView
         style={tw`flex-1 bg-input-bg`}
         contentContainerStyle={tw`px-5 pt-6 pb-10`}
@@ -410,6 +416,7 @@ export default function IndividualScreen() {
           </Text>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
