@@ -8,6 +8,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Toaster } from "sonner-native";
@@ -23,6 +24,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <KeyboardProvider>
       <QueryClientProvider client={queryClient}>
         <FlashMessage position="top" statusBarHeight={32} />
         <ThemeProvider
@@ -46,6 +48,7 @@ export default function RootLayout() {
           <StatusBar style="light" backgroundColor="#3C3C44" />
         </ThemeProvider>
       </QueryClientProvider>
+      </KeyboardProvider>
       <Toaster />
     </GestureHandlerRootView>
   );

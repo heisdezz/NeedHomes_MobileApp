@@ -71,6 +71,9 @@ export const refresh_kyc = async () => {
 export const useLogout = () =>
   useMutation({
     mutationFn: auth_logout,
+    onMutate: () => {
+      showMessage({ message: "Logging out...", type: "info", duration: 2000 });
+    },
     onSuccess: () => {
       clear_user();
       clear_kyc();

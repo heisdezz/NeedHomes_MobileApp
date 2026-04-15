@@ -2,12 +2,10 @@ import {
   View,
   Text,
   Image,
-  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm, Controller } from "react-hook-form";
@@ -93,16 +91,13 @@ export default function PartnerSignUpScreen() {
         />
       </View>
 
-      <KeyboardAvoidingView
-        style={tw`flex-1`}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <KeyboardAwareScrollView
+        style={tw`flex-1 bg-input-bg`}
+        contentContainerStyle={tw`px-5 pt-6 pb-10`}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        bottomOffset={16}
       >
-        <ScrollView
-          style={tw`flex-1 bg-input-bg`}
-          contentContainerStyle={tw`px-5 pt-6 pb-10`}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
           {/* Title */}
           <Text style={tw`text-text-primary text-xl font-bold text-center`}>
             Sign Up as a Partner
@@ -293,8 +288,7 @@ export default function PartnerSignUpScreen() {
               </Text>
             </Text>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

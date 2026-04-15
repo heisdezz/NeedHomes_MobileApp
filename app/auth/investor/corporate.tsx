@@ -2,12 +2,10 @@ import {
   View,
   Text,
   Image,
-  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm, Controller } from "react-hook-form";
@@ -86,10 +84,6 @@ export default function CorporateScreen() {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top"]}>
-      <KeyboardAvoidingView
-        style={tw`flex-1`}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
         {/* Header */}
         <View style={tw`items-center pt-4 pb-5`}>
           <Image
@@ -99,11 +93,12 @@ export default function CorporateScreen() {
           />
         </View>
 
-        <ScrollView
+        <KeyboardAwareScrollView
           style={tw`flex-1 bg-input-bg`}
           contentContainerStyle={tw`px-5 pt-6 pb-10`}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          bottomOffset={16}
         >
           {/* Title */}
           <Text style={tw`text-text-primary text-xl font-bold text-center`}>
@@ -294,8 +289,7 @@ export default function CorporateScreen() {
               </Text>
             </Text>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }
