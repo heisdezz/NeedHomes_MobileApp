@@ -4,7 +4,7 @@ import tw from "@/lib/tw";
 
 export default function InvestmentScreen() {
   return (
-    <SafeAreaView style={tw`flex-1 bg-bg`}>
+    <SafeAreaView style={tw`flex-1 bg-bg-light`}>
       <View style={tw`flex-1 items-center justify-center`}>
         <Text style={tw`text-white/50 text-base`}>Investment</Text>
       </View>

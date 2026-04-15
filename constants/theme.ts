@@ -10,9 +10,10 @@ export const Colors = {
   brandDark: '#D45610',
 
   // Backgrounds
-  bg: '#3C3C44',
-  surface: '#2E2E36',
-  card: '#FFFFFF',
+  bg: '#3C3C44',       // dark screens (auth, investor dashboard)
+  surface: '#2E2E36',  // dark cards / input backgrounds
+  card: '#FFFFFF',     // white cards
+  bgLight: '#FFFFFF',  // white-background screens
 
   // Text
   textPrimary: '#1A1A2E',

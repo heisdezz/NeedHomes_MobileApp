@@ -38,6 +38,12 @@ Splash screen (1.5s auto-advance) → onboarding slides.
 | Investment | `investment` | `investor/(tabs)/investment.tsx` | Investments |
 | Account | `account` | `investor/(tabs)/account.tsx` | Account |
 
+### Investor full-screen routes (outside tabs, inside drawer navigator)
+| Route | File | Description |
+|---|---|---|
+| `/investor/properties` | `investor/properties.tsx` | Full property listing — 2-column grid, debounced search, `GET /properties` |
+| `/investor/settings` | `investor/settings.tsx` | Settings screen |
+
 ### Investor drawer (`app/investor/_layout.tsx` → `@react-navigation/drawer`)
 Opened via `DrawerActions.openDrawer()`. Items: Profile Info, My Investments, Wallet, Properties, Transactions, Announcements, Chat, Notifications, Settings, Log Out.
 

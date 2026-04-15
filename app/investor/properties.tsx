@@ -26,21 +26,22 @@ function formatKoboToNaira(kobo: number): string {
 }
 
 const STAGE_TO_STATUS: Record<string, Property["status"]> = {
-  ONGOING: "Ongoing",
-  COMPLETED: "Completed",
   PLANNING: "Off Plan",
+  FOUNDATION: "Ongoing",
+  ROOFING: "Ongoing",
+  FINISHED: "Completed",
 };
 
 function mapToCard(p: ApiProperty): Property {
   return {
     id: p.id,
-    title: p.title,
-    location: p.location ?? p.address ?? "",
+    title: p.propertyTitle,
+    location: p.location,
     propertyType:
       p.propertyType.charAt(0) + p.propertyType.slice(1).toLowerCase(),
     price: formatKoboToNaira(p.basePrice),
     status: STAGE_TO_STATUS[p.developmentStage],
-    imageUri: p.images?.[0],
+    imageUri: p.coverImage || p.galleryImages?.[0],
   };
 }
 
@@ -52,7 +53,9 @@ export default function PropertiesScreen() {
   const [activeSearch, setActiveSearch] = useState("");
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const query = useProperties(activeSearch ? { search: activeSearch } : undefined);
+  const query = useProperties(
+    activeSearch ? { search: activeSearch } : undefined,
+  );
 
   const handleSearchChange = useCallback((text: string) => {
     setSearch(text);
@@ -69,18 +72,20 @@ export default function PropertiesScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top"]}>
+    <SafeAreaView style={tw`flex-1 bg-bg-light`} edges={["top"]}>
       {/* Header */}
       <View style={tw`flex-row items-center px-4 pt-3 pb-2 gap-3`}>
         <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} />
         </TouchableOpacity>
-        <Text style={tw`text-white text-lg font-bold`}>Properties</Text>
+        <Text style={tw` text-lg font-bold`}>Properties</Text>
       </View>
 
       {/* "All Properties" title row */}
       <View style={tw`flex-row items-center justify-between px-4 mb-3`}>
-        <Text style={[tw`text-base font-semibold`, { color: Colors.textInverse }]}>
+        <Text
+          style={[tw`text-base font-semibold`, { color: Colors.textInverse }]}
+        >
           All Properties
         </Text>
         <TouchableOpacity activeOpacity={0.7}>
@@ -132,7 +137,11 @@ export default function PropertiesScreen() {
               )}
               ListEmptyComponent={
                 <View style={tw`items-center justify-center mt-24 gap-2`}>
-                  <Ionicons name="home-outline" size={48} color={Colors.textMuted} />
+                  <Ionicons
+                    name="home-outline"
+                    size={48}
+                    color={Colors.textMuted}
+                  />
                   <Text style={[tw`text-sm`, { color: Colors.textMuted }]}>
                     {activeSearch
                       ? `No results for "${activeSearch}"`

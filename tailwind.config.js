@@ -11,6 +11,7 @@ module.exports = {
         bg: '#3C3C44',
         surface: '#2E2E36',
         card: '#FFFFFF',
+        'bg-light': '#FFFFFF',
 
         // Text
         'text-primary': '#1A1A2E',
