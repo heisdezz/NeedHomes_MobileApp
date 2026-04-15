@@ -41,21 +41,22 @@ function formatKoboToNaira(kobo: number): string {
 }
 
 const STAGE_TO_STATUS: Record<string, Property["status"]> = {
-  ONGOING: "Ongoing",
-  COMPLETED: "Completed",
   PLANNING: "Off Plan",
+  FOUNDATION: "Ongoing",
+  ROOFING: "Ongoing",
+  FINISHED: "Completed",
 };
 
 function mapToCard(p: ApiProperty): Property {
   return {
     id: p.id,
-    title: p.title,
-    location: p.location ?? p.address ?? "",
+    title: p.propertyTitle,
+    location: p.location,
     propertyType:
       p.propertyType.charAt(0) + p.propertyType.slice(1).toLowerCase(),
     price: formatKoboToNaira(p.basePrice),
     status: STAGE_TO_STATUS[p.developmentStage],
-    imageUri: p.images?.[0],
+    imageUri: p.coverImage || p.galleryImages?.[0],
   };
 }
 
@@ -77,8 +78,8 @@ export default function InvestorPropertyListings() {
       {/* Section header */}
       <View style={tw`flex-row items-center justify-between px-4 mb-3`}>
         <TouchableOpacity style={tw`flex-row items-center gap-1`} activeOpacity={0.7}>
-          <Text style={tw`text-white text-base font-bold`}>Properties</Text>
-          <Ionicons name="chevron-down" size={16} color="#fff" />
+          <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>Properties</Text>
+          <Ionicons name="chevron-down" size={16} color={Colors.textPrimary} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => router.push("/investor/properties")}
@@ -106,18 +107,16 @@ export default function InvestorPropertyListings() {
               style={[
                 tw`px-4 py-1.5 rounded-full`,
                 {
-                  backgroundColor: isActive
-                    ? Colors.brand
-                    : "rgba(255,255,255,0.1)",
+                  backgroundColor: isActive ? Colors.brand : Colors.inputBg,
                   borderWidth: isActive ? 0 : 1,
-                  borderColor: "rgba(255,255,255,0.2)",
+                  borderColor: Colors.inputBorder,
                 },
               ]}
             >
               <Text
                 style={[
                   tw`text-xs font-semibold`,
-                  { color: isActive ? "#fff" : "rgba(255,255,255,0.6)" },
+                  { color: isActive ? "#fff" : Colors.textSecondary },
                 ]}
               >
                 {tab.label}

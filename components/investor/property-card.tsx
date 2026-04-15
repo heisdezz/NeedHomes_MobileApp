@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
+import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
@@ -25,6 +26,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function PropertyCard({
+  id,
   title,
   location,
   propertyType,
@@ -36,13 +38,28 @@ export default function PropertyCard({
   onBookmark,
   onPress,
 }: Property) {
+  function handlePress() {
+    if (onPress) {
+      onPress();
+    } else {
+      router.push(`/investor/properties/${id}`);
+    }
+  }
+
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={handlePress}
       activeOpacity={0.85}
       style={[
         tw`rounded-2xl overflow-hidden`,
-        { backgroundColor: "#fff", width: cardWidth },
+        {
+          backgroundColor: "#fff",
+          width: cardWidth,
+          height: 270,
+          borderWidth: 1,
+          borderColor: Colors.divider,
+          elevation: 2,
+        },
       ]}
     >
       {/* Image */}
@@ -91,7 +108,7 @@ export default function PropertyCard({
       </View>
 
       {/* Body */}
-      <View style={tw`px-3 pt-2 pb-3`}>
+      <View style={tw`px-3 pt-2 pb-3 flex-1`}>
         <Text
           style={[tw`text-sm font-bold mb-1`, { color: Colors.textPrimary }]}
           numberOfLines={2}
@@ -103,7 +120,7 @@ export default function PropertyCard({
         <View style={tw`flex-row items-center gap-1 mb-2`}>
           <Ionicons name="location-outline" size={11} color={Colors.brand} />
           <Text
-            style={[tw`text-xs`, { color: Colors.textSecondary }]}
+            style={[tw`text-xs flex-1`, { color: Colors.textSecondary }]}
             numberOfLines={1}
           >
             {location}
@@ -124,7 +141,7 @@ export default function PropertyCard({
         {/* Price */}
         <View
           style={[
-            tw`self-stretch items-center py-1.5 rounded-full`,
+            tw`self-stretch items-center py-1.5 rounded-full mt-auto`,
             { backgroundColor: Colors.brand },
           ]}
         >

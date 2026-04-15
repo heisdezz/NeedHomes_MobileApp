@@ -6,14 +6,19 @@ import apiClient, { type ApiResponse, type ApiResponseV2, new_url } from "@/lib/
 
 export interface ApiProperty {
   id: string;
-  title: string;
-  location?: string;
-  address?: string;
+  propertyTitle: string;
+  location: string;
   propertyType: "RESIDENTIAL" | "COMMERCIAL" | "LAND";
-  investmentModel: "OUTRIGHT_PURCHASE" | "CO_DEVELOPMENT" | "FRACTIONAL_OWNERSHIP";
-  developmentStage: "PLANNING" | "ONGOING" | "COMPLETED";
+  investmentModel:
+    | "OUTRIGHT_PURCHASE"
+    | "CO_DEVELOPMENT"
+    | "FRACTIONAL_OWNERSHIP"
+    | "SAVE_TO_OWN"
+    | "LAND_BANKING";
+  developmentStage: "PLANNING" | "FOUNDATION" | "ROOFING" | "FINISHED";
   basePrice: number; // in kobo
-  images?: string[];
+  coverImage: string;
+  galleryImages: string[];
 }
 
 export interface PropertiesMeta {
@@ -25,13 +30,51 @@ export interface PropertiesMeta {
 
 export interface PropertiesParams {
   search?: string;
-  investmentModel?: "OUTRIGHT_PURCHASE" | "CO_DEVELOPMENT" | "FRACTIONAL_OWNERSHIP";
+  investmentModel?: ApiProperty["investmentModel"];
   propertyType?: "RESIDENTIAL" | "COMMERCIAL" | "LAND";
-  developmentStage?: "PLANNING" | "ONGOING" | "COMPLETED";
+  developmentStage?: ApiProperty["developmentStage"];
   minPrice?: number;
   maxPrice?: number;
   page?: number;
   limit?: number;
+}
+
+export interface AdditionalFee {
+  label: string;
+  amount: number; // in kobo
+}
+
+export interface PropertyDetail extends ApiProperty {
+  description: string;
+  totalPrice: number; // in kobo
+  videos?: string;
+  availableUnits?: number;
+  profitSharingRatio?: string;
+  exitRule?: string;
+  exitWindow?: string;
+  minimumInvestment?: number;
+  // OUTRIGHT_PURCHASE / CO_DEVELOPMENT / SAVE_TO_OWN
+  paymentOption?: string;
+  minimumInstallmentAmount?: number;
+  installmentDuration?: number;
+  // FRACTIONAL_OWNERSHIP
+  totalShares?: number;
+  pricePerShare?: number;
+  minimumShares?: number;
+  // LAND_BANKING
+  availablePlots?: number;
+  pricePerPlot?: number;
+  holdingPeriod?: number;
+  buyBackOption?: boolean;
+  // SAVE_TO_OWN
+  savingsFrequency?: string;
+  targetPropertyPrice?: number;
+  // Fees
+  additionalFees?: AdditionalFee[];
+  systemCharges?: { platformChargePercentage: number };
+  // Location
+  latitude?: number;
+  longitude?: number;
 }
 
 // No auth required — use a plain axios instance to avoid auth interceptors
@@ -44,6 +87,16 @@ export const useProperties = (params?: PropertiesParams) =>
       const resp = await publicClient.get("/properties", { params });
       return resp.data;
     },
+  });
+
+export const useProperty = (id: string) =>
+  useQuery<ApiResponse<PropertyDetail>>({
+    queryKey: ["property", id],
+    queryFn: async () => {
+      const resp = await publicClient.get(`/properties/${id}`);
+      return resp.data;
+    },
+    enabled: !!id,
   });
 
 // ─── Investment Stats ────────────────────────────────────────────────────────

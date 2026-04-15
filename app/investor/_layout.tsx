@@ -1,8 +1,11 @@
+import { StatusBar } from "react-native";
 import { Drawer } from "expo-router/drawer";
 import DrawerContent from "@/components/investor/drawer-menu";
 
 export default function InvestorLayout() {
   return (
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" translucent={false} />
     <Drawer
       drawerContent={(props) => <DrawerContent {...props} />}
       screenOptions={{
@@ -17,5 +20,6 @@ export default function InvestorLayout() {
       <Drawer.Screen name="settings" options={{ headerShown: false, swipeEnabled: false }} />
       <Drawer.Screen name="properties" options={{ headerShown: false, swipeEnabled: false }} />
     </Drawer>
+    </>
   );
 }

@@ -39,7 +39,7 @@ function TxRow({ tx }: { tx: WalletTransaction }) {
     <View
       style={[
         tw`flex-row items-center gap-3 p-3 rounded-xl mb-2`,
-        { backgroundColor: Colors.surface },
+        { backgroundColor: Colors.inputBg },
       ]}
     >
       <View
@@ -52,7 +52,9 @@ function TxRow({ tx }: { tx: WalletTransaction }) {
       </View>
 
       <View style={tw`flex-1`}>
-        <Text style={[tw`text-sm font-semibold`, { color: Colors.textInverse }]}>
+        <Text
+          style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}
+        >
           {isDeposit ? "Deposit" : "Withdrawal"}
         </Text>
         <Text style={[tw`text-xs mt-0.5`, { color: Colors.textMuted }]}>
@@ -61,7 +63,7 @@ function TxRow({ tx }: { tx: WalletTransaction }) {
       </View>
 
       <View style={tw`items-end`}>
-        <Text style={[tw`text-sm font-bold`, { color: Colors.textInverse }]}>
+        <Text style={[tw`text-sm font-bold`, { color: Colors.textPrimary }]}>
           {isDeposit ? "+" : "−"} ₦{(tx.amount / 100).toLocaleString()}
         </Text>
         <Text style={[tw`text-xs mt-0.5 font-medium`, { color: statusColor }]}>
@@ -107,7 +109,12 @@ function AmountModal({
   }
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={handleClose}
+    >
       <KeyboardAvoidingView
         style={tw`flex-1`}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -131,7 +138,9 @@ function AmountModal({
             ]}
           />
 
-          <Text style={[tw`text-lg font-bold mb-1`, { color: Colors.textPrimary }]}>
+          <Text
+            style={[tw`text-lg font-bold mb-1`, { color: Colors.textPrimary }]}
+          >
             {label} Funds
           </Text>
           <Text style={[tw`text-sm mb-5`, { color: Colors.textSecondary }]}>
@@ -142,10 +151,18 @@ function AmountModal({
           <View
             style={[
               tw`flex-row items-center rounded-xl px-4 border mb-5`,
-              { borderColor: Colors.inputBorder, backgroundColor: Colors.inputBg },
+              {
+                borderColor: Colors.inputBorder,
+                backgroundColor: Colors.inputBg,
+              },
             ]}
           >
-            <Text style={[tw`text-base font-bold mr-2`, { color: Colors.textPrimary }]}>
+            <Text
+              style={[
+                tw`text-base font-bold mr-2`,
+                { color: Colors.textPrimary },
+              ]}
+            >
               ₦
             </Text>
             <TextInput
@@ -168,7 +185,12 @@ function AmountModal({
                 { borderColor: Colors.divider },
               ]}
             >
-              <Text style={[tw`text-sm font-semibold`, { color: Colors.textSecondary }]}>
+              <Text
+                style={[
+                  tw`text-sm font-semibold`,
+                  { color: Colors.textSecondary },
+                ]}
+              >
                 Cancel
               </Text>
             </TouchableOpacity>
@@ -228,7 +250,7 @@ export default function InvestorWallet() {
     const mutation = modalType === "deposit" ? deposit : withdraw;
     try {
       const label = modalType === "deposit" ? "Deposit" : "Withdrawal";
-      await toast.promise(mutation.mutateAsync(amount), {
+      toast.promise(mutation.mutateAsync(amount), {
         loading: "Processing…",
         success: () => `${label} successful`,
         error: extract_message as any,
@@ -242,139 +264,173 @@ export default function InvestorWallet() {
 
   return (
     <>
-      <View style={[tw`mx-4 rounded-2xl overflow-hidden`, { backgroundColor: "#fff" }]}>
-        {/* Card header */}
-        <View
-          style={[
-            tw`flex-row items-center justify-between px-4 py-3 border-b`,
-            { borderColor: Colors.divider },
-          ]}
-        >
-          <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>
-            Wallet
-          </Text>
-        </View>
-
-        {/* Balance band */}
-        <View
-          style={[
-            tw`px-5 py-5`,
-            { backgroundColor: Colors.surface },
-          ]}
-        >
-          <Text
+      <View
+        style={[
+          tw`mx-4 rounded-2xl overflow-hidden`,
+          {
+            backgroundColor: "#fff",
+            borderWidth: 1,
+            borderColor: Colors.divider,
+            elevation: 3,
+          },
+        ]}
+      >
+          {/* Card header */}
+          <View
             style={[
-              tw`text-xs font-semibold tracking-widest mb-2`,
-              { color: "rgba(255,255,255,0.5)" },
+              tw`flex-row items-center justify-between px-4 py-3 border-b`,
+              { borderColor: Colors.divider },
             ]}
           >
-            TOTAL BALANCE
-          </Text>
-          <View style={tw`flex-row items-center justify-between`}>
-            {isLoading ? (
-              <ActivityIndicator color={Colors.brand} />
-            ) : (
-              <Text style={tw`text-white text-2xl font-bold`}>
-                ₦{balance.toLocaleString()}
+            <Text
+              style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
+            >
+              Wallet
+            </Text>
+          </View>
+
+          {/* Balance band */}
+          <View style={[tw`px-5 py-5`, { backgroundColor: Colors.surface }]}>
+            <Text
+              style={[
+                tw`text-xs font-semibold tracking-widest mb-2`,
+                { color: "rgba(255,255,255,0.5)" },
+              ]}
+            >
+              TOTAL BALANCE
+            </Text>
+            <View style={tw`flex-row items-center justify-between`}>
+              {isLoading ? (
+                <ActivityIndicator color={Colors.brand} />
+              ) : (
+                <Text style={tw`text-white text-2xl font-bold`}>
+                  ₦{balance.toLocaleString()}
+                </Text>
+              )}
+              <TouchableOpacity
+                onPress={() => openModal("deposit")}
+                activeOpacity={0.8}
+                style={[
+                  tw`w-10 h-10 rounded-full items-center justify-center`,
+                  { backgroundColor: "rgba(255,255,255,0.15)" },
+                ]}
+              >
+                <Ionicons name="add" size={22} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Income / Withdrawal row */}
+          <View style={tw`flex-row gap-3 px-4 py-4`}>
+            <View
+              style={[
+                tw`flex-1 rounded-xl p-3`,
+                {
+                  backgroundColor: "#D1FAE5",
+                  borderWidth: 1,
+                  borderColor: "#A7F3D0",
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  tw`text-xs font-semibold uppercase mb-1`,
+                  { color: Colors.textSecondary },
+                ]}
+              >
+                Income
               </Text>
-            )}
+              <Text
+                style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
+              >
+                ₦{(income / 100).toLocaleString()}
+              </Text>
+            </View>
+            <View
+              style={[
+                tw`flex-1 rounded-xl p-3`,
+                {
+                  backgroundColor: "#FEE2E2",
+                  borderWidth: 1,
+                  borderColor: "#FECACA",
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  tw`text-xs font-semibold uppercase mb-1`,
+                  { color: Colors.textSecondary },
+                ]}
+              >
+                Withdrawn
+              </Text>
+              <Text
+                style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
+              >
+                ₦{(withdrawals / 100).toLocaleString()}
+              </Text>
+            </View>
+          </View>
+
+          {/* Action buttons */}
+          <View style={tw`flex-row gap-3 px-4 pb-4`}>
             <TouchableOpacity
               onPress={() => openModal("deposit")}
               activeOpacity={0.8}
               style={[
-                tw`w-10 h-10 rounded-full items-center justify-center`,
-                { backgroundColor: "rgba(255,255,255,0.15)" },
+                tw`flex-1 py-3.5 rounded-xl items-center border`,
+                { borderColor: Colors.brand },
               ]}
             >
-              <Ionicons name="add" size={22} color="#fff" />
+              <Text style={[tw`text-sm font-bold`, { color: Colors.brand }]}>
+                Deposit
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => openModal("withdraw")}
+              activeOpacity={0.8}
+              style={[
+                tw`flex-1 py-3.5 rounded-xl items-center`,
+                { backgroundColor: Colors.brand },
+              ]}
+            >
+              <Text style={tw`text-white text-sm font-bold`}>Withdraw</Text>
             </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Income / Withdrawal row */}
-        <View style={tw`flex-row gap-3 px-4 py-4`}>
+          {/* Recent transactions */}
           <View
             style={[
-              tw`flex-1 rounded-xl p-3`,
-              { backgroundColor: "#D1FAE5", borderWidth: 1, borderColor: "#A7F3D0" },
+              tw`px-4 pt-3 pb-4 border-t`,
+              { borderColor: Colors.divider, backgroundColor: Colors.inputBg },
             ]}
           >
-            <Text style={[tw`text-xs font-semibold uppercase mb-1`, { color: Colors.textSecondary }]}>
-              Income
-            </Text>
-            <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>
-              ₦{(income / 100).toLocaleString()}
-            </Text>
-          </View>
-          <View
-            style={[
-              tw`flex-1 rounded-xl p-3`,
-              { backgroundColor: "#FEE2E2", borderWidth: 1, borderColor: "#FECACA" },
-            ]}
-          >
-            <Text style={[tw`text-xs font-semibold uppercase mb-1`, { color: Colors.textSecondary }]}>
-              Withdrawn
-            </Text>
-            <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>
-              ₦{(withdrawals / 100).toLocaleString()}
-            </Text>
-          </View>
-        </View>
-
-        {/* Action buttons */}
-        <View style={tw`flex-row gap-3 px-4 pb-4`}>
-          <TouchableOpacity
-            onPress={() => openModal("deposit")}
-            activeOpacity={0.8}
-            style={[
-              tw`flex-1 py-3.5 rounded-xl items-center border`,
-              { borderColor: Colors.brand },
-            ]}
-          >
-            <Text style={[tw`text-sm font-bold`, { color: Colors.brand }]}>Deposit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => openModal("withdraw")}
-            activeOpacity={0.8}
-            style={[
-              tw`flex-1 py-3.5 rounded-xl items-center`,
-              { backgroundColor: Colors.brand },
-            ]}
-          >
-            <Text style={tw`text-white text-sm font-bold`}>Withdraw</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Recent transactions */}
-        <View
-          style={[
-            tw`px-4 pt-3 pb-4 border-t`,
-            { borderColor: Colors.divider, backgroundColor: Colors.bg },
-          ]}
-        >
-          <Text
-            style={[
-              tw`text-xs font-semibold uppercase mb-3`,
-              { color: "rgba(255,255,255,0.5)", letterSpacing: 0.8 },
-            ]}
-          >
-            Recent
-          </Text>
-          {isLoading ? (
-            <ActivityIndicator color={Colors.brand} style={tw`py-4`} />
-          ) : walletData && walletData.walletTransactions.length > 0 ? (
-            walletData.walletTransactions
-              .slice(0, 3)
-              .map((tx) => <TxRow key={tx.id} tx={tx} />)
-          ) : (
             <Text
-              style={[tw`text-xs text-center py-4`, { color: Colors.textMuted }]}
+              style={[
+                tw`text-xs font-semibold uppercase mb-3`,
+                { color: Colors.textSecondary, letterSpacing: 0.8 },
+              ]}
             >
-              No recent activity
+              Recent
             </Text>
-          )}
+            {isLoading ? (
+              <ActivityIndicator color={Colors.brand} style={tw`py-4`} />
+            ) : walletData && walletData.walletTransactions.length > 0 ? (
+              walletData.walletTransactions
+                .slice(0, 3)
+                .map((tx) => <TxRow key={tx.id} tx={tx} />)
+            ) : (
+              <Text
+                style={[
+                  tw`text-xs text-center py-4`,
+                  { color: Colors.textMuted },
+                ]}
+              >
+                No recent activity
+              </Text>
+            )}
+          </View>
         </View>
-      </View>
 
       <AmountModal
         visible={modalVisible}

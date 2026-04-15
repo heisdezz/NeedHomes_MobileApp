@@ -30,7 +30,12 @@ function QuickLinkCard({
       ]}
     >
       <Text style={{ fontSize: 28 }}>{icon}</Text>
-      <Text style={[tw`text-xs font-semibold text-center`, { color: Colors.textInverse }]}>
+      <Text
+        style={[
+          tw`text-xs font-semibold text-center`,
+          { color: Colors.textInverse },
+        ]}
+      >
         {label}
       </Text>
     </TouchableOpacity>
@@ -44,7 +49,7 @@ export default function HomeScreen() {
   const user = auth?.user;
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top"]}>
+    <SafeAreaView style={tw`flex-1 bg-bg-light`} edges={["top"]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={tw`pb-8`}
@@ -61,8 +66,12 @@ export default function HomeScreen() {
               <Ionicons name="person" size={20} color={Colors.textMuted} />
             </View>
             <View>
-              <Text style={tw`text-white/60 text-xs`}>Welcome back,</Text>
-              <Text style={tw`text-white text-base font-bold`}>
+              <Text style={[tw`text-xs`, { color: Colors.textMuted }]}>
+                Welcome back,
+              </Text>
+              <Text
+                style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
+              >
                 {user?.firstName ?? "Investor"}
               </Text>
             </View>
@@ -76,10 +85,14 @@ export default function HomeScreen() {
                 { backgroundColor: Colors.surface },
               ]}
             >
-              <Ionicons name="notifications-outline" size={20} color={Colors.brand} />
+              <Ionicons
+                name="notifications-outline"
+                size={20}
+                color={Colors.brand}
+              />
             </TouchableOpacity>
             <TouchableOpacity onPress={openDrawer} activeOpacity={0.7}>
-              <Ionicons name="menu" size={28} color="#fff" />
+              <Ionicons name="menu" size={28} color={Colors.textPrimary} />
             </TouchableOpacity>
           </View>
         </View>

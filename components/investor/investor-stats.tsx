@@ -19,7 +19,7 @@ function StatCard({ title, value, label, icon, variant }: StatCardProps) {
     <View
       style={[
         tw`flex-1 rounded-2xl overflow-hidden`,
-        { backgroundColor: "#fff" },
+        { backgroundColor: "#fff", borderWidth: 1, borderColor: Colors.divider },
       ]}
     >
       {/* Header strip */}
@@ -63,10 +63,10 @@ function SkeletonCard() {
     <View
       style={[
         tw`flex-1 rounded-2xl overflow-hidden`,
-        { backgroundColor: Colors.surface },
+        { backgroundColor: "#fff", borderWidth: 1, borderColor: Colors.divider },
       ]}
     >
-      <View style={[tw`h-10`, { backgroundColor: "rgba(255,255,255,0.07)" }]} />
+      <View style={[tw`h-10`, { backgroundColor: Colors.inputBg }]} />
       <View style={tw`px-3 pt-3 pb-4 items-center`}>
         <ActivityIndicator size="small" color={Colors.brand} />
       </View>
@@ -115,7 +115,7 @@ export default function InvestorStats() {
 
   return (
     <View style={tw`px-4`}>
-      <Text style={tw`text-white text-base font-bold mb-3`}>
+      <Text style={[tw`text-base font-bold mb-3`, { color: Colors.textPrimary }]}>
         Key Activities
       </Text>
       <View style={tw`flex-row gap-3 mb-3`}>
