@@ -15,7 +15,7 @@ type MenuItem = {
 
 const MENU_ITEMS: MenuItem[] = [
   { label: "Profile Info", icon: "person-outline" },
-  { label: "My Investments", icon: "trending-up-outline" },
+  { label: "Promotions", icon: "pricetag-outline" },
   { label: "Wallet", icon: "wallet-outline" },
   { label: "Properties", icon: "home-outline" },
   { label: "Transactions", icon: "receipt-outline" },
@@ -42,7 +42,7 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
   const user = auth?.user;
   const fullName = user
     ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
-    : "Investor";
+    : "Partner";
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={["top", "bottom"]}>
@@ -66,7 +66,7 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
               <Text style={tw`text-text-primary text-base font-bold`}>
                 {fullName || "User"}
               </Text>
-              <Text style={tw`text-text-muted text-xs`}>Investor</Text>
+              <Text style={tw`text-text-muted text-xs`}>Partner</Text>
             </View>
           </View>
           <TouchableOpacity onPress={() => navigation.closeDrawer()} activeOpacity={0.7}>

@@ -38,8 +38,8 @@ Splash screen (1.5s auto-advance) → onboarding slides.
 | Investment | `investment` | `investor/(tabs)/investment.tsx` | Investments |
 | Account | `account` | `investor/(tabs)/account.tsx` | Account |
 
-### Investor drawer (overlay, not a route)
-Opened via `useDrawer()` context. Items: Profile Info, My Investments, Wallet, Properties, Transactions, Announcements, Chat, Notifications, Settings, Log Out.
+### Investor drawer (`app/investor/_layout.tsx` → `@react-navigation/drawer`)
+Opened via `DrawerActions.openDrawer()`. Items: Profile Info, My Investments, Wallet, Properties, Transactions, Announcements, Chat, Notifications, Settings, Log Out.
 
 ---
 
@@ -47,3 +47,10 @@ Opened via `useDrawer()` context. Items: Profile Info, My Investments, Wallet, P
 | Tab | Route name | File | Description |
 |---|---|---|---|
 | Home | `index` | `partner/(tabs)/index.tsx` | Home screen |
+| Message | `message` | `partner/(tabs)/message.tsx` | Messages |
+| Add | `add` | `partner/(tabs)/add.tsx` | Add (center FAB tab) |
+| Promotions | `promotions` | `partner/(tabs)/promotions.tsx` | Promotions |
+| Account | `account` | `partner/(tabs)/account.tsx` | Account |
+
+### Partner drawer (`app/partner/_layout.tsx` → `@react-navigation/drawer`)
+Opened via `DrawerActions.openDrawer()`. Items: Profile Info, Promotions, Wallet, Properties, Transactions, Announcements, Chat, Notifications, Settings, Log Out.

@@ -1,12 +1,14 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useDrawer } from "./_layout";
+import { useNavigation } from "expo-router";
+import { DrawerActions } from "@react-navigation/native";
 import { useAuth } from "@/store";
 import tw from "@/lib/tw";
 
 export default function HomeScreen() {
-  const { openDrawer } = useDrawer();
+  const navigation = useNavigation();
+  const openDrawer = () => navigation.dispatch(DrawerActions.openDrawer());
   const auth = useAuth();
   const user = auth?.user;
 

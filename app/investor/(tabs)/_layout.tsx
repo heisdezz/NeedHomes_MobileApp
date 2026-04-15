@@ -1,14 +1,8 @@
-import { createContext, useContext, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
-import DrawerMenu from "@/components/investor/drawer-menu";
 import tw from "@/lib/tw";
-
-// ── Drawer context ────────────────────────────────────────────────────────────
-export const DrawerContext = createContext({ openDrawer: () => {} });
-export const useDrawer = () => useContext(DrawerContext);
 
 // ── Tab config ────────────────────────────────────────────────────────────────
 type TabConfig = {
@@ -109,25 +103,16 @@ function CustomTabBar({ state, navigation }: any) {
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 export default function InvestorTabLayout() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
   return (
-    <DrawerContext.Provider value={{ openDrawer: () => setDrawerOpen(true) }}>
-      <Tabs
-        tabBar={(props) => <CustomTabBar {...props} />}
-        screenOptions={{ headerShown: false }}
-      >
-        <Tabs.Screen name="index" />
-        <Tabs.Screen name="message" />
-        <Tabs.Screen name="add" />
-        <Tabs.Screen name="investment" />
-        <Tabs.Screen name="account" />
-      </Tabs>
-
-      <DrawerMenu
-        visible={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      />
-    </DrawerContext.Provider>
+    <Tabs
+      tabBar={(props) => <CustomTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
+    >
+      <Tabs.Screen name="index" />
+      <Tabs.Screen name="message" />
+      <Tabs.Screen name="add" />
+      <Tabs.Screen name="investment" />
+      <Tabs.Screen name="account" />
+    </Tabs>
   );
 }
