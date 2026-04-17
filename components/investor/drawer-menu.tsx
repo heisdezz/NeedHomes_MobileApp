@@ -4,8 +4,8 @@ import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/theme";
-import { useAuth } from "@/store";
-import { logout } from "@/lib/mutations/auth";
+import { useAuth, useKyc } from "@/store";
+import { useLogout } from "@/lib/mutations/auth";
 import tw from "@/lib/tw";
 
 type MenuItem = {
@@ -38,10 +38,19 @@ function IconCircle({ name }: { name: keyof typeof Ionicons.glyphMap }) {
   );
 }
 
+const KYC_BADGE: Record<string, { label: string; bg: string; color: string }> = {
+  VERIFIED: { label: "KYC Verified", bg: "#DCFCE7", color: "#16A34A" },
+  PENDING:  { label: "KYC Pending",  bg: "#FEF9C3", color: "#CA8A04" },
+  REJECTED: { label: "KYC Rejected", bg: "#FEE2E2", color: "#DC2626" },
+};
+
 export default function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const router = useRouter();
   const auth = useAuth();
   const user = auth?.user;
+  const kyc = useKyc();
+  const { doLogout } = useLogout();
+  const badge = KYC_BADGE[kyc?.account_verification_status as string] ?? null;
   const fullName = user
     ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
     : "Investor";
@@ -68,7 +77,15 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
               <Text style={tw`text-text-primary text-base font-bold`}>
                 {fullName || "User"}
               </Text>
-              <Text style={tw`text-text-muted text-xs`}>Investor</Text>
+              {badge ? (
+                <View style={[tw`self-start mt-0.5 rounded-full px-2 py-0.5`, { backgroundColor: badge.bg }]}>
+                  <Text style={[tw`text-[10px] font-semibold`, { color: badge.color }]}>
+                    {badge.label}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={tw`text-text-muted text-xs`}>Investor</Text>
+              )}
             </View>
           </View>
           <TouchableOpacity onPress={() => navigation.closeDrawer()} activeOpacity={0.7}>
@@ -114,7 +131,7 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => { navigation.closeDrawer(); logout(); }}
+            onPress={() => { navigation.closeDrawer(); doLogout(); }}
             activeOpacity={0.7}
             style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
           >

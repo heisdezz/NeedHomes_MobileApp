@@ -1,15 +1,24 @@
-import { ScrollView, View, Text, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  RefreshControl,
+} from "react-native";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
-import { useAuth } from "@/store";
+import { useAuth, useKyc } from "@/store";
+import apiClient from "@/lib/api";
 import { Colors } from "@/constants/theme";
 import InvestorStats from "@/components/investor/investor-stats";
 import InvestorWallet from "@/components/investor/investor-wallet";
 import PromoCarousel from "@/components/investor/promo-carousel";
 import InvestorPropertyListings from "@/components/investor/investor-property-listings";
 import tw from "@/lib/tw";
+import { set_kyc_value } from "@/store/auth-store";
 
 function QuickLinkCard({
   icon,
@@ -42,17 +51,47 @@ function QuickLinkCard({
   );
 }
 
+const KYC_BADGE: Record<string, { label: string; bg: string; color: string }> =
+  {
+    VERIFIED: { label: "KYC Verified", bg: "#DCFCE7", color: "#16A34A" },
+    PENDING: { label: "KYC Pending", bg: "#FEF9C3", color: "#CA8A04" },
+    REJECTED: { label: "KYC Rejected", bg: "#FEE2E2", color: "#DC2626" },
+  };
+
 export default function HomeScreen() {
   const navigation = useNavigation();
   const openDrawer = () => navigation.dispatch(DrawerActions.openDrawer());
   const auth = useAuth();
   const user = auth?.user;
+  const kyc = useKyc();
+  const badge = KYC_BADGE[kyc?.account_verification_status as string] ?? null;
+  const isVerified = kyc?.account_verification_status === "VERIFIED";
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = async () => {
+    if (isVerified) return;
+    setRefreshing(true);
+    try {
+      const { data } = await apiClient.get("kyc");
+      const verification = data?.data?.verification;
+      if (verification) set_kyc_value(verification);
+    } catch {}
+    setRefreshing(false);
+  };
 
   return (
     <SafeAreaView style={tw`flex-1 bg-bg-light`} edges={["top"]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={tw`pb-8`}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.brand}
+            colors={[Colors.brand]}
+          />
+        }
       >
         {/* Header */}
         <View style={tw`flex-row items-center justify-between px-5 py-4`}>
@@ -74,6 +113,23 @@ export default function HomeScreen() {
               >
                 {user?.firstName ?? "Investor"}
               </Text>
+              {badge ? (
+                <View
+                  style={[
+                    tw`self-start mt-0.5 rounded-full px-2 py-0.5`,
+                    { backgroundColor: badge.bg },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      tw`text-[10px] font-semibold`,
+                      { color: badge.color },
+                    ]}
+                  >
+                    {badge.label}
+                  </Text>
+                </View>
+              ) : null}
             </View>
           </View>
 
@@ -106,9 +162,9 @@ export default function HomeScreen() {
         </View>
 
         {/* Promo Carousel */}
-        <View style={tw`mt-5`}>
+        {/*<View style={tw`mt-5`}>
           <PromoCarousel />
-        </View>
+        </View>*/}
 
         {/* Property Listings */}
         <View style={tw`mt-5`}>

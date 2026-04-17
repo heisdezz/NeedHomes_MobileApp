@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import apiClient, { type ApiResponse } from "@/lib/api";
 import { router } from "expo-router";
-import { showMessage } from "react-native-flash-message";
+import { toast } from "sonner-native";
 import {
   get_user_value,
   set_kyc_value,
@@ -68,26 +68,26 @@ export const refresh_kyc = async () => {
   return resp.data;
 };
 
-export const useLogout = () =>
-  useMutation({
+export const useLogout = () => {
+  const mutation = useMutation({
     mutationFn: auth_logout,
-    onMutate: () => {
-      showMessage({ message: "Logging out...", type: "info", duration: 2000 });
-    },
-    onSuccess: () => {
+    onSettled: () => {
       clear_user();
       clear_kyc();
-      showMessage({ message: "Logged out successfully", type: "success" });
-      router.replace("/auth/login");
-    },
-    onError: () => {
-      // session may already be invalid — still clear local state
-      clear_user();
-      clear_kyc();
-      showMessage({ message: "Logout failed", type: "error" });
       router.replace("/auth/login");
     },
   });
+
+  const doLogout = () => {
+    toast.promise(mutation.mutateAsync(), {
+      loading: "Logging out...",
+      success: () => "Logged out successfully",
+      error: "Logout , redirecting...",
+    });
+  };
+
+  return { ...mutation, doLogout };
+};
 
 export const logout = async () => {
   try {

@@ -20,6 +20,7 @@ import {
   type WalletTransaction,
 } from "@/lib/queries/investor";
 import { extract_message } from "@/helpers/apihelpers";
+import { useKyc } from "@/store";
 import tw from "@/lib/tw";
 
 // ─── Transaction row ──────────────────────────────────────────────────────────
@@ -223,6 +224,9 @@ export default function InvestorWallet() {
   const [modalType, setModalType] = useState<ModalType>("deposit");
   const [modalVisible, setModalVisible] = useState(false);
 
+  const kyc = useKyc();
+  const kycApproved = kyc?.account_verification_status === "VERIFIED";
+
   const { data, isLoading, refetch } = useWallet();
   const deposit = useDepositMutation();
   const withdraw = useWithdrawalMutation();
@@ -230,6 +234,19 @@ export default function InvestorWallet() {
   const walletData = data?.data;
   const balance = walletData ? walletData.balance / 100 : 0;
   const isPending = deposit.isPending || withdraw.isPending;
+
+  function openModal(type: ModalType) {
+    setModalType(type);
+    setModalVisible(true);
+  }
+
+  function handleOpenModal(type: ModalType) {
+    if (!kycApproved) {
+      toast.error("Complete KYC verification to use wallet features.");
+      return;
+    }
+    openModal(type);
+  }
 
   const income =
     walletData?.walletTransactions
@@ -240,11 +257,6 @@ export default function InvestorWallet() {
     walletData?.walletTransactions
       .filter((t) => t.type === "WITHDRAWAL" && t.status === "SUCCESS")
       .reduce((acc, t) => acc + t.amount, 0) ?? 0;
-
-  function openModal(type: ModalType) {
-    setModalType(type);
-    setModalVisible(true);
-  }
 
   async function handleConfirm(amount: number) {
     const mutation = modalType === "deposit" ? deposit : withdraw;
@@ -308,11 +320,11 @@ export default function InvestorWallet() {
                 </Text>
               )}
               <TouchableOpacity
-                onPress={() => openModal("deposit")}
+                onPress={() => handleOpenModal("deposit")}
                 activeOpacity={0.8}
                 style={[
                   tw`w-10 h-10 rounded-full items-center justify-center`,
-                  { backgroundColor: "rgba(255,255,255,0.15)" },
+                  { backgroundColor: "rgba(255,255,255,0.15)", opacity: kycApproved ? 1 : 0.4 },
                 ]}
               >
                 <Ionicons name="add" size={22} color="#fff" />
@@ -375,11 +387,11 @@ export default function InvestorWallet() {
           {/* Action buttons */}
           <View style={tw`flex-row gap-3 px-4 pb-4`}>
             <TouchableOpacity
-              onPress={() => openModal("deposit")}
+              onPress={() => handleOpenModal("deposit")}
               activeOpacity={0.8}
               style={[
                 tw`flex-1 py-3.5 rounded-xl items-center border`,
-                { borderColor: Colors.brand },
+                { borderColor: Colors.brand, opacity: kycApproved ? 1 : 0.4 },
               ]}
             >
               <Text style={[tw`text-sm font-bold`, { color: Colors.brand }]}>
@@ -387,11 +399,11 @@ export default function InvestorWallet() {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => openModal("withdraw")}
+              onPress={() => handleOpenModal("withdraw")}
               activeOpacity={0.8}
               style={[
                 tw`flex-1 py-3.5 rounded-xl items-center`,
-                { backgroundColor: Colors.brand },
+                { backgroundColor: Colors.brand, opacity: kycApproved ? 1 : 0.4 },
               ]}
             >
               <Text style={tw`text-white text-sm font-bold`}>Withdraw</Text>

@@ -11,15 +11,15 @@ type SettingsItem = {
   onPress?: () => void;
 };
 
-const SETTINGS_ITEMS: SettingsItem[] = [
-  { label: "Profile Info", icon: "person-circle-outline" },
-  { label: "Bank Details", icon: "card-outline" },
-  { label: "KYC", icon: "shield-checkmark-outline" },
-  { label: "Security", icon: "lock-closed-outline" },
-];
-
 export default function SettingsScreen() {
   const router = useRouter();
+
+  const SETTINGS_ITEMS: SettingsItem[] = [
+    { label: "Profile Info", icon: "person-circle-outline" },
+    { label: "Bank Details", icon: "card-outline" },
+    { label: "KYC", icon: "shield-checkmark-outline", onPress: () => router.push("/investor/kyc") },
+    { label: "Security", icon: "lock-closed-outline" },
+  ];
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={["top", "bottom"]}>

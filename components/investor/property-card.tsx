@@ -111,7 +111,7 @@ export default function PropertyCard({
       <View style={tw`px-3 pt-2 pb-3 flex-1`}>
         <Text
           style={[tw`text-sm font-bold mb-1`, { color: Colors.textPrimary }]}
-          numberOfLines={2}
+          numberOfLines={1}
         >
           {title}
         </Text>

@@ -43,6 +43,7 @@ Splash screen (1.5s auto-advance) → onboarding slides.
 |---|---|---|
 | `/investor/properties` | `investor/properties.tsx` | Full property listing — 2-column grid, debounced search, `GET /properties` |
 | `/investor/settings` | `investor/settings.tsx` | Settings screen |
+| `/investor/kyc` | `investor/kyc.tsx` | KYC verification — renders `KYCForm` (individual) or `CorpKYCForm` (corporate) based on `verificationType` |
 
 ### Investor drawer (`app/investor/_layout.tsx` → `@react-navigation/drawer`)
 Opened via `DrawerActions.openDrawer()`. Items: Profile Info, My Investments, Wallet, Properties, Transactions, Announcements, Chat, Notifications, Settings, Log Out.
