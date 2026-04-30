@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 
 import apiClient, { type ApiResponse } from "@/lib/api";
 import { Colors } from "@/constants/theme";
@@ -175,8 +176,12 @@ function InvestmentCard({ investment, onPress }: InvestmentCardProps) {
 
 export default function InvestmentsListScreen() {
   const router = useRouter();
+  const filterSheetRef = useRef<BottomSheet>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ACTIVE");
+  const [tempStatusFilter, setTempStatusFilter] =
+    useState<StatusFilter>("ACTIVE");
   const [page] = useState(1);
+  const snapPoints = ["45%"];
 
   const query = useQuery<ApiResponse<{ data: Investment[] }>>({
     queryKey: ["investments", page, statusFilter],
@@ -232,43 +237,40 @@ export default function InvestmentsListScreen() {
         </View>
       </View>
 
-      {/* Filters */}
+      {/* Filter Button */}
       <View style={tw`px-4 py-3 bg-white border-b`}>
-        <View style={tw`flex-row items-center gap-2 mb-3`}>
-          <Ionicons name="filter-outline" size={16} color={Colors.textMuted} />
-          <Text
-            style={[tw`text-xs font-semibold`, { color: Colors.textSecondary }]}
-          >
-            FILTER BY STATUS
-          </Text>
-        </View>
-        <View style={tw`flex-row flex-wrap gap-2`}>
-          {statuses.map((status) => {
-            const isActive = statusFilter === status;
-            return (
-              <TouchableOpacity
-                key={status}
-                onPress={() => setStatusFilter(status)}
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => filterSheetRef.current?.expand()}
+          style={[
+            tw`flex-row items-center justify-between px-4 py-3 rounded-xl border`,
+            { borderColor: Colors.divider, backgroundColor: "#F9FAFB" },
+          ]}
+        >
+          <View style={tw`flex-row items-center gap-2`}>
+            <Ionicons name="filter-outline" size={18} color={Colors.brand} />
+            <Text
+              style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}
+            >
+              Filter by Status
+            </Text>
+          </View>
+          <View style={tw`flex-row items-center gap-2`}>
+            {statusFilter !== "ALL" && (
+              <View
                 style={[
-                  tw`px-3 py-2 rounded-lg border`,
-                  {
-                    backgroundColor: isActive ? Colors.brand : "#fff",
-                    borderColor: isActive ? Colors.brand : Colors.divider,
-                  },
+                  tw`px-2 py-0.5 rounded-full`,
+                  { backgroundColor: Colors.brand },
                 ]}
               >
-                <Text
-                  style={[
-                    tw`text-xs font-semibold`,
-                    { color: isActive ? "#fff" : Colors.textSecondary },
-                  ]}
-                >
-                  {status}
+                <Text style={tw`text-xs font-semibold text-white`}>
+                  {statusFilter}
                 </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+              </View>
+            )}
+            <Ionicons name="chevron-down" size={18} color={Colors.textMuted} />
+          </View>
+        </TouchableOpacity>
       </View>
 
       {/* Statistics Placeholder */}
@@ -422,6 +424,124 @@ export default function InvestmentsListScreen() {
           />
         )}
       </View>
+
+      {/* Filter Bottom Sheet */}
+      <BottomSheet
+        ref={filterSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        enableDynamicSizing={false}
+        backgroundStyle={{ backgroundColor: "#fff" }}
+        handleIndicatorStyle={{ backgroundColor: Colors.divider }}
+      >
+        <BottomSheetView style={tw`flex-1 px-4 pb-6`}>
+          {/* Header */}
+          <View style={tw`flex-row items-center justify-between mb-4`}>
+            <View style={tw`flex-row items-center gap-2`}>
+              <Ionicons name="filter-outline" size={20} color={Colors.brand} />
+              <Text
+                style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}
+              >
+                Filter Investments
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => filterSheetRef.current?.close()}
+              style={tw`p-2`}
+            >
+              <Ionicons name="close" size={24} color={Colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Status Filter */}
+          <View style={tw`mb-6`}>
+            <Text
+              style={[
+                tw`text-xs font-semibold mb-3 uppercase tracking-wide`,
+                { color: Colors.textSecondary },
+              ]}
+            >
+              Status
+            </Text>
+            <View style={tw`flex-row flex-wrap gap-2`}>
+              {statuses.map((status) => {
+                const isActive = tempStatusFilter === status;
+                const statusColors = getStatusColor(status);
+                return (
+                  <TouchableOpacity
+                    key={status}
+                    onPress={() => setTempStatusFilter(status)}
+                    style={[
+                      tw`px-4 py-2.5 rounded-xl border`,
+                      {
+                        backgroundColor: isActive ? statusColors.bg : "#fff",
+                        borderColor: isActive
+                          ? statusColors.text
+                          : Colors.divider,
+                        borderWidth: isActive ? 1.5 : 1,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        tw`text-sm font-semibold`,
+                        {
+                          color: isActive
+                            ? statusColors.text
+                            : Colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      {status}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Action Buttons */}
+          <View style={tw`flex-row gap-3 mt-auto`}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                setTempStatusFilter("ALL");
+                setStatusFilter("ALL");
+              }}
+              style={[
+                tw`flex-1 py-3 px-4 rounded-xl border`,
+                { borderColor: Colors.divider },
+              ]}
+            >
+              <Text
+                style={[
+                  tw`text-sm font-semibold text-center`,
+                  { color: Colors.textSecondary },
+                ]}
+              >
+                Reset
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                setStatusFilter(tempStatusFilter);
+                filterSheetRef.current?.close();
+              }}
+              style={[
+                tw`flex-1 py-3 px-4 rounded-xl`,
+                { backgroundColor: Colors.brand },
+              ]}
+            >
+              <Text style={tw`text-white text-sm font-bold text-center`}>
+                Apply Filter
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
