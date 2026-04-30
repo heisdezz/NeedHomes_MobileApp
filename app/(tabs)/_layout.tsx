@@ -8,7 +8,7 @@ import { Colors } from "@/constants/theme";
 export default function TabLayout() {
   return (
     <Tabs
-      backBehavior="fullHistory"
+      backBehavior="history"
       screenOptions={{
         tabBarActiveTintColor: Colors.brand,
         headerShown: false,

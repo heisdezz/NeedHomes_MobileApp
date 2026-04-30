@@ -151,6 +151,7 @@ export default function ExitStrategy({
   const [reason, setReason] = useState("");
   const queryClient = useQueryClient();
   const snapPoints = ["75%"];
+  const [sheetIndex, setSheetIndex] = useState(-1);
 
   const propertyQuery = useQuery<ApiResponse<PropertyDetail>>({
     queryKey: ["inv", propertyId],
@@ -470,8 +471,11 @@ export default function ExitStrategy({
         ref={bottomSheetRef}
         index={-1}
         snapPoints={snapPoints}
-        enablePanDownToClose
+        enablePanDownToClose={true}
         enableDynamicSizing={false}
+        animateOnMount={false}
+        detached={false}
+        onChange={(index) => setSheetIndex(index)}
         backgroundStyle={{ backgroundColor: "#fff" }}
         handleIndicatorStyle={{ backgroundColor: Colors.divider }}
       >
