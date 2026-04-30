@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -150,7 +150,7 @@ export default function ExitStrategy({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [reason, setReason] = useState("");
   const queryClient = useQueryClient();
-  const snapPoints = useMemo(() => ["75%"], []);
+  const snapPoints = ["75%"];
 
   const propertyQuery = useQuery<ApiResponse<PropertyDetail>>({
     queryKey: ["inv", propertyId],
@@ -471,6 +471,7 @@ export default function ExitStrategy({
         index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose
+        enableDynamicSizing={false}
         backgroundStyle={{ backgroundColor: "#fff" }}
         handleIndicatorStyle={{ backgroundColor: Colors.divider }}
       >

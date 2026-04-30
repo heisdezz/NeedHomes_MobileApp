@@ -208,6 +208,7 @@ export default function InvestmentsListScreen() {
       style={[tw`flex-1`, { backgroundColor: "#F9FAFB" }]}
       edges={["top", "bottom"]}
     >
+      <Text>ss</Text>
       {/* Header */}
       <View
         style={[
