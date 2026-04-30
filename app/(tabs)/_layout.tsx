@@ -1,11 +1,15 @@
 import { Tabs } from "expo-router";
 import React from "react";
+import { Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       backBehavior="history"
@@ -13,6 +17,10 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors.brand,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: {
+          paddingBottom: Platform.OS === "android" ? insets.bottom : 0,
+          height: Platform.OS === "android" ? 60 + insets.bottom : 60,
+        },
       }}
     >
       <Tabs.Screen
@@ -36,3 +44,8 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+export const unstable_settings = {
+  // Ensure the 'index' (usually your Home tab) is the fallback back target
+  initialRouteName: "index",
+};

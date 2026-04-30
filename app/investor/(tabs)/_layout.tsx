@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Platform } from "react-native";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
 
@@ -38,11 +39,19 @@ const TAB_CONFIG: TabConfig[] = [
 
 // ── Custom tab bar ────────────────────────────────────────────────────────────
 function CustomTabBar({ state, navigation }: any) {
+  const insets = useSafeAreaInsets();
+  const bottomPadding = Platform.OS === "android" ? insets.bottom : 16;
+
   return (
     <View
       style={[
-        tw`flex-row bg-white px-2 pt-2 pb-4`,
-        { borderTopWidth: 1, borderTopColor: "#F0F0F0", elevation: 8 },
+        tw`flex-row bg-white px-2 pt-2`,
+        {
+          borderTopWidth: 1,
+          borderTopColor: "#F0F0F0",
+          elevation: 8,
+          paddingBottom: bottomPadding,
+        },
       ]}
     >
       {state.routes.map((route: any, idx: number) => {
