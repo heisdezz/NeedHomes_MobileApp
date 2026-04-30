@@ -72,6 +72,10 @@ export interface PropertyDetail extends ApiProperty {
   // Fees
   additionalFees?: AdditionalFee[];
   systemCharges?: { platformChargePercentage: number };
+  // Documents
+  buildingPermitNumber?: string | null;
+  propertyDocument?: string | null;
+  propertyTitleDocuments?: { type: string; documentUrl: string }[] | null;
   // Location
   latitude?: number;
   longitude?: number;

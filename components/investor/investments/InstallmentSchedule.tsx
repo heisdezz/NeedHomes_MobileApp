@@ -1,6 +1,5 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from "@expo/vector-icons";
 import { showMessage } from "react-native-flash-message";
 
@@ -329,13 +328,11 @@ export default function InstallmentSchedule({
       {/* Header */}
       <View
         style={[
-          tw`bg-white rounded-t-xl p-4 border-b`,
+          tw`bg-white rounded-t-xl p-4 border-b shadow`,
           {
             borderBottomColor: Colors.divider,
             borderTopWidth: 1,
             borderTopColor: Colors.divider,
-            borderLeftWidth: 1,
-            borderRightWidth: 1,
           },
         ]}
       >
@@ -379,21 +376,28 @@ export default function InstallmentSchedule({
       {/* List of Installments */}
       <View
         style={[
-          tw`bg-white rounded-b-xl p-4`,
+          tw`bg-white rounded-b-xl p-4 shadow`,
           {
             borderBottomWidth: 1,
             borderBottomColor: Colors.divider,
-            borderLeftWidth: 1,
-            borderRightWidth: 1,
-            minHeight: 200,
           },
         ]}
       >
-        <FlashList
-          data={installments}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+        {installments.length === 0 ? (
+          <View style={tw`items-center justify-center py-8`}>
+            <Ionicons
+              name="calendar-outline"
+              size={48}
+              color={Colors.textMuted}
+            />
+            <Text style={[tw`text-sm mt-2`, { color: Colors.textMuted }]}>
+              No installments scheduled
+            </Text>
+          </View>
+        ) : (
+          installments.map((item) => (
             <InstallmentCard
+              key={item.id}
               installment={item}
               onPay={handlePay}
               isPaying={
@@ -401,21 +405,8 @@ export default function InstallmentSchedule({
                 paymentMutation.variables?.id === item.id
               }
             />
-          )}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <View style={tw`items-center justify-center py-8`}>
-              <Ionicons
-                name="calendar-outline"
-                size={48}
-                color={Colors.textMuted}
-              />
-              <Text style={[tw`text-sm mt-2`, { color: Colors.textMuted }]}>
-                No installments scheduled
-              </Text>
-            </View>
-          }
-        />
+          ))
+        )}
       </View>
     </View>
   );

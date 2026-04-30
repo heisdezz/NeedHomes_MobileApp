@@ -1,15 +1,18 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
 } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { showMessage } from "react-native-flash-message";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 
 import apiClient, { type ApiResponse } from "@/lib/api";
 import { Colors } from "@/constants/theme";
@@ -147,11 +150,9 @@ export default function ExitStrategy({
   investment,
   propertyId,
 }: ExitStrategyProps) {
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const [reason, setReason] = useState("");
   const queryClient = useQueryClient();
-  const snapPoints = ["75%"];
-  const [sheetIndex, setSheetIndex] = useState(-1);
 
   const propertyQuery = useQuery<ApiResponse<PropertyDetail>>({
     queryKey: ["inv", propertyId],
@@ -192,7 +193,7 @@ export default function ExitStrategy({
         queryKey: ["exit-requests", investment.id],
       });
       setReason("");
-      bottomSheetRef.current?.close();
+      setModalVisible(false);
     },
     onError: (error: any) => {
       const message =
@@ -290,7 +291,7 @@ export default function ExitStrategy({
           ) : (
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => bottomSheetRef.current?.expand()}
+              onPress={() => setModalVisible(true)}
               style={[
                 tw`flex-row items-center gap-1.5 px-3 py-2 rounded-lg border`,
                 {
@@ -466,154 +467,184 @@ export default function ExitStrategy({
         </View>
       </View>
 
-      {/* Bottom Sheet Modal */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
-        enableDynamicSizing={false}
-        animateOnMount={false}
-        detached={false}
-        onChange={(index) => setSheetIndex(index)}
-        backgroundStyle={{ backgroundColor: "#fff" }}
-        handleIndicatorStyle={{ backgroundColor: Colors.divider }}
+      {/* Exit Request Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
       >
-        <BottomSheetView style={tw`flex-1 px-4 pb-8`}>
-          {/* Modal Header */}
-          <View style={tw`flex-row items-center justify-between mb-4`}>
-            <Text
-              style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}
-            >
-              Request Investment Exit
-            </Text>
-            <TouchableOpacity
-              onPress={() => bottomSheetRef.current?.close()}
-              style={tw`p-2`}
-            >
-              <Ionicons name="close" size={24} color={Colors.textSecondary} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Warning Box */}
+        <Pressable
+          style={[tw`flex-1`, { backgroundColor: "rgba(0,0,0,0.5)" }]}
+          onPress={() => setModalVisible(false)}
+        />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={tw`absolute bottom-0 left-0 right-0`}
+        >
           <View
             style={[
-              tw`flex-row gap-3 p-3 rounded-xl mb-4`,
-              {
-                backgroundColor: "#FEF3C7",
-                borderWidth: 1,
-                borderColor: "#FCD34D",
-              },
+              tw`bg-white rounded-t-3xl px-4 pt-3 pb-8`,
+              { paddingBottom: Platform.OS === "ios" ? 34 : 24 },
             ]}
           >
-            <Ionicons name="warning-outline" size={18} color="#D97706" />
-            <Text style={[tw`text-xs flex-1 leading-5`, { color: "#92400E" }]}>
-              Your exit request will be reviewed by an admin. Eligibility is
-              verified automatically based on your investment's exit policy.
-            </Text>
-          </View>
-
-          {/* Info Grid */}
-          <View style={tw`flex-row gap-4 mb-4`}>
-            <View style={tw`flex-1`}>
-              <Text style={[tw`text-xs mb-1`, { color: Colors.textSecondary }]}>
-                Exit Policy
-              </Text>
-              <Text
-                style={[tw`text-sm font-medium`, { color: Colors.textPrimary }]}
-              >
-                {getExitPolicyLabel(property)}
-              </Text>
-            </View>
-            <View>
-              <Text style={[tw`text-xs mb-1`, { color: Colors.textSecondary }]}>
-                Current Value
-              </Text>
-              <Text
-                style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
-              >
-                {formatNaira(investment.currentValue)}
-              </Text>
-            </View>
-          </View>
-
-          {/* Reason Input */}
-          <View style={tw`mb-6`}>
-            <Text
+            {/* Handle */}
+            <View
               style={[
-                tw`text-sm font-medium mb-2`,
-                { color: Colors.textPrimary },
+                tw`self-center rounded-full mb-4`,
+                { width: 40, height: 4, backgroundColor: Colors.divider },
               ]}
-            >
-              Reason{" "}
-              <Text style={[tw`font-normal`, { color: Colors.textSecondary }]}>
-                (optional)
+            />
+
+            {/* Header */}
+            <View style={tw`flex-row items-center justify-between mb-4`}>
+              <Text
+                style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}
+              >
+                Request Investment Exit
               </Text>
-            </Text>
-            <TextInput
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={tw`p-2`}
+              >
+                <Ionicons name="close" size={24} color={Colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Warning Box */}
+            <View
               style={[
-                tw`rounded-xl border px-3 py-3 text-sm`,
+                tw`flex-row gap-3 p-3 rounded-xl mb-4`,
                 {
-                  borderColor: Colors.inputBorder,
-                  backgroundColor: Colors.inputBg,
-                  color: Colors.textPrimary,
-                  textAlignVertical: "top",
-                  minHeight: 100,
+                  backgroundColor: "#FEF3C7",
+                  borderWidth: 1,
+                  borderColor: "#FCD34D",
                 },
               ]}
-              multiline
-              numberOfLines={4}
-              placeholder="e.g. Need liquidity for other commitments"
-              placeholderTextColor={Colors.textMuted}
-              value={reason}
-              onChangeText={setReason}
-            />
-          </View>
-
-          {/* Action Buttons */}
-          <View style={tw`flex-row gap-3`}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => bottomSheetRef.current?.close()}
-              style={[
-                tw`flex-1 py-3 px-4 rounded-xl items-center border`,
-                { borderColor: Colors.divider },
-              ]}
             >
+              <Ionicons name="warning-outline" size={18} color="#D97706" />
+              <Text
+                style={[tw`text-xs flex-1 leading-5`, { color: "#92400E" }]}
+              >
+                Your exit request will be reviewed by an admin. Eligibility is
+                verified automatically based on your investment's exit policy.
+              </Text>
+            </View>
+
+            {/* Info Grid */}
+            <View style={tw`flex-row gap-4 mb-4`}>
+              <View style={tw`flex-1`}>
+                <Text
+                  style={[tw`text-xs mb-1`, { color: Colors.textSecondary }]}
+                >
+                  Exit Policy
+                </Text>
+                <Text
+                  style={[
+                    tw`text-sm font-medium`,
+                    { color: Colors.textPrimary },
+                  ]}
+                >
+                  {getExitPolicyLabel(property)}
+                </Text>
+              </View>
+              <View>
+                <Text
+                  style={[tw`text-xs mb-1`, { color: Colors.textSecondary }]}
+                >
+                  Current Value
+                </Text>
+                <Text
+                  style={[
+                    tw`text-base font-bold`,
+                    { color: Colors.textPrimary },
+                  ]}
+                >
+                  {formatNaira(investment.currentValue)}
+                </Text>
+              </View>
+            </View>
+
+            {/* Reason Input */}
+            <View style={tw`mb-6`}>
               <Text
                 style={[
-                  tw`text-sm font-semibold`,
-                  { color: Colors.textSecondary },
+                  tw`text-sm font-medium mb-2`,
+                  { color: Colors.textPrimary },
                 ]}
               >
-                Cancel
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => submitMutation.mutate()}
-              disabled={submitMutation.isPending}
-              style={[
-                tw`flex-1 py-3 px-4 rounded-xl items-center`,
-                {
-                  backgroundColor: submitMutation.isPending
-                    ? Colors.divider
-                    : Colors.brand,
-                },
-              ]}
-            >
-              {submitMutation.isPending ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Text style={tw`text-white text-sm font-bold`}>
-                  Submit Request
+                Reason{" "}
+                <Text
+                  style={[tw`font-normal`, { color: Colors.textSecondary }]}
+                >
+                  (optional)
                 </Text>
-              )}
-            </TouchableOpacity>
+              </Text>
+              <TextInput
+                style={[
+                  tw`rounded-xl border px-3 py-3 text-sm`,
+                  {
+                    borderColor: Colors.inputBorder,
+                    backgroundColor: Colors.inputBg,
+                    color: Colors.textPrimary,
+                    textAlignVertical: "top",
+                    minHeight: 100,
+                  },
+                ]}
+                multiline
+                numberOfLines={4}
+                placeholder="e.g. Need liquidity for other commitments"
+                placeholderTextColor={Colors.textMuted}
+                value={reason}
+                onChangeText={setReason}
+              />
+            </View>
+
+            {/* Action Buttons */}
+            <View style={tw`flex-row gap-3`}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => setModalVisible(false)}
+                style={[
+                  tw`flex-1 py-3 px-4 rounded-xl items-center border`,
+                  { borderColor: Colors.divider },
+                ]}
+              >
+                <Text
+                  style={[
+                    tw`text-sm font-semibold`,
+                    { color: Colors.textSecondary },
+                  ]}
+                >
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => submitMutation.mutate()}
+                disabled={submitMutation.isPending}
+                style={[
+                  tw`flex-1 py-3 px-4 rounded-xl items-center`,
+                  {
+                    backgroundColor: submitMutation.isPending
+                      ? Colors.divider
+                      : Colors.brand,
+                  },
+                ]}
+              >
+                {submitMutation.isPending ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={tw`text-white text-sm font-bold`}>
+                    Submit Request
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
-        </BottomSheetView>
-      </BottomSheet>
+        </KeyboardAvoidingView>
+      </Modal>
     </>
   );
 }

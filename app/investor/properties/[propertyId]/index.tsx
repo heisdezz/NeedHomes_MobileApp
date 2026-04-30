@@ -1,6 +1,10 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, router } from "expo-router";
+import {
+  useLocalSearchParams,
+  router,
+  useNavigationContainerRef,
+} from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { useProperty } from "@/lib/queries/investor";
@@ -8,6 +12,7 @@ import PageLoader from "@/components/layout/PageLoader";
 import InvestmentDetails from "@/components/investor/investment-details";
 import AdditionalFees from "@/components/investor/additional-fees";
 import ImageCarousel from "@/components/investor/image-carousel";
+import { RenderDocuments } from "@/components/RenderDocuments";
 import tw from "@/lib/tw";
 
 function fmt(kobo: number | null | undefined): string {
@@ -18,6 +23,17 @@ function fmt(kobo: number | null | undefined): string {
 export default function PropertyDetailScreen() {
   const { propertyId } = useLocalSearchParams<{ propertyId: string }>();
   const query = useProperty(propertyId);
+
+  function handleBack() {
+    // Navigate to the properties list if there's no proper back stack
+    // (e.g. when opened directly from the home screen's property listings)
+    const canGoBack = router.canGoBack();
+    if (canGoBack) {
+      router.back();
+    } else {
+      router.replace("/investor/properties");
+    }
+  }
 
   return (
     <SafeAreaView
@@ -43,7 +59,7 @@ export default function PropertyDetailScreen() {
                 <ImageCarousel
                   images={allImages}
                   height={260}
-                  onBack={() => router.back()}
+                  onBack={handleBack}
                   onBookmark={() => {}}
                 />
 
@@ -117,6 +133,23 @@ export default function PropertyDetailScreen() {
                       <AdditionalFees fees={fees} />
                     </View>
                   )}
+
+                  {/* Documents */}
+                  <View style={tw`mb-5`}>
+                    <Text
+                      style={[
+                        tw`text-sm font-bold mb-3`,
+                        { color: Colors.textPrimary },
+                      ]}
+                    >
+                      Documents
+                    </Text>
+                    <RenderDocuments
+                      buildingPermitNumber={property.buildingPermitNumber}
+                      propertyDocument={property.propertyDocument}
+                      propertyTitleDocuments={property.propertyTitleDocuments}
+                    />
+                  </View>
                 </View>
               </ScrollView>
 

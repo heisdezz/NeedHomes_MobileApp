@@ -5,6 +5,8 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+
 import { StatusBar } from "expo-status-bar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -17,6 +19,10 @@ export const unstable_settings = {
   anchor: "index",
 };
 
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true,
+});
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
