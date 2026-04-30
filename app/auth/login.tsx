@@ -99,7 +99,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top"]}>
+    <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         style={tw`flex-1`}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -191,7 +191,7 @@ export default function LoginScreen() {
             </View>
 
             {/* Spacer */}
-            <View style={tw`flex-1 min-h-10`} />
+            <View style={tw` min-h-10`} />
 
             {/* Login button */}
             <TouchableOpacity
