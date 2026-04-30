@@ -28,7 +28,10 @@ type FilterTab = {
 
 const FILTER_TABS: FilterTab[] = [
   { label: "All", params: {} },
-  { label: "Outright Purchase", params: { investmentModel: "OUTRIGHT_PURCHASE" } },
+  {
+    label: "Outright Purchase",
+    params: { investmentModel: "OUTRIGHT_PURCHASE" },
+  },
   { label: "Co-Development", params: { investmentModel: "CO_DEVELOPMENT" } },
   { label: "Fractional", params: { investmentModel: "FRACTIONAL_OWNERSHIP" } },
 ];
@@ -77,8 +80,15 @@ export default function InvestorPropertyListings() {
     <View>
       {/* Section header */}
       <View style={tw`flex-row items-center justify-between px-4 mb-3`}>
-        <TouchableOpacity style={tw`flex-row items-center gap-1`} activeOpacity={0.7}>
-          <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>Properties</Text>
+        <TouchableOpacity
+          style={tw`flex-row items-center gap-1`}
+          activeOpacity={0.7}
+        >
+          <Text
+            style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
+          >
+            Properties
+          </Text>
           <Ionicons name="chevron-down" size={16} color={Colors.textPrimary} />
         </TouchableOpacity>
         <TouchableOpacity

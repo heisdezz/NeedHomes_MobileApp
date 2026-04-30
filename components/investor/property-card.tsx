@@ -72,7 +72,10 @@ export default function PropertyCard({
           />
         ) : (
           <View
-            style={[tw`w-full h-full items-center justify-center`, { backgroundColor: "#D1D5DB" }]}
+            style={[
+              tw`w-full h-full items-center justify-center`,
+              { backgroundColor: "#D1D5DB" },
+            ]}
           >
             <Ionicons name="home" size={36} color="#9CA3AF" />
           </View>
@@ -128,12 +131,19 @@ export default function PropertyCard({
         </View>
 
         {/* Property type */}
-        <Text style={[tw`text-xs uppercase mb-0.5`, { color: Colors.textMuted, letterSpacing: 0.5 }]}>
+        <Text
+          style={[
+            tw`text-xs uppercase mb-0.5`,
+            { color: Colors.textMuted, letterSpacing: 0.5 },
+          ]}
+        >
           Property Type
         </Text>
         <View style={tw`flex-row items-center gap-1 mb-3`}>
           <Ionicons name="business-outline" size={11} color={Colors.brand} />
-          <Text style={[tw`text-xs font-medium`, { color: Colors.textSecondary }]}>
+          <Text
+            style={[tw`text-xs font-medium`, { color: Colors.textSecondary }]}
+          >
             {propertyType}
           </Text>
         </View>

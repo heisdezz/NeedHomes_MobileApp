@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm, Controller } from "react-hook-form";
@@ -94,7 +94,8 @@ export default function IndividualScreen() {
         },
       },
       {
-        onSuccess: () => router.push(`/auth/verify?email=${encodeURIComponent(data.email)}`),
+        onSuccess: () =>
+          router.push(`/auth/verify?email=${encodeURIComponent(data.email)}`),
         onError: (e: any) => {
           showMessage({
             message: extract_message(e),

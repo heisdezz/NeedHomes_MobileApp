@@ -12,7 +12,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Toaster } from "sonner-native";
 import FlashMessage from "react-native-flash-message";
 const queryClient = new QueryClient();
-
+import { KeyboardProvider } from "react-native-keyboard-controller";
 export const unstable_settings = {
   anchor: "index",
 };
@@ -22,30 +22,32 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <FlashMessage position="top" statusBarHeight={32} />
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="onboarding"
-              options={{ headerShown: false, animation: "fade" }}
-            />
-            <Stack.Screen name="auth" options={{ headerShown: false }} />
-            <Stack.Screen name="investor" options={{ headerShown: false }} />
-            <Stack.Screen name="partner" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="modal"
-              options={{ presentation: "modal", title: "Modal" }}
-            />
-          </Stack>
-          <StatusBar style="light" backgroundColor="#3C3C44" />
-        </ThemeProvider>
-      </QueryClientProvider>
-      <Toaster />
+      <KeyboardProvider>
+        <QueryClientProvider client={queryClient}>
+          <FlashMessage position="top" statusBarHeight={32} />
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <Stack>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="onboarding"
+                options={{ headerShown: false, animation: "fade" }}
+              />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen name="investor" options={{ headerShown: false }} />
+              <Stack.Screen name="partner" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="modal"
+                options={{ presentation: "modal", title: "Modal" }}
+              />
+            </Stack>
+            <StatusBar style="light" backgroundColor="#3C3C44" />
+          </ThemeProvider>
+        </QueryClientProvider>
+        <Toaster />
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

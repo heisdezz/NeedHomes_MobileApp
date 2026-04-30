@@ -1,9 +1,4 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,7 +20,10 @@ export default function PropertyDetailScreen() {
   const query = useProperty(propertyId);
 
   return (
-    <SafeAreaView style={[tw`flex-1`, { backgroundColor: "#fff" }]} edges={["top"]}>
+    <SafeAreaView
+      style={[tw`flex-1 relative`, { backgroundColor: "#fff" }]}
+      edges={["top", "bottom"]}
+    >
       <PageLoader query={query} loadingText="Loading property...">
         {(response) => {
           const property = response.data;
@@ -125,7 +123,7 @@ export default function PropertyDetailScreen() {
               {/* Invest Now — fixed bottom CTA */}
               <View
                 style={[
-                  tw`absolute bottom-0 left-0 right-0 px-4 pb-6 pt-3`,
+                  tw`absolute bottom-0  left-0 right-0 px-4 pb-6 pt-3`,
                   {
                     backgroundColor: "#fff",
                     borderTopWidth: 1,
@@ -135,6 +133,15 @@ export default function PropertyDetailScreen() {
               >
                 <TouchableOpacity
                   activeOpacity={0.85}
+                  onPress={() => {
+                    // Navigate to appropriate investment form based on model
+                    if (property.investmentModel === "CO_DEVELOPMENT") {
+                      router.push(`/investor/invest/${propertyId}/co-dev`);
+                    } else {
+                      // Handle other investment models
+                      router.push(`/investor/invest/${propertyId}/co-dev`);
+                    }
+                  }}
                   style={[
                     tw`w-full py-4 rounded-2xl items-center`,
                     { backgroundColor: Colors.brand },

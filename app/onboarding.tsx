@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,32 +7,32 @@ import {
   TouchableOpacity,
   Dimensions,
   ListRenderItemInfo,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { useOnboardingStore } from '@/store';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import tw from '@/lib/tw';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { useOnboardingStore } from "@/store";
+import { SafeAreaView } from "react-native-safe-area-context";
+import tw from "@/lib/tw";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const SLIDES = [
   {
-    id: '1',
-    image: require('@/assets/onboarding/onboarding_1.png'),
-    title: 'Discover. Buy. Invest.\nOn Needhomes',
-    buttonLabel: 'Next',
+    id: "1",
+    image: require("@/assets/onboarding/onboarding_1.png"),
+    title: "Discover. Buy. Invest.\nOn Needhomes",
+    buttonLabel: "Next",
   },
   {
-    id: '2',
-    image: require('@/assets/onboarding/onboarding_2.png'),
-    title: 'Track Your Investment\nWhile Making Profits',
-    buttonLabel: 'Next',
+    id: "2",
+    image: require("@/assets/onboarding/onboarding_2.png"),
+    title: "Track Your Investment\nWhile Making Profits",
+    buttonLabel: "Next",
   },
   {
-    id: '3',
-    image: require('@/assets/onboarding/onboarding_3.png'),
-    title: 'Promote Properties,\nEarn Commision',
-    buttonLabel: 'Explore',
+    id: "3",
+    image: require("@/assets/onboarding/onboarding_3.png"),
+    title: "Promote Properties,\nEarn Commision",
+    buttonLabel: "Explore",
   },
 ];
 
@@ -47,8 +47,8 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
   return (
     <View style={tw`flex-1 items-center justify-center bg-[#3C3C44]`}>
       <Image
-        source={require('@/assets/need/logo.png')}
-        style={tw`w-56 h-28`}
+        source={require("@/assets/need/logo.png")}
+        style={tw`w-56 h-28  `}
         resizeMode="contain"
       />
     </View>
@@ -65,7 +65,7 @@ function SlideItem({ item }: { item: Slide }) {
       >
         <Image
           source={item.image}
-          style={{ width: width * 0.78, height: width * 0.56 }}
+          style={{ width: width * 0.78, height: width * 0.78 }}
           resizeMode="cover"
         />
       </View>
@@ -75,7 +75,9 @@ function SlideItem({ item }: { item: Slide }) {
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const setHasSeenOnboarding = useOnboardingStore((s) => s.setHasSeenOnboarding);
+  const setHasSeenOnboarding = useOnboardingStore(
+    (s) => s.setHasSeenOnboarding,
+  );
   const [showSplash, setShowSplash] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<Slide>>(null);
@@ -95,16 +97,16 @@ export default function OnboardingScreen() {
       setCurrentIndex(next);
     } else {
       setHasSeenOnboarding(true);
-      router.replace('/auth/sign-up');
+      router.replace("/auth/sign-up");
     }
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-[#3C3C44]`} edges={['top', 'bottom']}>
+    <SafeAreaView style={tw`flex-1 bg-[#3C3C44]`} edges={["top", "bottom"]}>
       {/* Header logo */}
       <View style={tw`items-center pt-6 pb-4`}>
         <Image
-          source={require('@/assets/need/logo.png')}
+          source={require("@/assets/need/logo.png")}
           style={tw`w-36 h-14`}
           resizeMode="contain"
         />
@@ -119,7 +121,9 @@ export default function OnboardingScreen() {
         pagingEnabled
         scrollEnabled={false}
         showsHorizontalScrollIndicator={false}
-        renderItem={({ item }: ListRenderItemInfo<Slide>) => <SlideItem item={item} />}
+        renderItem={({ item }: ListRenderItemInfo<Slide>) => (
+          <SlideItem item={item} />
+        )}
         style={tw`flex-1`}
         contentContainerStyle={tw`items-center`}
       />
@@ -133,15 +137,17 @@ export default function OnboardingScreen() {
               key={i}
               style={tw`rounded-full ${
                 i === currentIndex
-                  ? 'w-5 h-2 bg-[#F56821]'
-                  : 'w-2 h-2 bg-white/30'
+                  ? "w-5 h-2 bg-[#F56821]"
+                  : "w-2 h-2 bg-white/30"
               }`}
             />
           ))}
         </View>
 
         {/* Title */}
-        <Text style={tw`text-white text-xl font-semibold text-center leading-7`}>
+        <Text
+          style={tw`text-white text-xl font-semibold text-center leading-7`}
+        >
           {SLIDES[currentIndex].title}
         </Text>
 

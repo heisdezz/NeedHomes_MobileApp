@@ -105,6 +105,7 @@ function CustomTabBar({ state, navigation }: any) {
 export default function InvestorTabLayout() {
   return (
     <Tabs
+      backBehavior="fullHistory"
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >

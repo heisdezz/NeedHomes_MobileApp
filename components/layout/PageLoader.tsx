@@ -43,7 +43,7 @@ function LoadingView({ loadingText }: { loadingText: string }) {
         duration: 2000,
         easing: Easing.linear,
         useNativeDriver: true,
-      })
+      }),
     ).start();
 
     Animated.loop(
@@ -52,7 +52,7 @@ function LoadingView({ loadingText }: { loadingText: string }) {
         duration: 3000,
         easing: Easing.linear,
         useNativeDriver: true,
-      })
+      }),
     ).start();
   }, []);
 
@@ -142,8 +142,7 @@ function ErrorView({
   const scale = useRef(new Animated.Value(0.95)).current;
   const fadeIn = useRef(new Animated.Value(0)).current;
 
-  const is403 =
-    (error as AxiosError<ApiResponse>)?.response?.status === 403;
+  const is403 = (error as AxiosError<ApiResponse>)?.response?.status === 403;
 
   useEffect(() => {
     Animated.parallel([
@@ -178,7 +177,10 @@ function ErrorView({
           <Ionicons name="shield-outline" size={32} color={Colors.error} />
         </View>
         <Text
-          style={[tw`text-lg font-bold text-center`, { color: Colors.textInverse }]}
+          style={[
+            tw`text-lg font-bold text-center`,
+            { color: Colors.textInverse },
+          ]}
         >
           Access Denied
         </Text>
@@ -211,7 +213,10 @@ function ErrorView({
         <Ionicons name="alert-circle-outline" size={32} color={Colors.error} />
       </View>
       <Text
-        style={[tw`text-lg font-bold text-center`, { color: Colors.textInverse }]}
+        style={[
+          tw`text-lg font-bold text-center`,
+          { color: Colors.textInverse },
+        ]}
       >
         Something went wrong
       </Text>
@@ -262,7 +267,7 @@ function FadeInView({ children }: { children: React.ReactNode }) {
 
   return (
     <Animated.View
-      style={{ opacity: fadeIn, transform: [{ translateY: slideY }] }}
+      style={{ opacity: fadeIn, flex: 1, transform: [{ translateY: slideY }] }}
     >
       {children}
     </Animated.View>
@@ -278,7 +283,11 @@ export default function PageLoader<TData>({
   loadingText = "Loading resources...",
 }: PageLoaderProps<TData>) {
   if (query.isLoading) {
-    return customLoading ? <>{customLoading}</> : <LoadingView loadingText={loadingText} />;
+    return customLoading ? (
+      <>{customLoading}</>
+    ) : (
+      <LoadingView loadingText={loadingText} />
+    );
   }
 
   if (query.isError) {

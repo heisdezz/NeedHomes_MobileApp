@@ -29,7 +29,7 @@ type LOGIN_RESPONSE = AUTHRECORD;
 export default function LoginScreen() {
   const router = useRouter();
   useEffect(() => {
-    toast("init");
+    // toast("init");
   }, []);
   const { redirect } = useLocalSearchParams<{ redirect?: string }>();
   const [email, setEmail] = useState("");
@@ -82,6 +82,7 @@ export default function LoginScreen() {
         toast.error(extract_message(error), { duration: 2000 });
         return router.push({ pathname: "/auth/verify", params: { email } });
       }
+      // console.log("error", JSON.stringify(error));
       toast.error(
         error.response?.data?.message ??
           "Login failed. Please check your credentials.",
