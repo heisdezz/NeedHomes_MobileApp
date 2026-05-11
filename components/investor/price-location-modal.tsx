@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, {
@@ -17,7 +17,6 @@ export type PropertyFilters = {
   location: string | null;
 };
 
-// Keeping for backwards compatibility
 export type PriceLocationFilters = PropertyFilters;
 
 type Props = {
@@ -27,20 +26,14 @@ type Props = {
   onClose: () => void;
 };
 
-const PROPERTY_TYPES: {
-  id: PropertiesParams["propertyType"] | null;
-  label: string;
-}[] = [
+const PROPERTY_TYPES: { id: PropertiesParams["propertyType"] | null; label: string }[] = [
   { id: null, label: "All" },
   { id: "RESIDENTIAL", label: "Residential" },
   { id: "COMMERCIAL", label: "Commercial" },
   { id: "LAND", label: "Land" },
 ];
 
-const INVESTMENT_MODELS: {
-  id: PropertiesParams["investmentModel"] | null;
-  label: string;
-}[] = [
+const INVESTMENT_MODELS: { id: PropertiesParams["investmentModel"] | null; label: string }[] = [
   { id: null, label: "All Models" },
   { id: "OUTRIGHT_PURCHASE", label: "Outright Purchase" },
   { id: "CO_DEVELOPMENT", label: "Co-Development" },
@@ -81,15 +74,10 @@ function FilterOption({
   );
 }
 
-export default function PriceLocationModal({
-  visible,
-  initial,
-  onApply,
-  onClose,
-}: Props) {
-  const [propertyType, setPropertyType] = useState<
-    PropertiesParams["propertyType"] | null
-  >(initial.propertyType ?? null);
+export default function PriceLocationModal({ visible, initial, onApply, onClose }: Props) {
+  const [propertyType, setPropertyType] = useState<PropertiesParams["propertyType"] | null>(
+    initial.propertyType ?? null,
+  );
   const [investmentModel, setInvestmentModel] = useState<
     PropertiesParams["investmentModel"] | null
   >(initial.investmentModel ?? null);
@@ -97,10 +85,8 @@ export default function PriceLocationModal({
   const [maxPrice, setMaxPrice] = useState(initial.maxPrice?.toString() ?? "");
   const [location, setLocation] = useState(initial.location ?? "");
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["65%", "90%"], []);
 
-  // Update state when initial values change
   useEffect(() => {
     setPropertyType(initial.propertyType ?? null);
     setInvestmentModel(initial.investmentModel ?? null);
@@ -109,19 +95,9 @@ export default function PriceLocationModal({
     setLocation(initial.location ?? "");
   }, [initial]);
 
-  useEffect(() => {
-    if (visible) {
-      bottomSheetRef.current?.expand();
-    } else {
-      bottomSheetRef.current?.close();
-    }
-  }, [visible]);
-
   const handleSheetChanges = useCallback(
     (index: number) => {
-      if (index === -1) {
-        onClose();
-      }
+      if (index === -1) onClose();
     },
     [onClose],
   );
@@ -157,12 +133,16 @@ export default function PriceLocationModal({
     setLocation("");
   }
 
+  // Only mount when visible — prevents the GestureDetector overlay
+  // from intercepting touches on the underlying screen when closed
+  if (!visible) return null;
+
   return (
     <BottomSheet
-      ref={bottomSheetRef}
-      index={-1}
+      index={0}
       snapPoints={snapPoints}
       enablePanDownToClose
+      animateOnMount
       onChange={handleSheetChanges}
       backdropComponent={renderBackdrop}
       handleIndicatorStyle={{ backgroundColor: Colors.divider }}
@@ -180,9 +160,7 @@ export default function PriceLocationModal({
 
         {/* Property Type */}
         <View style={tw`mb-5`}>
-          <Text
-            style={[tw`text-sm font-bold mb-2`, { color: Colors.textPrimary }]}
-          >
+          <Text style={[tw`text-sm font-bold mb-2`, { color: Colors.textPrimary }]}>
             Property Type
           </Text>
           <View style={tw`flex-row flex-wrap`}>
@@ -199,9 +177,7 @@ export default function PriceLocationModal({
 
         {/* Investment Model */}
         <View style={tw`mb-5`}>
-          <Text
-            style={[tw`text-sm font-bold mb-2`, { color: Colors.textPrimary }]}
-          >
+          <Text style={[tw`text-sm font-bold mb-2`, { color: Colors.textPrimary }]}>
             Investment Model
           </Text>
           <View style={tw`flex-row flex-wrap`}>
@@ -217,45 +193,34 @@ export default function PriceLocationModal({
         </View>
 
         {/* Location */}
-        <View style={tw`mb-4`}>
-          <View style={tw`gap-1.5`}>
-            <Text
-              style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}
-            >
-              Location
-            </Text>
-            <TextInput
-              value={location}
-              onChangeText={setLocation}
-              placeholder="e.g. Lekki, Abuja, Victoria Island"
-              placeholderTextColor={Colors.inputPlaceholder}
-              style={[
-                tw`border rounded-xl px-4 py-3 text-sm`,
-                {
-                  borderColor: Colors.inputBorder,
-                  backgroundColor: Colors.inputBg,
-                  color: Colors.textPrimary,
-                },
-              ]}
-            />
-          </View>
+        <View style={tw`mb-4 gap-1.5`}>
+          <Text style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}>
+            Location
+          </Text>
+          <TextInput
+            value={location}
+            onChangeText={setLocation}
+            placeholder="e.g. Lekki, Abuja, Victoria Island"
+            placeholderTextColor={Colors.inputPlaceholder}
+            style={[
+              tw`border rounded-xl px-4 py-3 text-sm`,
+              {
+                borderColor: Colors.inputBorder,
+                backgroundColor: Colors.inputBg,
+                color: Colors.textPrimary,
+              },
+            ]}
+          />
         </View>
 
         {/* Price Range */}
         <View style={tw`mb-6`}>
-          <Text
-            style={[tw`text-sm font-bold mb-2`, { color: Colors.textPrimary }]}
-          >
+          <Text style={[tw`text-sm font-bold mb-2`, { color: Colors.textPrimary }]}>
             Price Range
           </Text>
           <View style={tw`flex-row gap-3`}>
             <View style={tw`flex-1 gap-1.5`}>
-              <Text
-                style={[
-                  tw`text-sm font-semibold`,
-                  { color: Colors.textPrimary },
-                ]}
-              >
+              <Text style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}>
                 Min Price (₦)
               </Text>
               <TextInput
@@ -275,12 +240,7 @@ export default function PriceLocationModal({
               />
             </View>
             <View style={tw`flex-1 gap-1.5`}>
-              <Text
-                style={[
-                  tw`text-sm font-semibold`,
-                  { color: Colors.textPrimary },
-                ]}
-              >
+              <Text style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}>
                 Max Price (₦)
               </Text>
               <TextInput
@@ -312,22 +272,14 @@ export default function PriceLocationModal({
               { borderColor: Colors.divider },
             ]}
           >
-            <Text
-              style={[
-                tw`text-sm font-semibold`,
-                { color: Colors.textSecondary },
-              ]}
-            >
+            <Text style={[tw`text-sm font-semibold`, { color: Colors.textSecondary }]}>
               Clear
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleApply}
             activeOpacity={0.8}
-            style={[
-              tw`flex-1 py-3.5 rounded-xl items-center`,
-              { backgroundColor: Colors.brand },
-            ]}
+            style={[tw`flex-1 py-3.5 rounded-xl items-center`, { backgroundColor: Colors.brand }]}
           >
             <Text style={tw`text-white text-sm font-bold`}>Apply</Text>
           </TouchableOpacity>

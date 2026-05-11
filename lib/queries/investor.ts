@@ -61,6 +61,9 @@ export interface PropertyDetail extends ApiProperty {
   totalShares?: number;
   pricePerShare?: number;
   minimumShares?: number;
+  availableShares?: number;
+  fractionalHoldingPeriodDays?: number;
+  returnTiers?: Record<string, number>; // { [days: string]: ratePercent }
   // LAND_BANKING
   availablePlots?: number;
   pricePerPlot?: number;

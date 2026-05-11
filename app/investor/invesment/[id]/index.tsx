@@ -18,6 +18,7 @@ import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
 import InstallmentSchedule from "@/components/investor/investments/InstallmentSchedule";
 import ExitStrategy from "@/components/investor/investments/ExitStrategy";
+import InvPropDetails from "@/components/investor/investments/InvPropDetails";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -553,6 +554,11 @@ export default function InvestmentDetailsScreen() {
               </View>
             ))}
           </View>
+        </View>
+
+        {/* Property */}
+        <View style={tw`mb-4`}>
+          <InvPropDetails propertyId={investment.propertyId} />
         </View>
 
         {/* Installment Schedule */}

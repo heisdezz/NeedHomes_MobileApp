@@ -1,11 +1,18 @@
-import { ApiProperty } from "@/lib/queries/investor";
-import { ADMIN_PROPERTY_LISTING, PROPERTY_DATA } from "@/types";
+import { router } from "expo-router";
+import type { ApiProperty } from "@/lib/queries/investor";
 
-export const nav_to_invest_page = (property: PROPERTY_DATA) => {
-  switch (property.investmentModel) {
-    case "CO_DEVELOPMENT":
-      return "co-dev";
-    default:
-      break;
-  }
+const MODEL_ROUTE: Record<ApiProperty["investmentModel"], string> = {
+  CO_DEVELOPMENT: "co-dev",
+  OUTRIGHT_PURCHASE: "outright-purchase",
+  FRACTIONAL_OWNERSHIP: "fractional-ownership",
+  LAND_BANKING: "land-banking",
+  SAVE_TO_OWN: "save-to-own",
 };
+
+export function navigateToInvest(
+  propertyId: string,
+  investmentModel: ApiProperty["investmentModel"],
+) {
+  const segment = MODEL_ROUTE[investmentModel] ?? "co-dev";
+  router.push(`/investor/properties/${propertyId}/invest/${segment}`);
+}

@@ -7,7 +7,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from "react-native";
-import { FlashList } from "@shopify/flash-list";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -137,8 +137,25 @@ export default function PropertiesScreen() {
     filters.location ? `📍 ${filters.location}` : null,
   ].filter(Boolean) as string[];
 
+  const array = new Array(10).fill("soso");
+  // return (
+  //   <>
+  //     <SafeAreaView style={tw`bg-bg-light flex-1`} edges={["bottom", "top"]}>
+  //       <ScrollView style={tw`flex-1`}>
+  //         {array.map((_) => {
+  //           return (
+  //             <>
+  //               <View style={tw`h-120 bg-red-200 m`}></View>
+  //             </>
+  //           );
+  //         })}
+  //       </ScrollView>
+  //     </SafeAreaView>
+  //   </>
+  // );
+
   return (
-    <SafeAreaView style={tw`flex-1 bg-bg-light`} edges={["top"]}>
+    <SafeAreaView style={tw`flex-1 bg-bg-light`} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={tw`flex-row items-center px-4 pt-3 pb-2 gap-3`}>
         <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
@@ -256,44 +273,45 @@ export default function PropertiesScreen() {
 
       {/* Content */}
       <View style={tw`flex-1`}>
+        {/*<Text>testing</Text>*/}
         <PageLoader query={query} loadingText="Loading properties...">
           {(data) => {
             const properties = (data.data?.data ?? []).map(mapToCard);
+
+            if (properties.length === 0) {
+              return (
+                <View style={tw`flex-1 items-center justify-center gap-2`}>
+                  <Ionicons
+                    name="home-outline"
+                    size={48}
+                    color={Colors.textMuted}
+                  />
+                  <Text style={[tw`text-sm`, { color: Colors.textMuted }]}>
+                    {activeSearch
+                      ? `No results for "${activeSearch}"`
+                      : "No properties available"}
+                  </Text>
+                </View>
+              );
+            }
+
             return (
-              <>
-                <FlashList
-                  data={properties}
-                  keyExtractor={(item) => item.id}
-                  numColumns={2}
-                  style={tw`flex-1`}
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{
-                    paddingHorizontal: 16,
-                    paddingBottom: 80,
-                  }}
-                  renderItem={({ item }) => (
-                    <View
-                      style={{ width: cardWidth, marginBottom: COLUMN_GAP }}
-                    >
-                      <PropertyCard {...item} cardWidth={cardWidth} />
-                    </View>
-                  )}
-                  ListEmptyComponent={
-                    <View style={tw`items-center justify-center mt-24 gap-2`}>
-                      <Ionicons
-                        name="home-outline"
-                        size={48}
-                        color={Colors.textMuted}
-                      />
-                      <Text style={[tw`text-sm`, { color: Colors.textMuted }]}>
-                        {activeSearch
-                          ? `No results for "${activeSearch}"`
-                          : "No properties available"}
-                      </Text>
-                    </View>
-                  }
-                />
-              </>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{
+                  paddingHorizontal: 16,
+                  paddingBottom: 80,
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: COLUMN_GAP,
+                }}
+              >
+                {properties.map((item) => (
+                  <View key={item.id} style={{ width: cardWidth }}>
+                    <PropertyCard {...item} cardWidth={cardWidth} />
+                  </View>
+                ))}
+              </ScrollView>
             );
           }}
         </PageLoader>

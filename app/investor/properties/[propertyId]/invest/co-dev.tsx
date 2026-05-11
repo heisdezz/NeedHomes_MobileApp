@@ -83,8 +83,7 @@ export default function CoDevInvestment() {
       return resp.data as ApiResponse<InstallmentInvestmentResponse>;
     },
     onSuccess: (data) => {
-      // Navigate back to property details or investments list
-      router.back();
+      router.replace(`/investor/invesment/${data.data.id}`);
     },
     onError: (error: AxiosError<ApiResponse>) => {
       toast.error(extract_message(error));

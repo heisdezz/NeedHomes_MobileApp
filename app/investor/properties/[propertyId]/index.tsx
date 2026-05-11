@@ -13,6 +13,7 @@ import InvestmentDetails from "@/components/investor/investment-details";
 import AdditionalFees from "@/components/investor/additional-fees";
 import ImageCarousel from "@/components/investor/image-carousel";
 import { RenderDocuments } from "@/components/RenderDocuments";
+import { navigateToInvest } from "@/helpers/invest-page";
 import tw from "@/lib/tw";
 
 function fmt(kobo: number | null | undefined): string {
@@ -31,7 +32,7 @@ export default function PropertyDetailScreen() {
     if (canGoBack) {
       router.back();
     } else {
-      router.replace("/investor/properties");
+      router.back();
     }
   }
 
@@ -166,15 +167,9 @@ export default function PropertyDetailScreen() {
               >
                 <TouchableOpacity
                   activeOpacity={0.85}
-                  onPress={() => {
-                    // Navigate to appropriate investment form based on model
-                    if (property.investmentModel === "CO_DEVELOPMENT") {
-                      router.push(`/investor/invest/${propertyId}/co-dev`);
-                    } else {
-                      // Handle other investment models
-                      router.push(`/investor/invest/${propertyId}/co-dev`);
-                    }
-                  }}
+                  onPress={() =>
+                    navigateToInvest(propertyId, property.investmentModel)
+                  }
                   style={[
                     tw`w-full py-4 rounded-2xl items-center`,
                     { backgroundColor: Colors.brand },
