@@ -175,12 +175,81 @@ export const useDepositMutation = () => {
 export const useWithdrawalMutation = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (amount: number) => {
-      const resp = await apiClient.post("/withdrawals", { amount: amount * 100 });
+    mutationFn: async ({ amount, pin }: { amount: number; pin: string }) => {
+      const resp = await apiClient.post("/withdrawals", { amount: amount * 100, pin });
       return resp.data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["wallet"] });
+      qc.invalidateQueries({ queryKey: ["withdrawal-pin-status"] });
+    },
+  });
+};
+
+// ─── Withdrawal PIN ───────────────────────────────────────────────────────────
+
+export interface PinStatus {
+  isSetUp: boolean;
+  securityQuestion?: string;
+  isLocked?: boolean;
+  lockedUntil?: string;
+}
+
+export interface SecurityQuestion {
+  id: string;
+  question: string;
+}
+
+export const usePinStatus = () =>
+  useQuery<ApiResponse<PinStatus>>({
+    queryKey: ["withdrawal-pin-status"],
+    queryFn: async () => {
+      const resp = await apiClient.get("/withdrawal-pin/status");
+      return resp.data;
+    },
+  });
+
+export const usePinQuestions = (enabled: boolean) =>
+  useQuery<ApiResponse<SecurityQuestion[]>>({
+    queryKey: ["withdrawal-pin-questions"],
+    queryFn: async () => {
+      const resp = await apiClient.get("/withdrawal-pin/questions");
+      return resp.data;
+    },
+    enabled,
+    staleTime: 1000 * 60 * 10,
+  });
+
+export const useSetupPinMutation = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { pin: string; securityQuestion: string; securityAnswer: string }) => {
+      const resp = await apiClient.post("/withdrawal-pin/setup", data);
+      return resp.data as ApiResponse<any>;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["withdrawal-pin-status"] });
+    },
+  });
+};
+
+export const useVerifyPinAnswerMutation = () =>
+  useMutation({
+    mutationFn: async (data: { securityAnswer: string }) => {
+      const resp = await apiClient.post("/withdrawal-pin/verify-answer", data);
+      return resp.data as ApiResponse<{ resetToken: string }>;
+    },
+  });
+
+export const useResetPinMutation = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { resetToken: string; newPin: string }) => {
+      const resp = await apiClient.post("/withdrawal-pin/reset", data);
+      return resp.data as ApiResponse<any>;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["withdrawal-pin-status"] });
     },
   });
 };
@@ -239,3 +308,44 @@ export const useResolveBankMutation = () => {
     },
   });
 };
+
+// ─── Transactions ─────────────────────────────────────────────────────────────
+
+export interface Transaction {
+  id: string;
+  walletId: string;
+  amount: number;
+  type: "INVESTMENT" | "DEPOSIT" | "WITHDRAWAL";
+  status: "SUCCESS" | "PENDING" | "FAILED";
+  reference: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface TransactionParams {
+  page?: number;
+  type?: string;
+  status?: string;
+  search?: string;
+}
+
+export const useTransactions = (params: TransactionParams) =>
+  useQuery<ApiResponseV2<Transaction[]>>({
+    queryKey: ["transactions", params],
+    queryFn: async () => {
+      const resp = await apiClient.get("/wallet-trx", { params });
+      return resp.data;
+    },
+    retry: 1,
+  });
+
+export const useTransaction = (id: string) =>
+  useQuery<ApiResponse<Transaction>>({
+    queryKey: ["transaction", id],
+    queryFn: async () => {
+      const resp = await apiClient.get(`/wallet-trx/${id}`);
+      return resp.data;
+    },
+    enabled: !!id,
+  });

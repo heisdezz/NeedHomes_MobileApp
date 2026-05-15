@@ -126,10 +126,20 @@ export default function DrawerContent({
               key={item.label}
               onPress={() => {
                 navigation.closeDrawer();
-                if (item.label === "Bank Details") {
-                  router.push("/investor/BankDetails");
-                } else if (item.label === "Profile Info") {
+                if (item.label === "Profile Info") {
                   router.push("/investor/profile-info");
+                } else if (item.label === "Bank Details") {
+                  router.push("/investor/BankDetails");
+                } else if (item.label === "Transactions") {
+                  router.push("/investor/transactions");
+                } else if (item.label === "Properties") {
+                  router.push("/investor/properties");
+                } else if (item.label === "Wallet PIN") {
+                  router.push("/investor/wallet-pin");
+                } else if (item.label === "My Investments") {
+                  router.push("/investor/investment");
+                } else if (item.label === "Chat") {
+                  router.push("/investor/message");
                 } else {
                   item.onPress?.();
                 }

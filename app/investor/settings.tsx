@@ -16,8 +16,21 @@ export default function SettingsScreen() {
 
   const SETTINGS_ITEMS: SettingsItem[] = [
     { label: "Profile Info", icon: "person-circle-outline" },
-    { label: "Bank Details", icon: "card-outline" },
-    { label: "KYC", icon: "shield-checkmark-outline", onPress: () => router.push("/investor/kyc") },
+    {
+      label: "Bank Details",
+      icon: "card-outline",
+      onPress: () => router.push("/investor/BankDetails"),
+    },
+    {
+      label: "KYC",
+      icon: "shield-checkmark-outline",
+      onPress: () => router.push("/investor/kyc"),
+    },
+    {
+      label: "Wallet PIN",
+      icon: "lock-closed-outline",
+      onPress: () => router.push("/investor/wallet-pin"),
+    },
     { label: "Security", icon: "lock-closed-outline" },
   ];
 
@@ -58,11 +71,18 @@ export default function SettingsScreen() {
               <Ionicons name={item.icon} size={18} color={Colors.brand} />
             </View>
             <Text
-              style={[tw`flex-1 text-sm font-medium`, { color: Colors.textPrimary }]}
+              style={[
+                tw`flex-1 text-sm font-medium`,
+                { color: Colors.textPrimary },
+              ]}
             >
               {item.label}
             </Text>
-            <Ionicons name="chevron-forward" size={18} color={Colors.textMuted} />
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={Colors.textMuted}
+            />
           </TouchableOpacity>
         ))}
       </View>
