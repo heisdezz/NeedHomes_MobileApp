@@ -17,7 +17,7 @@ type MenuItem = {
 const MENU_ITEMS: MenuItem[] = [
   { label: "Profile Info", icon: "person-outline" },
   { label: "My Investments", icon: "trending-up-outline" },
-  { label: "Wallet", icon: "wallet-outline" },
+  // { label: "Wallet", icon: "wallet-outline" },
   { label: "Properties", icon: "home-outline" },
   { label: "Transactions", icon: "receipt-outline" },
   { label: "Announcements", icon: "megaphone-outline" },
