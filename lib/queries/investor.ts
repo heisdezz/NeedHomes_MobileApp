@@ -184,3 +184,58 @@ export const useWithdrawalMutation = () => {
     },
   });
 };
+
+// ─── Bank ─────────────────────────────────────────────────────────────────────
+
+export interface Bank {
+  id: number;
+  name: string;
+  code: string;
+}
+
+export interface MyBankInfo {
+  id: string;
+  account_number: string;
+  bank_code: string;
+  bank_name: string;
+  account_name: string;
+}
+
+export interface ResolvedAccount {
+  account_name: string;
+  account_number: string;
+  bank_id: number;
+}
+
+export const useBanks = () =>
+  useQuery<ApiResponse<Bank[]>>({
+    queryKey: ["banks"],
+    queryFn: async () => {
+      const resp = await apiClient.get("/banks");
+      return resp.data;
+    },
+    staleTime: 1000 * 60 * 10,
+  });
+
+export const useMyBankInfo = () =>
+  useQuery<ApiResponse<MyBankInfo>>({
+    queryKey: ["banks", "me"],
+    queryFn: async () => {
+      const resp = await apiClient.get("/banks/me");
+      return resp.data;
+    },
+    retry: 1,
+  });
+
+export const useResolveBankMutation = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { accountNumber: string; bankCode: string }) => {
+      const resp = await apiClient.post("/banks/resolve", data);
+      return resp.data as ApiResponse<ResolvedAccount>;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["banks", "me"] });
+    },
+  });
+};

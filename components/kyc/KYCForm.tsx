@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -17,6 +18,7 @@ import { useAuth, get_user_value } from "@/store/auth-store";
 import apiClient, { type ApiResponse, new_url } from "@/lib/api";
 import { extract_message } from "@/helpers/apihelpers";
 import type { AxiosError } from "axios";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 
 interface KycFormData {
   idType: "NIN" | "drivers-license" | "passport" | "voters-card" | "";
@@ -191,10 +193,15 @@ export default function KYCForm() {
       : null;
 
   return (
+    <KeyboardAvoidingView
+      style={tw`flex-1`}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
     <ScrollView
       style={tw`flex-1`}
       contentContainerStyle={tw`p-4 gap-5 pb-10`}
       showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
     >
       {rejection ? (
         <View style={tw`bg-red-50 border border-red-200 rounded-xl p-4`}>
@@ -338,5 +345,6 @@ export default function KYCForm() {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

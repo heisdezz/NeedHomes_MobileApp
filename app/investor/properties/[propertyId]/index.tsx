@@ -1,10 +1,13 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  useLocalSearchParams,
-  router,
-  useNavigationContainerRef,
-} from "expo-router";
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  useWindowDimensions,
+} from "react-native";
+import RenderHtml from "react-native-render-html";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { useProperty } from "@/lib/queries/investor";
@@ -24,6 +27,7 @@ function fmt(kobo: number | null | undefined): string {
 export default function PropertyDetailScreen() {
   const { propertyId } = useLocalSearchParams<{ propertyId: string }>();
   const query = useProperty(propertyId);
+  const { width } = useWindowDimensions();
 
   function handleBack() {
     // Navigate to the properties list if there's no proper back stack
@@ -68,7 +72,7 @@ export default function PropertyDetailScreen() {
                 <View style={tw`px-4 pt-4`}>
                   {/* Title + Price */}
                   <View
-                    style={tw`flex-row items-start justify-between gap-3 mb-2`}
+                    style={tw`flex flex-col-reverse items-start justify-between`}
                   >
                     <Text
                       style={[
@@ -79,7 +83,7 @@ export default function PropertyDetailScreen() {
                       {property.propertyTitle}
                     </Text>
                     <Text
-                      style={[tw`text-base font-bold`, { color: Colors.brand }]}
+                      style={[tw`text-lg font-bold`, { color: Colors.brand }]}
                     >
                       {fmt(property.basePrice)}
                     </Text>
@@ -110,14 +114,32 @@ export default function PropertyDetailScreen() {
                     >
                       Description
                     </Text>
-                    <Text
-                      style={[
-                        tw`text-sm leading-5`,
-                        { color: Colors.textSecondary },
-                      ]}
-                    >
-                      {property.description || "No description available."}
-                    </Text>
+                    {property.description ? (
+                      <RenderHtml
+                        contentWidth={width - 32}
+                        source={{ html: property.description }}
+                        tagsStyles={{
+                          body: {
+                            color: Colors.textSecondary,
+                            fontSize: 14,
+                            lineHeight: 22,
+                          },
+                          p: { marginTop: 0, marginBottom: 8 },
+                          a: { color: Colors.brand },
+                          strong: { color: Colors.textPrimary },
+                          b: { color: Colors.textPrimary },
+                        }}
+                      />
+                    ) : (
+                      <Text
+                        style={[
+                          tw`text-sm leading-5`,
+                          { color: Colors.textSecondary },
+                        ]}
+                      >
+                        No description available.
+                      </Text>
+                    )}
                   </View>
 
                   {/* Investment Details */}

@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Platform } from "react-native";
-import { Tabs } from "expo-router";
+import { Tabs, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/theme";
@@ -63,7 +63,7 @@ function CustomTabBar({ state, navigation }: any) {
           return (
             <TouchableOpacity
               key={route.key}
-              onPress={() => navigation.navigate(route.name)}
+              onPress={() => router.push("/investor/properties")}
               activeOpacity={0.85}
               style={tw`flex-1 items-center justify-center`}
             >

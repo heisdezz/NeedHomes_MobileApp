@@ -23,6 +23,7 @@ const MENU_ITEMS: MenuItem[] = [
   { label: "Announcements", icon: "megaphone-outline" },
   { label: "Chat", icon: "chatbubble-outline" },
   { label: "Notifications", icon: "notifications-outline" },
+  { label: "Bank Details", icon: "card-outline" },
 ];
 
 function IconCircle({ name }: { name: keyof typeof Ionicons.glyphMap }) {
@@ -38,13 +39,16 @@ function IconCircle({ name }: { name: keyof typeof Ionicons.glyphMap }) {
   );
 }
 
-const KYC_BADGE: Record<string, { label: string; bg: string; color: string }> = {
-  VERIFIED: { label: "KYC Verified", bg: "#DCFCE7", color: "#16A34A" },
-  PENDING:  { label: "KYC Pending",  bg: "#FEF9C3", color: "#CA8A04" },
-  REJECTED: { label: "KYC Rejected", bg: "#FEE2E2", color: "#DC2626" },
-};
+const KYC_BADGE: Record<string, { label: string; bg: string; color: string }> =
+  {
+    VERIFIED: { label: "KYC Verified", bg: "#DCFCE7", color: "#16A34A" },
+    PENDING: { label: "KYC Pending", bg: "#FEF9C3", color: "#CA8A04" },
+    REJECTED: { label: "KYC Rejected", bg: "#FEE2E2", color: "#DC2626" },
+  };
 
-export default function DrawerContent({ navigation }: DrawerContentComponentProps) {
+export default function DrawerContent({
+  navigation,
+}: DrawerContentComponentProps) {
   const router = useRouter();
   const auth = useAuth();
   const user = auth?.user;
@@ -57,7 +61,10 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={["top", "bottom"]}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={tw`pb-8`}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={tw`pb-8`}
+      >
         {/* Header */}
         <View style={tw`flex-row items-center justify-between px-6 pt-6 pb-6`}>
           <View style={tw`flex-row items-center gap-3`}>
@@ -68,7 +75,10 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
               ]}
             >
               {user?.profilePicture ? (
-                <Image source={{ uri: user.profilePicture }} style={tw`w-12 h-12`} />
+                <Image
+                  source={{ uri: user.profilePicture }}
+                  style={tw`w-12 h-12`}
+                />
               ) : (
                 <Ionicons name="person" size={26} color="#9CA3AF" />
               )}
@@ -78,8 +88,18 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
                 {fullName || "User"}
               </Text>
               {badge ? (
-                <View style={[tw`self-start mt-0.5 rounded-full px-2 py-0.5`, { backgroundColor: badge.bg }]}>
-                  <Text style={[tw`text-[10px] font-semibold`, { color: badge.color }]}>
+                <View
+                  style={[
+                    tw`self-start mt-0.5 rounded-full px-2 py-0.5`,
+                    { backgroundColor: badge.bg },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      tw`text-[10px] font-semibold`,
+                      { color: badge.color },
+                    ]}
+                  >
                     {badge.label}
                   </Text>
                 </View>
@@ -88,7 +108,10 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
               )}
             </View>
           </View>
-          <TouchableOpacity onPress={() => navigation.closeDrawer()} activeOpacity={0.7}>
+          <TouchableOpacity
+            onPress={() => navigation.closeDrawer()}
+            activeOpacity={0.7}
+          >
             <Ionicons name="close" size={22} color={Colors.textSecondary} />
           </TouchableOpacity>
         </View>
@@ -101,7 +124,16 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
           {MENU_ITEMS.map((item) => (
             <TouchableOpacity
               key={item.label}
-              onPress={() => { item.onPress?.(); navigation.closeDrawer(); }}
+              onPress={() => {
+                navigation.closeDrawer();
+                if (item.label === "Bank Details") {
+                  router.push("/investor/BankDetails");
+                } else if (item.label === "Profile Info") {
+                  router.push("/investor/profile-info");
+                } else {
+                  item.onPress?.();
+                }
+              }}
               activeOpacity={0.7}
               style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
             >
@@ -127,11 +159,16 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
             style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
           >
             <IconCircle name="settings-outline" />
-            <Text style={tw`text-text-primary text-sm font-medium`}>Settings</Text>
+            <Text style={tw`text-text-primary text-sm font-medium`}>
+              Settings
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => { navigation.closeDrawer(); doLogout(); }}
+            onPress={() => {
+              navigation.closeDrawer();
+              doLogout();
+            }}
             activeOpacity={0.7}
             style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
           >
