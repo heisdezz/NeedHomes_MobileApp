@@ -108,7 +108,7 @@ export default function IndividualScreen() {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top"]}>
+    <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={tw`items-center pt-4 pb-5`}>
         <Image

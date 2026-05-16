@@ -81,7 +81,7 @@ export default function PartnerSignUpScreen() {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top"]}>
+    <SafeAreaView style={tw`flex-1 bg-bg`} edges={["top", "bottom"]}>
       {/* Header */}
       <View style={tw`items-center pt-4 pb-5`}>
         <Image
@@ -116,7 +116,7 @@ export default function PartnerSignUpScreen() {
                 render={({ field: { onChange, value } }) => (
                   <FormInput
                     label="First Name"
-                    placeholder="Chidiebere"
+                    placeholder="John"
                     value={value}
                     onChangeText={onChange}
                     error={errors.firstName?.message}
@@ -131,7 +131,7 @@ export default function PartnerSignUpScreen() {
                 render={({ field: { onChange, value } }) => (
                   <FormInput
                     label="Last Name"
-                    placeholder="Igwe"
+                    placeholder="Doe"
                     value={value}
                     onChangeText={onChange}
                     error={errors.lastName?.message}
@@ -147,7 +147,7 @@ export default function PartnerSignUpScreen() {
             render={({ field: { onChange, value } }) => (
               <FormInput
                 label="Email"
-                placeholder="tyler.igwe@gmail.com"
+                placeholder="john.doe@example.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={value}
@@ -171,7 +171,7 @@ export default function PartnerSignUpScreen() {
               containerStyle={tw`w-full bg-card border border-input-border rounded-xl`}
               textContainerStyle={tw`bg-card rounded-r-xl py-0`}
               textInputStyle={tw`text-sm text-text-primary`}
-              placeholder="Enter your phone number"
+              placeholder="08012345678"
             />
             {errors.phone && (
               <Text style={tw`text-error text-xs`}>{errors.phone.message}</Text>

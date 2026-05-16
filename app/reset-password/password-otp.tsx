@@ -19,7 +19,7 @@ import apiClient from "@/lib/api";
 import { extract_message } from "@/helpers/apihelpers";
 
 const OTP_LENGTH = 6;
-const RESEND_SECONDS = 120;
+const RESEND_SECONDS = 40;
 
 export default function PasswordOTPScreen() {
   const router = useRouter();
@@ -76,7 +76,10 @@ export default function PasswordOTPScreen() {
       apiClient.post("auth/password/forgot", { email: decodedEmail }),
     onSuccess: () => {
       setCountdown(RESEND_SECONDS);
-      showMessage({ message: "OTP resent! Check your email.", type: "success" });
+      showMessage({
+        message: "OTP resent! Check your email.",
+        type: "success",
+      });
     },
     onError: (e: any) =>
       showMessage({ message: extract_message(e), type: "danger" }),
@@ -84,7 +87,10 @@ export default function PasswordOTPScreen() {
 
   const handleSubmit = () => {
     if (otp.join("").length < OTP_LENGTH) {
-      return showMessage({ message: "Please enter the full OTP", type: "warning" });
+      return showMessage({
+        message: "Please enter the full OTP",
+        type: "warning",
+      });
     }
     verify();
   };
@@ -118,10 +124,14 @@ export default function PasswordOTPScreen() {
             {otp.map((digit, i) => (
               <TextInput
                 key={i}
-                ref={(r) => { inputs.current[i] = r; }}
+                ref={(r) => {
+                  inputs.current[i] = r;
+                }}
                 value={digit}
                 onChangeText={(t) => handleChange(t, i)}
-                onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, i)}
+                onKeyPress={({ nativeEvent }) =>
+                  handleKeyPress(nativeEvent.key, i)
+                }
                 keyboardType="number-pad"
                 maxLength={1}
                 style={[

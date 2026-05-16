@@ -18,7 +18,7 @@ import { Colors } from "@/constants/theme";
 import apiClient from "@/lib/api";
 
 const OTP_LENGTH = 6;
-const RESEND_SECONDS = 120;
+const RESEND_SECONDS = 40;
 
 export default function VerifyScreen() {
   const router = useRouter();
