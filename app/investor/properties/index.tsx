@@ -33,7 +33,7 @@ function formatKoboToNaira(kobo: number): string {
 }
 
 const STAGE_TO_STATUS: Record<string, Property["status"]> = {
-  PLANNING: "Off Plan",
+  PLANNING: "Planning",
   FOUNDATION: "Ongoing",
   ROOFING: "Ongoing",
   FINISHED: "Completed",

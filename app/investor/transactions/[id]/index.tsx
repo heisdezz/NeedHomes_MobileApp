@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
   Clipboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +11,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { useTransaction, type Transaction } from "@/lib/queries/investor";
+import PageLoader from "@/components/layout/PageLoader";
 import tw from "@/lib/tw";
 
 // ─── Copy button ──────────────────────────────────────────────────────────────
@@ -151,7 +151,7 @@ function fmtDate(d: string) {
 
 export default function TransactionDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data, isLoading, isError } = useTransaction(id);
+  const query = useTransaction(id);
 
   return (
     <SafeAreaView style={tw`flex-1 bg-[#F9FAFB]`} edges={["top", "bottom"]}>
@@ -166,48 +166,17 @@ export default function TransactionDetailScreen() {
           <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
         </TouchableOpacity>
         <Text
-          style={[
-            tw`text-base font-bold flex-1`,
-            { color: Colors.textPrimary },
-          ]}
+          style={[tw`text-base font-bold flex-1`, { color: Colors.textPrimary }]}
         >
           Transaction Details
         </Text>
       </View>
 
-      {isLoading ? (
-        <View style={tw`flex-1 items-center justify-center`}>
-          <ActivityIndicator color={Colors.brand} size="large" />
-        </View>
-      ) : isError || !data?.data ? (
-        <View style={tw`flex-1 items-center justify-center gap-3 px-8`}>
-          <Ionicons
-            name="alert-circle-outline"
-            size={40}
-            color={Colors.error}
-          />
-          <Text
-            style={[tw`text-sm text-center`, { color: Colors.textSecondary }]}
-          >
-            Failed to load transaction.
-          </Text>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            activeOpacity={0.7}
-            style={[
-              tw`px-5 py-2.5 rounded-xl`,
-              { backgroundColor: Colors.brand },
-            ]}
-          >
-            <Text style={tw`text-white text-sm font-bold`}>Go Back</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        (() => {
+      <PageLoader query={query} loadingText="Loading transaction...">
+        {(data) => {
           const trx = data.data;
           const typeStyle = TYPE_CONFIG[trx.type] ?? TYPE_CONFIG.DEPOSIT;
-          const statusStyle =
-            STATUS_CONFIG[trx.status] ?? STATUS_CONFIG.PENDING;
+          const statusStyle = STATUS_CONFIG[trx.status] ?? STATUS_CONFIG.PENDING;
 
           return (
             <ScrollView
@@ -218,82 +187,66 @@ export default function TransactionDetailScreen() {
               <View
                 style={[
                   tw`rounded-2xl overflow-hidden`,
-                  {
-                    backgroundColor: "#fff",
-                    borderWidth: 1,
-                    borderColor: Colors.divider,
-                  },
+                  { backgroundColor: "#fff", borderWidth: 1, borderColor: Colors.divider },
                 ]}
               >
                 {/* Accent strip */}
-                <View
-                  style={{ height: 4, backgroundColor: typeStyle.accent }}
-                />
+                <View style={{ height: 4, backgroundColor: typeStyle.accent }} />
 
                 <View style={tw`p-5 gap-4`}>
                   {/* Type + status row */}
-                  <View style={tw`flex-row items-start justify-between gap-3`}>
-                    <View style={tw`flex-row items-center gap-3 flex-1`}>
-                      <View
-                        style={[
-                          tw`w-12 h-12 rounded-2xl items-center justify-center`,
-                          { backgroundColor: typeStyle.iconBg },
-                        ]}
-                      >
-                        <Ionicons
-                          name={typeStyle.icon}
-                          size={24}
-                          color={typeStyle.iconColor}
-                        />
-                      </View>
-                      <View style={tw`flex-1`}>
-                        <Text
-                          style={[
-                            tw`text-base font-bold`,
-                            { color: Colors.textPrimary },
-                          ]}
-                        >
-                          {typeStyle.label} Transaction
-                        </Text>
-                        <View style={tw`flex-row items-center gap-1.5 mt-1`}>
-                          <View
-                            style={[
-                              tw`w-1.5 h-1.5 rounded-full`,
-                              { backgroundColor: statusStyle.dot },
-                            ]}
-                          />
-                          <Text
-                            style={[
-                              tw`text-xs font-semibold`,
-                              { color: statusStyle.text },
-                            ]}
-                          >
-                            {statusStyle.label}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-
-                    {/* Amount */}
+                  <View style={tw`flex-row items-center gap-3`}>
                     <View
                       style={[
-                        tw`rounded-xl px-4 py-2 items-end`,
-                        {
-                          backgroundColor: "#FFF7ED",
-                          borderWidth: 1,
-                          borderColor: "#FED7AA",
-                        },
+                        tw`w-12 h-12 rounded-2xl items-center justify-center`,
+                        { backgroundColor: typeStyle.iconBg },
                       ]}
                     >
-                      <Text style={[tw`text-xs`, { color: Colors.textMuted }]}>
-                        Amount
-                      </Text>
-                      <Text
-                        style={[tw`text-lg font-bold`, { color: Colors.brand }]}
-                      >
-                        {fmt(trx.amount)}
-                      </Text>
+                      <Ionicons
+                        name={typeStyle.icon}
+                        size={24}
+                        color={typeStyle.iconColor}
+                      />
                     </View>
+                    <View style={tw`flex-1`}>
+                      <Text
+                        style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
+                      >
+                        {typeStyle.label} Transaction
+                      </Text>
+                      <View style={tw`flex-row items-center gap-1.5 mt-1`}>
+                        <View
+                          style={[
+                            tw`w-1.5 h-1.5 rounded-full`,
+                            { backgroundColor: statusStyle.dot },
+                          ]}
+                        />
+                        <Text
+                          style={[tw`text-xs font-semibold`, { color: statusStyle.text }]}
+                        >
+                          {statusStyle.label}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Amount — full-width block so large values never compress siblings */}
+                  <View
+                    style={[
+                      tw`rounded-xl px-4 py-3`,
+                      { backgroundColor: "#FFF7ED", borderWidth: 1, borderColor: "#FED7AA" },
+                    ]}
+                  >
+                    <Text style={[tw`text-xs mb-1`, { color: Colors.textMuted }]}>
+                      Amount
+                    </Text>
+                    <Text
+                      style={[tw`text-2xl font-bold`, { color: Colors.brand }]}
+                      adjustsFontSizeToFit
+                      numberOfLines={1}
+                    >
+                      {fmt(trx.amount)}
+                    </Text>
                   </View>
 
                   {/* Reference */}
@@ -318,10 +271,7 @@ export default function TransactionDetailScreen() {
                         Reference
                       </Text>
                       <Text
-                        style={[
-                          tw`text-xs font-mono`,
-                          { color: Colors.textPrimary },
-                        ]}
+                        style={[tw`text-xs font-mono`, { color: Colors.textPrimary }]}
                         numberOfLines={1}
                       >
                         {trx.reference}
@@ -336,11 +286,7 @@ export default function TransactionDetailScreen() {
               <View
                 style={[
                   tw`rounded-2xl overflow-hidden`,
-                  {
-                    backgroundColor: "#fff",
-                    borderWidth: 1,
-                    borderColor: Colors.divider,
-                  },
+                  { backgroundColor: "#fff", borderWidth: 1, borderColor: Colors.divider },
                 ]}
               >
                 <View
@@ -368,32 +314,18 @@ export default function TransactionDetailScreen() {
                   </Text>
                 </View>
 
-                <DetailRow
-                  label="Transaction ID"
-                  value={trx.id}
-                  mono
-                  copyable
-                />
-                <DetailRow
-                  label="Wallet ID"
-                  value={trx.walletId}
-                  mono
-                  copyable
-                />
+                <DetailRow label="Transaction ID" value={trx.id} mono copyable />
+                <DetailRow label="Wallet ID" value={trx.walletId} mono copyable />
                 <DetailRow label="Type" value={typeStyle.label} />
                 <DetailRow label="Status" value={statusStyle.label} />
                 <DetailRow label="Amount" value={fmt(trx.amount)} />
                 <DetailRow label="Created" value={fmtDate(trx.createdAt)} />
-                <DetailRow
-                  label="Last Updated"
-                  value={fmtDate(trx.updatedAt)}
-                  last
-                />
+                <DetailRow label="Last Updated" value={fmtDate(trx.updatedAt)} last />
               </View>
             </ScrollView>
           );
-        })()
-      )}
+        }}
+      </PageLoader>
     </SafeAreaView>
   );
 }

@@ -10,7 +10,7 @@ export type Property = {
   location: string;
   propertyType: string;
   price: string;
-  status?: "Ongoing" | "Brand New" | "Completed" | "Off Plan";
+  status?: "Ongoing" | "Brand New" | "Completed" | "Planning";
   imageUri?: string;
   isBookmarked?: boolean;
   cardWidth?: number;
@@ -22,7 +22,7 @@ const STATUS_COLORS: Record<string, string> = {
   Ongoing: "#22C55E",
   "Brand New": Colors.brand,
   Completed: "#3B82F6",
-  "Off Plan": "#8B5CF6",
+  Planning: "#8B5CF6",
 };
 
 export default function PropertyCard({
@@ -94,20 +94,6 @@ export default function PropertyCard({
         )}
 
         {/* Bookmark */}
-        <TouchableOpacity
-          onPress={onBookmark}
-          activeOpacity={0.7}
-          style={[
-            tw`absolute bottom-2 right-2 w-7 h-7 rounded-full items-center justify-center`,
-            { backgroundColor: "rgba(0,0,0,0.45)" },
-          ]}
-        >
-          <Ionicons
-            name={isBookmarked ? "bookmark" : "bookmark-outline"}
-            size={14}
-            color="#fff"
-          />
-        </TouchableOpacity>
       </View>
 
       {/* Body */}

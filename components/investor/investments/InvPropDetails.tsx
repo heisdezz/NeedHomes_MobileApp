@@ -1,4 +1,10 @@
-import { View, Text, Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useProperty } from "@/lib/queries/investor";
@@ -14,7 +20,7 @@ const MODEL_LABEL: Record<string, string> = {
 };
 
 const STAGE_LABEL: Record<string, string> = {
-  PLANNING: "Off Plan",
+  PLANNING: "Planning",
   FOUNDATION: "Ongoing",
   ROOFING: "Ongoing",
   FINISHED: "Completed",
@@ -48,8 +54,10 @@ export default function InvPropDetails({ propertyId }: Props) {
 
   const property = query.data.data;
   const coverImage = property.coverImage || property.galleryImages?.[0];
-  const stageLabel = STAGE_LABEL[property.developmentStage] ?? property.developmentStage;
-  const modelLabel = MODEL_LABEL[property.investmentModel] ?? property.investmentModel;
+  const stageLabel =
+    STAGE_LABEL[property.developmentStage] ?? property.developmentStage;
+  const modelLabel =
+    MODEL_LABEL[property.investmentModel] ?? property.investmentModel;
 
   return (
     <View
@@ -62,7 +70,10 @@ export default function InvPropDetails({ propertyId }: Props) {
       <View
         style={[
           tw`flex-row items-center justify-between px-4 py-3 border-b`,
-          { backgroundColor: Colors.inputBg, borderBottomColor: Colors.divider },
+          {
+            backgroundColor: Colors.inputBg,
+            borderBottomColor: Colors.divider,
+          },
         ]}
       >
         <View style={tw`flex-row items-center gap-2`}>
@@ -76,7 +87,9 @@ export default function InvPropDetails({ propertyId }: Props) {
           activeOpacity={0.7}
           style={tw`flex-row items-center gap-1`}
         >
-          <Text style={[tw`text-xs font-semibold`, { color: Colors.brand }]}>View</Text>
+          <Text style={[tw`text-xs font-semibold`, { color: Colors.brand }]}>
+            View
+          </Text>
           <Ionicons name="arrow-forward" size={12} color={Colors.brand} />
         </TouchableOpacity>
       </View>
@@ -104,7 +117,10 @@ export default function InvPropDetails({ propertyId }: Props) {
         {/* Title + price */}
         <View style={tw`flex-row items-start justify-between gap-3`}>
           <Text
-            style={[tw`text-base font-bold flex-1`, { color: Colors.textPrimary }]}
+            style={[
+              tw`text-base font-bold flex-1`,
+              { color: Colors.textPrimary },
+            ]}
             numberOfLines={2}
           >
             {property.propertyTitle}
@@ -128,7 +144,10 @@ export default function InvPropDetails({ propertyId }: Props) {
         {/* Badges */}
         <View style={tw`flex-row gap-2 flex-wrap`}>
           <View
-            style={[tw`px-3 py-1 rounded-full`, { backgroundColor: Colors.brand + "15" }]}
+            style={[
+              tw`px-3 py-1 rounded-full`,
+              { backgroundColor: Colors.brand + "15" },
+            ]}
           >
             <Text style={[tw`text-xs font-semibold`, { color: Colors.brand }]}>
               {modelLabel}
@@ -137,21 +156,34 @@ export default function InvPropDetails({ propertyId }: Props) {
           <View
             style={[
               tw`px-3 py-1 rounded-full`,
-              { backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.divider },
+              {
+                backgroundColor: Colors.inputBg,
+                borderWidth: 1,
+                borderColor: Colors.divider,
+              },
             ]}
           >
-            <Text style={[tw`text-xs font-medium`, { color: Colors.textSecondary }]}>
+            <Text
+              style={[tw`text-xs font-medium`, { color: Colors.textSecondary }]}
+            >
               {stageLabel}
             </Text>
           </View>
           <View
             style={[
               tw`px-3 py-1 rounded-full`,
-              { backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.divider },
+              {
+                backgroundColor: Colors.inputBg,
+                borderWidth: 1,
+                borderColor: Colors.divider,
+              },
             ]}
           >
-            <Text style={[tw`text-xs font-medium`, { color: Colors.textSecondary }]}>
-              {property.propertyType.charAt(0) + property.propertyType.slice(1).toLowerCase()}
+            <Text
+              style={[tw`text-xs font-medium`, { color: Colors.textSecondary }]}
+            >
+              {property.propertyType.charAt(0) +
+                property.propertyType.slice(1).toLowerCase()}
             </Text>
           </View>
         </View>

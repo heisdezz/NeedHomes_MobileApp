@@ -330,7 +330,13 @@ export default function InvestorWallet() {
 
         {/* Recent transactions */}
         <View style={[tw`px-4 pt-3 pb-4 border-t`, { borderColor: Colors.divider, backgroundColor: Colors.inputBg }]}>
-          <Text style={[tw`text-xs font-semibold uppercase mb-3`, { color: Colors.textSecondary, letterSpacing: 0.8 }]}>Recent</Text>
+          <View style={tw`flex-row items-center justify-between mb-3`}>
+            <Text style={[tw`text-xs font-semibold uppercase`, { color: Colors.textSecondary, letterSpacing: 0.8 }]}>Recent</Text>
+            <TouchableOpacity onPress={() => router.push("/investor/transactions")} activeOpacity={0.7} style={tw`flex-row items-center gap-1`}>
+              <Text style={[tw`text-xs font-semibold`, { color: Colors.brand }]}>View All</Text>
+              <Ionicons name="chevron-forward" size={12} color={Colors.brand} />
+            </TouchableOpacity>
+          </View>
           {isLoading ? (
             <ActivityIndicator color={Colors.brand} style={tw`py-4`} />
           ) : walletData && walletData.walletTransactions.length > 0 ? (
