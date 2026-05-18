@@ -165,7 +165,6 @@ export default function PropertiesScreen() {
           Properties
         </Text>
       </View>
-
       {/* Search bar */}
       <View
         style={[
@@ -197,7 +196,6 @@ export default function PropertiesScreen() {
           </TouchableOpacity>
         )}
       </View>
-
       {/* Filters + Reset row */}
       <View style={tw`flex-row items-center px-4 gap-2 mb-2`}>
         <TouchableOpacity
@@ -243,12 +241,12 @@ export default function PropertiesScreen() {
           </TouchableOpacity>
         )}
       </View>
-
       {/* Active filter tags */}
       {activeTagList.length > 0 && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          style={{ flexGrow: 0 }}
           contentContainerStyle={tw`px-4 mb-2`}
         >
           {activeTagList.map((tag) => (
@@ -260,17 +258,20 @@ export default function PropertiesScreen() {
                   backgroundColor: "#FFF7ED",
                   borderWidth: 1,
                   borderColor: "#FDBA74",
+                  maxWidth: 180,
                 },
               ]}
             >
-              <Text style={[tw`text-xs font-medium`, { color: Colors.brand }]}>
+              <Text
+                numberOfLines={1}
+                style={[tw`text-xs font-medium`, { color: Colors.brand }]}
+              >
                 {tag}
               </Text>
             </View>
           ))}
         </ScrollView>
       )}
-
       {/* Content */}
       <View style={tw`flex-1`}>
         {/*<Text>testing</Text>*/}
@@ -316,7 +317,6 @@ export default function PropertiesScreen() {
           }}
         </PageLoader>
       </View>
-
       <PriceLocationModal
         visible={modalVisible}
         initial={filters}

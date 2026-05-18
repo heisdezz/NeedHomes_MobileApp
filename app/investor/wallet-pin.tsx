@@ -474,7 +474,7 @@ function ResetVerifyView({
       }),
       {
         loading: "Verifying...",
-        success: "Identity verified. Set your new PIN.",
+        success: () => "Identity verified. Set your new PIN.",
         error: extract_message as any,
       },
     );

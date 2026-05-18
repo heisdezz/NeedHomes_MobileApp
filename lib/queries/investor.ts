@@ -164,7 +164,7 @@ export const useDepositMutation = () => {
       const resp = await apiClient.post("/wallet/deposit/initialize", {
         amount: amount * 100,
       });
-      return resp.data as ApiResponse<{ access_code: string; reference: string }>;
+      return resp.data as ApiResponse<{ access_code: string; reference: string; authorization_url: string }>;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["wallet"] });

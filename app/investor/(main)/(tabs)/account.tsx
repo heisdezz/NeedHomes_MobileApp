@@ -42,7 +42,8 @@ const KYC_CONFIG: Record<
     color: "#DC2626",
     border: "#FCA5A5",
     icon: "close-circle",
-    description: "Your KYC was rejected. Please re-submit with valid documents.",
+    description:
+      "Your KYC was rejected. Please re-submit with valid documents.",
   },
 };
 
@@ -53,13 +54,16 @@ export default function AccountScreen() {
   const clearKyc = useAuthStore((s) => s.clearKyc);
 
   const user = auth?.user;
-  const kycStatus = (kyc as any)?.account_verification_status as string | undefined;
+  const kycStatus = (kyc as any)?.account_verification_status as
+    | string
+    | undefined;
   const kycConfig = kycStatus ? KYC_CONFIG[kycStatus] : null;
 
-  const initials = [user?.firstName?.[0], user?.lastName?.[0]]
-    .filter(Boolean)
-    .join("")
-    .toUpperCase() || "?";
+  const initials =
+    [user?.firstName?.[0], user?.lastName?.[0]]
+      .filter(Boolean)
+      .join("")
+      .toUpperCase() || "?";
 
   function handleLogout() {
     Alert.alert("Log Out", "Are you sure you want to log out?", [
@@ -151,7 +155,7 @@ export default function AccountScreen() {
           <View style={tw`mt-4`}>
             <PrimaryButton
               label="Edit Profile"
-              onPress={() => router.push("/investor/settings")}
+              onPress={() => router.push("/investor/profile-info")}
             />
           </View>
         </View>
@@ -216,11 +220,18 @@ export default function AccountScreen() {
               <View
                 style={[
                   tw`px-2.5 py-1 rounded-full`,
-                  { backgroundColor: "#F3F4F6", borderWidth: 1, borderColor: "#E5E7EB" },
+                  {
+                    backgroundColor: "#F3F4F6",
+                    borderWidth: 1,
+                    borderColor: "#E5E7EB",
+                  },
                 ]}
               >
                 <Text
-                  style={[tw`text-xs font-semibold`, { color: Colors.textMuted }]}
+                  style={[
+                    tw`text-xs font-semibold`,
+                    { color: Colors.textMuted },
+                  ]}
                 >
                   Not Started
                 </Text>
@@ -231,7 +242,10 @@ export default function AccountScreen() {
           {/* Card body */}
           <View style={[tw`p-4`, { backgroundColor: Colors.card }]}>
             <Text
-              style={[tw`text-sm leading-5 mb-4`, { color: Colors.textSecondary }]}
+              style={[
+                tw`text-sm leading-5 mb-4`,
+                { color: Colors.textSecondary },
+              ]}
             >
               {kycConfig?.description ??
                 "Complete your KYC to unlock full investment features and increase your transaction limits."}
@@ -259,8 +273,8 @@ export default function AccountScreen() {
                   {kycStatus === "REJECTED"
                     ? "Re-submit KYC"
                     : kycStatus === "PENDING"
-                    ? "View KYC Status"
-                    : "Complete KYC"}
+                      ? "View KYC Status"
+                      : "Complete KYC"}
                 </Text>
               </TouchableOpacity>
             )}
@@ -303,12 +317,19 @@ export default function AccountScreen() {
               <View style={tw`flex-row items-center gap-3`}>
                 <Ionicons name={icon} size={20} color={Colors.textSecondary} />
                 <Text
-                  style={[tw`text-sm font-medium`, { color: Colors.textPrimary }]}
+                  style={[
+                    tw`text-sm font-medium`,
+                    { color: Colors.textPrimary },
+                  ]}
                 >
                   {label}
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={Colors.textMuted}
+              />
             </TouchableOpacity>
           ))}
         </View>

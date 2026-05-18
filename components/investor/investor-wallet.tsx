@@ -12,6 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { toast } from "sonner-native";
+import * as WebBrowser from "expo-web-browser";
 import { Colors } from "@/constants/theme";
 import {
   useWallet,
@@ -253,22 +254,25 @@ export default function InvestorWallet() {
       .filter((t) => t.type === "WITHDRAWAL" && t.status === "SUCCESS")
       .reduce((acc, t) => acc + t.amount, 0) ?? 0;
 
-  function handleConfirm(amount: number, pin: string) {
+  async function handleConfirm(amount: number, pin: string) {
     if (modalType === "deposit") {
-      toast.promise(deposit.mutateAsync(amount as any), {
-        loading: "Processing…",
-        success: () => "Deposit successful",
-        error: extract_message as any,
-      });
+      setModalVisible(false);
+      try {
+        const result = await deposit.mutateAsync(amount);
+        const { authorization_url } = result.data;
+        await WebBrowser.openBrowserAsync(authorization_url);
+        refetch();
+      } catch (e) {
+        toast.error(extract_message(e as any) ?? "Deposit failed");
+      }
     } else {
       toast.promise(withdraw.mutateAsync({ amount, pin }), {
         loading: "Processing…",
         success: () => "Withdrawal successful",
         error: extract_message as any,
       });
+      setModalVisible(false);
     }
-    setModalVisible(false);
-    refetch();
   }
 
   return (

@@ -15,7 +15,11 @@ export default function SettingsScreen() {
   const router = useRouter();
 
   const SETTINGS_ITEMS: SettingsItem[] = [
-    { label: "Profile Info", icon: "person-circle-outline" },
+    {
+      label: "Profile Info",
+      icon: "person-circle-outline",
+      onPress: () => router.push("/investor/profile-info"),
+    },
     {
       label: "Bank Details",
       icon: "card-outline",
@@ -31,7 +35,7 @@ export default function SettingsScreen() {
       icon: "lock-closed-outline",
       onPress: () => router.push("/investor/wallet-pin"),
     },
-    { label: "Security", icon: "lock-closed-outline" },
+    // { label: "Security", icon: "lock-closed-outline" },
   ];
 
   return (

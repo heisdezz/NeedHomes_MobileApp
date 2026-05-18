@@ -211,7 +211,7 @@ export default function InvestmentDetails({
             value={fmt(property.pricePerPlot)}
           />
           <DetailRow
-            label="Holding Period"
+            label="Minimum Holding Period"
             value={
               property.holdingPeriod
                 ? `${property.holdingPeriod} Months`
