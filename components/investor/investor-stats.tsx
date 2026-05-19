@@ -46,7 +46,7 @@ function StatCard({ title, value, label, icon, variant }: StatCardProps) {
       </View>
 
       {/* Body */}
-      <View style={tw`px-3 pt-3 pb-4`}>
+      <View style={[tw`px-3 pt-3 pb-4`, { backgroundColor: "#F5F5F5" }]}>
         <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
           {value}
         </Text>
@@ -67,7 +67,7 @@ function SkeletonCard() {
       ]}
     >
       <View style={[tw`h-10`, { backgroundColor: Colors.inputBg }]} />
-      <View style={tw`px-3 pt-3 pb-4 items-center`}>
+      <View style={[tw`px-3 pt-3 pb-4 items-center`, { backgroundColor: "#F5F5F5" }]}>
         <ActivityIndicator size="small" color={Colors.brand} />
       </View>
     </View>
