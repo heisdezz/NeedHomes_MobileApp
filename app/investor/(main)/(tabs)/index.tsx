@@ -8,7 +8,7 @@ import {
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 import { useAuth, useKyc } from "@/store";
 import apiClient from "@/lib/api";
@@ -44,10 +44,7 @@ function QuickLinkCard({
     >
       <Text style={{ fontSize: 28 }}>{icon}</Text>
       <Text
-        style={[
-          tw`text-xs font-semibold text-center`,
-          { color: textColor },
-        ]}
+        style={[tw`text-xs font-semibold text-center`, { color: textColor }]}
       >
         {label}
       </Text>
@@ -64,6 +61,7 @@ const KYC_BADGE: Record<string, { label: string; bg: string; color: string }> =
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const router = useRouter();
   const openDrawer = () => navigation.dispatch(DrawerActions.openDrawer());
   const auth = useAuth();
   const user = auth?.user;
@@ -142,12 +140,12 @@ export default function HomeScreen() {
               activeOpacity={0.7}
               style={[
                 tw`w-9 h-9 rounded-full items-center justify-center`,
-                { backgroundColor: Colors.surface },
+                // { s: Colors.surface },
               ]}
             >
               <Ionicons
                 name="notifications-outline"
-                size={20}
+                size={24}
                 color={Colors.brand}
               />
             </TouchableOpacity>
@@ -182,6 +180,7 @@ export default function HomeScreen() {
             label="Frequently Asked Questions"
             bg="#FFDEC1"
             textColor={Colors.textPrimary}
+            onPress={() => router.push("/faq")}
           />
           <QuickLinkCard
             icon="📄"
