@@ -25,9 +25,15 @@ export default function VerifyScreen() {
   const { email } = useLocalSearchParams<{ email?: string }>();
   const decodedEmail = decodeURIComponent(email ?? "");
 
+  const [pendingEmail, setPendingEmail] = useState(decodedEmail);
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [countdown, setCountdown] = useState(RESEND_SECONDS);
   const inputs = useRef<(TextInput | null)[]>([]);
+
+  // ── Change-email state ────────────────────────────────────────────────────
+  const [showChangeEmail, setShowChangeEmail] = useState(false);
+  const [newEmailInput, setNewEmailInput] = useState("");
+  const [changeEmailError, setChangeEmailError] = useState("");
 
   // ── Countdown timer ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -60,7 +66,7 @@ export default function VerifyScreen() {
   const { mutate: verify, isPending } = useMutation({
     mutationFn: () =>
       apiClient.post("auth/verify-email", {
-        email: decodedEmail,
+        email: pendingEmail,
         otp: otp.join(""),
       }),
     onSuccess: () => {
@@ -78,7 +84,10 @@ export default function VerifyScreen() {
   // ── Resend mutation ───────────────────────────────────────────────────────
   const { mutate: resend, isPending: isResending } = useMutation({
     mutationFn: () =>
-      apiClient.post("auth/resend-otp", { email: decodedEmail }),
+      apiClient.post("auth/resend-otp", {
+        email: pendingEmail,
+        purpose: "email_verification",
+      }),
     onSuccess: () => {
       setCountdown(RESEND_SECONDS);
       showMessage({
@@ -94,6 +103,42 @@ export default function VerifyScreen() {
     },
   });
 
+  // ── Change email mutation ─────────────────────────────────────────────────
+  const { mutate: changeEmail, isPending: isChangingEmail } = useMutation({
+    mutationFn: (newEmail: string) =>
+      apiClient.post("auth/change-pending-email", {
+        currentEmail: pendingEmail,
+        newEmail,
+      }),
+    onSuccess: (_, newEmail) => {
+      setPendingEmail(newEmail);
+      setOtp(Array(OTP_LENGTH).fill(""));
+      setCountdown(RESEND_SECONDS);
+      setShowChangeEmail(false);
+      setNewEmailInput("");
+      setChangeEmailError("");
+      showMessage({
+        message: `Verification code sent to ${newEmail}`,
+        type: "success",
+      });
+    },
+    onError: (e: any) => {
+      setChangeEmailError(
+        e?.response?.data?.message ?? "Failed to update email"
+      );
+    },
+  });
+
+  const handleChangeEmailSubmit = () => {
+    const trimmed = newEmailInput.trim();
+    if (!trimmed) {
+      setChangeEmailError("Please enter a new email address");
+      return;
+    }
+    setChangeEmailError("");
+    changeEmail(trimmed);
+  };
+
   const handleSubmit = () => {
     if (otp.join("").length < OTP_LENGTH) {
       return showMessage({
@@ -101,8 +146,6 @@ export default function VerifyScreen() {
         type: "warning",
       });
     }
-
-    // console.log(decodedEmail);
     verify();
   };
 
@@ -126,10 +169,129 @@ export default function VerifyScreen() {
           <Text style={tw`text-text-primary text-xl font-bold mb-2`}>
             OTP Verification
           </Text>
-          <Text style={tw`text-text-secondary text-sm leading-5 mb-8`}>
-            An OTP has been sent to your email to be able to verify your
-            account. {decodedEmail}
-          </Text>
+
+          {/* ── Email line with Change Email button ── */}
+          <View style={tw`flex-row items-center flex-wrap gap-x-2 mb-6`}>
+            <Text style={tw`text-text-secondary text-sm leading-5`}>
+              Enter the code sent to{" "}
+              <Text style={tw`text-text-primary font-semibold`}>
+                {pendingEmail}
+              </Text>
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                setShowChangeEmail((v) => !v);
+                setChangeEmailError("");
+                setNewEmailInput("");
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={[tw`text-xs font-bold`, { color: Colors.brand }]}>
+                {showChangeEmail ? "Cancel" : "Change Email"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* ── Inline change-email panel ── */}
+          {showChangeEmail && (
+            <View
+              style={[
+                tw`rounded-2xl p-4 mb-6`,
+                {
+                  backgroundColor: Colors.inputBg,
+                  borderWidth: 1,
+                  borderColor: Colors.inputBorder,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  tw`text-sm font-semibold mb-3`,
+                  { color: Colors.textPrimary },
+                ]}
+              >
+                Update your email address
+              </Text>
+              <View
+                style={[
+                  tw`flex-row items-center rounded-xl px-4 border mb-1`,
+                  {
+                    borderColor: changeEmailError
+                      ? "#F87171"
+                      : Colors.inputBorder,
+                    backgroundColor: Colors.card,
+                  },
+                ]}
+              >
+                <TextInput
+                  value={newEmailInput}
+                  onChangeText={(t) => {
+                    setNewEmailInput(t);
+                    setChangeEmailError("");
+                  }}
+                  placeholder="New email address"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  placeholderTextColor={Colors.inputPlaceholder}
+                  style={[
+                    tw`flex-1 py-3.5 text-sm`,
+                    { color: Colors.textPrimary },
+                  ]}
+                />
+              </View>
+              {changeEmailError ? (
+                <Text style={tw`text-xs text-red-500 mb-3`}>
+                  {changeEmailError}
+                </Text>
+              ) : (
+                <View style={tw`mb-3`} />
+              )}
+              <View style={tw`flex-row gap-3`}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowChangeEmail(false);
+                    setNewEmailInput("");
+                    setChangeEmailError("");
+                  }}
+                  activeOpacity={0.7}
+                  style={[
+                    tw`flex-1 py-3 rounded-xl items-center border`,
+                    { borderColor: Colors.divider },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      tw`text-sm font-semibold`,
+                      { color: Colors.textSecondary },
+                    ]}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleChangeEmailSubmit}
+                  disabled={isChangingEmail}
+                  activeOpacity={0.85}
+                  style={[
+                    tw`flex-1 py-3 rounded-xl items-center`,
+                    {
+                      backgroundColor: Colors.brand,
+                      opacity: isChangingEmail ? 0.6 : 1,
+                    },
+                  ]}
+                >
+                  {isChangingEmail ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={tw`text-white text-sm font-bold`}>
+                      Update & Resend
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           {/* ── OTP boxes ── */}
           <View style={tw`flex-row justify-between mb-8`}>
