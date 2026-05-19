@@ -23,10 +23,14 @@ import { set_kyc_value } from "@/store/auth-store";
 function QuickLinkCard({
   icon,
   label,
+  bg,
+  textColor,
   onPress,
 }: {
   icon: string;
   label: string;
+  bg: string;
+  textColor: string;
   onPress?: () => void;
 }) {
   return (
@@ -35,14 +39,14 @@ function QuickLinkCard({
       activeOpacity={0.8}
       style={[
         tw`flex-1 rounded-2xl items-center justify-center py-5 gap-2`,
-        { backgroundColor: Colors.surface },
+        { backgroundColor: bg },
       ]}
     >
       <Text style={{ fontSize: 28 }}>{icon}</Text>
       <Text
         style={[
           tw`text-xs font-semibold text-center`,
-          { color: Colors.textInverse },
+          { color: textColor },
         ]}
       >
         {label}
@@ -173,8 +177,18 @@ export default function HomeScreen() {
 
         {/* Quick links */}
         <View style={tw`flex-row gap-3 px-4 mt-5`}>
-          <QuickLinkCard icon="📋" label="Frequently Asked Questions" />
-          <QuickLinkCard icon="📄" label="Our Policies" />
+          <QuickLinkCard
+            icon="📋"
+            label="Frequently Asked Questions"
+            bg="#FDEBD0"
+            textColor={Colors.textPrimary}
+          />
+          <QuickLinkCard
+            icon="📄"
+            label="Our Policies"
+            bg={Colors.surface}
+            textColor={Colors.textInverse}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
