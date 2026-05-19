@@ -180,14 +180,14 @@ export default function HomeScreen() {
           <QuickLinkCard
             icon="📋"
             label="Frequently Asked Questions"
-            bg="#FDEBD0"
+            bg="#FFDEC1"
             textColor={Colors.textPrimary}
           />
           <QuickLinkCard
             icon="📄"
             label="Our Policies"
-            bg={Colors.surface}
-            textColor={Colors.textInverse}
+            bg="#4F6473"
+            textColor="#fff"
           />
         </View>
       </ScrollView>
