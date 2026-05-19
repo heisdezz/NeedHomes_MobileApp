@@ -282,9 +282,16 @@ export default function InvestorWallet() {
         {/* Card header */}
         <View style={[tw`flex-row items-center justify-between px-4 py-3 border-b`, { borderColor: Colors.divider }]}>
           <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>Wallet</Text>
-          <TouchableOpacity onPress={() => router.push("/investor/wallet-pin")} activeOpacity={0.7} style={tw`flex-row items-center gap-1`}>
-            <Ionicons name="key-outline" size={15} color={Colors.textSecondary} />
-            <Text style={[tw`text-xs font-medium`, { color: Colors.textSecondary }]}>Manage PIN</Text>
+          <TouchableOpacity
+            onPress={() => router.push("/investor/wallet-pin")}
+            activeOpacity={0.7}
+            style={[
+              tw`flex-row items-center gap-1.5 px-3 py-1.5 rounded-full`,
+              { backgroundColor: Colors.surface },
+            ]}
+          >
+            <Ionicons name="key-outline" size={13} color="#fff" />
+            <Text style={tw`text-xs font-semibold text-white`}>Manage PIN</Text>
           </TouchableOpacity>
         </View>
 
@@ -333,8 +340,23 @@ export default function InvestorWallet() {
           <View style={tw`flex-row items-center justify-between mb-3`}>
             <View style={tw`flex-row items-center gap-2`}>
               <Text style={[tw`text-xs font-semibold uppercase`, { color: Colors.textSecondary, letterSpacing: 0.8 }]}>Recent</Text>
-              <TouchableOpacity onPress={() => refetch()} activeOpacity={0.7} disabled={isLoading}>
-                <Ionicons name="refresh-outline" size={15} color={isLoading ? Colors.textMuted : Colors.textSecondary} />
+              <TouchableOpacity
+                onPress={() => refetch()}
+                activeOpacity={0.7}
+                disabled={isLoading}
+                style={[
+                  tw`flex-row items-center gap-1 px-2 py-1 rounded-full`,
+                  { backgroundColor: isLoading ? Colors.divider : Colors.brand + "15" },
+                ]}
+              >
+                <Ionicons
+                  name="refresh-outline"
+                  size={11}
+                  color={isLoading ? Colors.textMuted : Colors.brand}
+                />
+                <Text style={[tw`text-[10px] font-semibold`, { color: isLoading ? Colors.textMuted : Colors.brand }]}>
+                  Refresh
+                </Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity onPress={() => router.push("/investor/transactions")} activeOpacity={0.7} style={tw`flex-row items-center gap-1`}>
