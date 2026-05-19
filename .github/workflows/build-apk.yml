@@ -14,10 +14,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 20
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -29,10 +29,10 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install dependencies
-        run: bun install
+        run: npm install
 
       - name: Prebuild Android project
-        run: bunx expo prebuild --platform android --no-install
+        run: npx expo prebuild --platform android --no-install
 
       - name: Make Gradlew executable
         run: chmod +x android/gradlew
