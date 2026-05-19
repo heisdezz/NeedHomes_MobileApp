@@ -17,7 +17,6 @@ import { AxiosError } from "axios";
 import { toast } from "sonner-native";
 
 import PageLoader from "@/components/layout/PageLoader";
-import FormInput from "@/components/ui/form-input";
 import SelectInput from "@/components/ui/select-input";
 import { useProperty } from "@/lib/queries/investor";
 import { Colors } from "@/constants/theme";
@@ -239,22 +238,63 @@ export default function LandBanking() {
                     </View>
                   </View>
 
-                  {/* Plots input */}
-                  <View style={tw`mb-6`}>
-                    <Controller
-                      control={form.control}
-                      name="plots"
-                      render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <FormInput
-                          label="Number of Plots"
-                          placeholder="Enter number of plots"
-                          keyboardType="numeric"
-                          value={value?.toString() || ""}
-                          onChangeText={(text) => onChange(parseInt(text) || 1)}
-                          error={error?.message}
-                        />
+                  {/* Plots stepper */}
+                  <View
+                    style={[
+                      tw`rounded-xl p-4 mb-6`,
+                      { backgroundColor: "#F9FAFB", borderWidth: 1, borderColor: Colors.divider },
+                    ]}
+                  >
+                    <View style={tw`flex-row items-center justify-between mb-1`}>
+                      <Text style={[tw`text-sm font-bold`, { color: Colors.textPrimary }]}>
+                        Number of Plots
+                      </Text>
+                      {availablePlots != null && (
+                        <View style={[tw`px-2 py-0.5 rounded-full`, { backgroundColor: Colors.brand + "15" }]}>
+                          <Text style={[tw`text-xs font-semibold`, { color: Colors.brand }]}>
+                            Max: {availablePlots}
+                          </Text>
+                        </View>
                       )}
-                    />
+                    </View>
+                    <View style={tw`flex-row items-center justify-between mt-3`}>
+                      <TouchableOpacity
+                        onPress={() => { if (plots > 1) form.setValue("plots", plots - 1); }}
+                        disabled={plots <= 1}
+                        style={[
+                          tw`w-10 h-10 rounded-xl items-center justify-center border`,
+                          {
+                            borderColor: plots <= 1 ? Colors.divider : Colors.brand,
+                            backgroundColor: plots <= 1 ? "#F9FAFB" : Colors.brand + "10",
+                          },
+                        ]}
+                      >
+                        <Ionicons name="remove" size={20} color={plots <= 1 ? Colors.textMuted : Colors.brand} />
+                      </TouchableOpacity>
+                      <Text style={[tw`text-2xl font-bold`, { color: Colors.textPrimary }]}>{plots}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (availablePlots == null || plots < availablePlots) form.setValue("plots", plots + 1);
+                        }}
+                        disabled={availablePlots != null && plots >= availablePlots}
+                        style={[
+                          tw`w-10 h-10 rounded-xl items-center justify-center border`,
+                          {
+                            borderColor: availablePlots != null && plots >= availablePlots ? Colors.divider : Colors.brand,
+                            backgroundColor: availablePlots != null && plots >= availablePlots ? "#F9FAFB" : Colors.brand + "10",
+                          },
+                        ]}
+                      >
+                        <Ionicons
+                          name="add"
+                          size={20}
+                          color={availablePlots != null && plots >= availablePlots ? Colors.textMuted : Colors.brand}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={[tw`text-xs text-center mt-2`, { color: Colors.textSecondary }]}>
+                      Subtotal: {fmt(plotsTotal)}
+                    </Text>
                   </View>
 
                   {/* Installment Options */}

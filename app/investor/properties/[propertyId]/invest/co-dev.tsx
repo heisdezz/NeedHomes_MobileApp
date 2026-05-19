@@ -15,7 +15,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 
 import PageLoader from "@/components/layout/PageLoader";
-import FormInput from "@/components/ui/form-input";
 import SelectInput from "@/components/ui/select-input";
 import { useProperty } from "@/lib/queries/investor";
 import { Colors } from "@/constants/theme";
@@ -307,38 +306,64 @@ export default function CoDevInvestment() {
                     </View>
                   </View>
 
-                  {/* Quantity Input */}
-                  <View style={tw`mb-6`}>
-                    <Controller
-                      control={form.control}
-                      name="quantity"
-                      render={({
-                        field: { onChange, value },
-                        fieldState: { error },
-                      }) => (
-                        <FormInput
-                          label="Number of Units"
-                          placeholder="Enter quantity"
-                          keyboardType="numeric"
-                          value={value?.toString() || ""}
-                          onChangeText={(text) => {
-                            const num = parseInt(text) || 0;
-                            onChange(num);
-                          }}
-                          error={error?.message}
-                        />
+                  {/* Quantity stepper */}
+                  <View
+                    style={[
+                      tw`rounded-xl p-4 mb-6`,
+                      { backgroundColor: "#F9FAFB", borderWidth: 1, borderColor: Colors.divider },
+                    ]}
+                  >
+                    <View style={tw`flex-row items-center justify-between mb-1`}>
+                      <Text style={[tw`text-sm font-bold`, { color: Colors.textPrimary }]}>
+                        Number of Units
+                      </Text>
+                      {property.availableUnits != null && (
+                        <View style={[tw`px-2 py-0.5 rounded-full`, { backgroundColor: Colors.brand + "15" }]}>
+                          <Text style={[tw`text-xs font-semibold`, { color: Colors.brand }]}>
+                            Max: {property.availableUnits}
+                          </Text>
+                        </View>
                       )}
-                    />
-                    {property.availableUnits && (
-                      <Text
+                    </View>
+                    <View style={tw`flex-row items-center justify-between mt-3`}>
+                      <TouchableOpacity
+                        onPress={() => { if (quantity > 1) form.setValue("quantity", quantity - 1); }}
+                        disabled={quantity <= 1}
                         style={[
-                          tw`text-xs mt-1`,
-                          { color: Colors.textSecondary },
+                          tw`w-10 h-10 rounded-xl items-center justify-center border`,
+                          {
+                            borderColor: quantity <= 1 ? Colors.divider : Colors.brand,
+                            backgroundColor: quantity <= 1 ? "#F9FAFB" : Colors.brand + "10",
+                          },
                         ]}
                       >
-                        Available units: {property.availableUnits}
-                      </Text>
-                    )}
+                        <Ionicons name="remove" size={20} color={quantity <= 1 ? Colors.textMuted : Colors.brand} />
+                      </TouchableOpacity>
+                      <Text style={[tw`text-2xl font-bold`, { color: Colors.textPrimary }]}>{quantity}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (property.availableUnits == null || quantity < property.availableUnits)
+                            form.setValue("quantity", quantity + 1);
+                        }}
+                        disabled={property.availableUnits != null && quantity >= property.availableUnits}
+                        style={[
+                          tw`w-10 h-10 rounded-xl items-center justify-center border`,
+                          {
+                            borderColor: property.availableUnits != null && quantity >= property.availableUnits ? Colors.divider : Colors.brand,
+                            backgroundColor: property.availableUnits != null && quantity >= property.availableUnits ? "#F9FAFB" : Colors.brand + "10",
+                          },
+                        ]}
+                      >
+                        <Ionicons
+                          name="add"
+                          size={20}
+                          color={property.availableUnits != null && quantity >= property.availableUnits ? Colors.textMuted : Colors.brand}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={[tw`text-xs text-center mt-2`, { color: Colors.textSecondary }]}>
+                      Subtotal: {formatCurrency(unitTotal)}
+                    </Text>
                   </View>
 
                   {/* Installment Options */}
