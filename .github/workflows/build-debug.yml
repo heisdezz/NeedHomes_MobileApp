@@ -42,6 +42,21 @@ jobs:
       - name: Make Gradlew executable
         run: chmod +x android/gradlew
 
+      - name: Generate dummy keystore
+        # expo prebuild generates a signing config block that reads a keystore path at
+        # configuration time — Gradle crashes with a null pointer if the file is missing,
+        # even for debug builds that never use release signing.
+        run: |
+          keytool -genkey -v \
+            -keystore android/app/release.keystore \
+            -alias needhomes \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass needhomes123 \
+            -keypass needhomes123 \
+            -dname "CN=NeedHomes, OU=Mobile, O=NeedHomes, L=Lagos, ST=Lagos, C=NG"
+
       - name: Build debug APK
         run: cd android && ./gradlew assembleDebug --no-daemon
 
