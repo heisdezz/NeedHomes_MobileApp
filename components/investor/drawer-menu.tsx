@@ -145,7 +145,7 @@ export default function DrawerContent({
                 }
               }}
               activeOpacity={0.7}
-              style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
+              style={tw`flex-row items-center gap-4 px-2 py-1.5 rounded-xl`}
             >
               <IconCircle name={item.icon} />
               <Text style={tw`text-text-primary text-sm font-medium`}>
@@ -166,7 +166,7 @@ export default function DrawerContent({
               router.push("/investor/settings");
             }}
             activeOpacity={0.7}
-            style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
+            style={tw`flex-row items-center gap-4 px-2 py-1.5 rounded-xl`}
           >
             <IconCircle name="settings-outline" />
             <Text style={tw`text-text-primary text-sm font-medium`}>
@@ -180,7 +180,7 @@ export default function DrawerContent({
               doLogout();
             }}
             activeOpacity={0.7}
-            style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
+            style={tw`flex-row items-center gap-4 px-2 py-1.5 rounded-xl`}
           >
             <View
               style={[
