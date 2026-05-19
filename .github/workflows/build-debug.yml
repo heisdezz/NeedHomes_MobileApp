@@ -1,6 +1,9 @@
 name: Build Debug APK (Manual)
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       branch:
