@@ -128,103 +128,106 @@ export default function FAQScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
-    <SafeAreaView
-      style={[tw`flex-1`, { backgroundColor: "#fff" }]}
-      edges={["top", "bottom"]}
-    >
-      {/* Header */}
-      <View
-        style={[
-          tw`flex-row items-center px-4 py-3 border-b`,
-          { borderBottomColor: Colors.divider },
-        ]}
+      {/*<Stack.Screen options={{ headerShown: false }} />*/}
+      <SafeAreaView
+        style={[tw`flex-1`, { backgroundColor: "#fff" }]}
+        edges={["top", "bottom"]}
       >
-        <TouchableOpacity onPress={() => router.back()} style={tw`mr-3`}>
-          <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
-        <Text
-          style={[tw`text-lg font-bold flex-1`, { color: Colors.textPrimary }]}
-        >
-          FAQs
-        </Text>
-      </View>
-
-      {/* Hero strip */}
-      <View style={[tw`px-5 py-6`, { backgroundColor: "#333D42" }]}>
-        <Text style={tw`text-3xl font-bold text-white mb-1`}>
-          FAQs<Text style={{ color: Colors.brand }}>.</Text>
-        </Text>
-        <Text style={[tw`text-sm`, { color: "rgba(255,255,255,0.6)" }]}>
-          Find answers to frequently asked questions.
-        </Text>
-
-        {/* Search */}
+        {/* Header */}
         <View
           style={[
-            tw`flex-row items-center rounded-xl px-4 mt-4`,
-            {
-              backgroundColor: "rgba(255,255,255,0.12)",
-              borderWidth: 1,
-              borderColor: "rgba(255,255,255,0.2)",
-            },
+            tw`flex-row items-center px-4 py-3 border-b`,
+            { borderBottomColor: Colors.divider },
           ]}
         >
-          <Ionicons
-            name="search-outline"
-            size={16}
-            color="rgba(255,255,255,0.6)"
-          />
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search questions…"
-            placeholderTextColor="rgba(255,255,255,0.4)"
-            style={[tw`flex-1 py-3 ml-2 text-sm`, { color: "#fff" }]}
-          />
-          {search.length > 0 && (
-            <TouchableOpacity onPress={() => setSearch("")}>
-              <Ionicons
-                name="close-circle"
-                size={16}
-                color="rgba(255,255,255,0.5)"
-              />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={() => router.back()} style={tw`mr-3`}>
+            <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
+          </TouchableOpacity>
+          <Text
+            style={[
+              tw`text-lg font-bold flex-1`,
+              { color: Colors.textPrimary },
+            ]}
+          >
+            FAQs
+          </Text>
         </View>
-      </View>
 
-      {/* FAQ list */}
-      <ScrollView
-        style={tw`flex-1`}
-        contentContainerStyle={tw`px-4 py-5 pb-12`}
-        showsVerticalScrollIndicator={false}
-      >
-        {isLoading ? (
-          <ActivityIndicator color={Colors.brand} style={tw`py-16`} />
-        ) : filtered.length === 0 ? (
-          <View style={tw`items-center py-16`}>
+        {/* Hero strip */}
+        <View style={[tw`px-5 py-6`, { backgroundColor: "#333D42" }]}>
+          <Text style={tw`text-3xl font-bold text-white mb-1`}>
+            FAQs<Text style={{ color: Colors.brand }}>.</Text>
+          </Text>
+          <Text style={[tw`text-sm`, { color: "rgba(255,255,255,0.6)" }]}>
+            Find answers to frequently asked questions.
+          </Text>
+
+          {/* Search */}
+          <View
+            style={[
+              tw`flex-row items-center rounded-xl px-4 mt-4`,
+              {
+                backgroundColor: "rgba(255,255,255,0.12)",
+                borderWidth: 1,
+                borderColor: "rgba(255,255,255,0.2)",
+              },
+            ]}
+          >
             <Ionicons
-              name="help-circle-outline"
-              size={48}
-              color={Colors.textMuted}
+              name="search-outline"
+              size={16}
+              color="rgba(255,255,255,0.6)"
             />
-            <Text style={[tw`text-sm mt-3`, { color: Colors.textMuted }]}>
-              {search ? "No results found." : "No FAQs available."}
-            </Text>
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Search questions…"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              style={[tw`flex-1 py-3 ml-2 text-sm`, { color: "#fff" }]}
+            />
+            {search.length > 0 && (
+              <TouchableOpacity onPress={() => setSearch("")}>
+                <Ionicons
+                  name="close-circle"
+                  size={16}
+                  color="rgba(255,255,255,0.5)"
+                />
+              </TouchableOpacity>
+            )}
           </View>
-        ) : (
-          filtered.map((item, idx) => (
-            <FaqItem
-              key={item.id}
-              item={item}
-              isOpen={openIndex === idx}
-              onToggle={() => toggle(idx)}
-            />
-          ))
-        )}
-      </ScrollView>
-    </SafeAreaView>
+        </View>
+
+        {/* FAQ list */}
+        <ScrollView
+          style={tw`flex-1`}
+          contentContainerStyle={tw`px-4 py-5 pb-12`}
+          showsVerticalScrollIndicator={false}
+        >
+          {isLoading ? (
+            <ActivityIndicator color={Colors.brand} style={tw`py-16`} />
+          ) : filtered.length === 0 ? (
+            <View style={tw`items-center py-16`}>
+              <Ionicons
+                name="help-circle-outline"
+                size={48}
+                color={Colors.textMuted}
+              />
+              <Text style={[tw`text-sm mt-3`, { color: Colors.textMuted }]}>
+                {search ? "No results found." : "No FAQs available."}
+              </Text>
+            </View>
+          ) : (
+            filtered.map((item, idx) => (
+              <FaqItem
+                key={item.id}
+                item={item}
+                isOpen={openIndex === idx}
+                onToggle={() => toggle(idx)}
+              />
+            ))
+          )}
+        </ScrollView>
+      </SafeAreaView>
     </>
   );
 }

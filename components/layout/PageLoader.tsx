@@ -297,10 +297,12 @@ export default function PageLoader<TData>({
   if (!query.data) return null;
 
   return (
-    <FadeInView>
-      {typeof children === "function"
-        ? (children as (data: TData) => React.ReactNode)(query.data)
-        : children}
-    </FadeInView>
+    <View style={tw`  flex-1`}>
+      <FadeInView>
+        {typeof children === "function"
+          ? (children as (data: TData) => React.ReactNode)(query.data)
+          : children}
+      </FadeInView>
+    </View>
   );
 }

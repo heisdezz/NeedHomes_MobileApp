@@ -11,6 +11,8 @@ import { useAuth } from "@/store/auth-store";
 import { useSocketStore } from "@/store/socket-store";
 import type { Conversation, Message } from "@/types/chat";
 import tw from "@/lib/tw";
+import { extract_message } from "@/helpers/apihelpers";
+import { showMessage } from "react-native-flash-message";
 
 interface ConversationsProps {
   conversation: Conversation | null;
@@ -215,8 +217,12 @@ export default function Conversations({
       onRefetch();
     };
 
-    const onChatError = (error: { message: string }) => {
-      console.error("❌ Chat error:", error.message);
+    const onChatError = (error: any) => {
+      showMessage({
+        message: extract_message(error),
+        type: "default",
+      });
+      console.error("❌ Chat error:", extract_message(error));
     };
 
     on("chat:newMessage", onNewMessage);

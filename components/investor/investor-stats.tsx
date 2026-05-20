@@ -19,7 +19,11 @@ function StatCard({ title, value, label, icon, variant }: StatCardProps) {
     <View
       style={[
         tw`flex-1 rounded-2xl overflow-hidden`,
-        { backgroundColor: "#fff", borderWidth: 1, borderColor: Colors.divider },
+        {
+          backgroundColor: "#fff",
+          borderWidth: 1,
+          borderColor: Colors.divider,
+        },
       ]}
     >
       {/* Header strip */}
@@ -46,7 +50,9 @@ function StatCard({ title, value, label, icon, variant }: StatCardProps) {
       </View>
 
       {/* Body */}
-      <View style={[tw`px-3 pt-3 pb-4`, { backgroundColor: "#F5F5F5" }]}>
+      <View
+        style={[tw`px-3 pt-3 pb-4 h-[100px]`, { backgroundColor: "#F5F5F5" }]}
+      >
         <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
           {value}
         </Text>
@@ -63,11 +69,20 @@ function SkeletonCard() {
     <View
       style={[
         tw`flex-1 rounded-2xl overflow-hidden`,
-        { backgroundColor: "#fff", borderWidth: 1, borderColor: Colors.divider },
+        {
+          backgroundColor: "#fff",
+          borderWidth: 1,
+          borderColor: Colors.divider,
+        },
       ]}
     >
       <View style={[tw`h-10`, { backgroundColor: Colors.inputBg }]} />
-      <View style={[tw`px-3 pt-3 pb-4 items-center`, { backgroundColor: "#F5F5F5" }]}>
+      <View
+        style={[
+          tw`px-3 pt-3 pb-4 items-center`,
+          { backgroundColor: "#F5F5F5" },
+        ]}
+      >
         <ActivityIndicator size="small" color={Colors.brand} />
       </View>
     </View>
@@ -115,7 +130,9 @@ export default function InvestorStats() {
 
   return (
     <View style={tw`px-4`}>
-      <Text style={[tw`text-base font-bold mb-3`, { color: Colors.textPrimary }]}>
+      <Text
+        style={[tw`text-base font-bold mb-3`, { color: Colors.textPrimary }]}
+      >
         Key Activities
       </Text>
       <View style={tw`flex-row gap-3 mb-3`}>

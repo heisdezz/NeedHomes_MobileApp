@@ -19,6 +19,7 @@ import apiClient, { type ApiResponse, new_url } from "@/lib/api";
 import { extract_message } from "@/helpers/apihelpers";
 import type { AxiosError } from "axios";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import AwareScrollview from "../KeyboardAwareScrollview";
 
 interface KycFormData {
   idType: "NIN" | "drivers-license" | "passport" | "voters-card" | "";
@@ -193,158 +194,160 @@ export default function KYCForm() {
       : null;
 
   return (
-    <KeyboardAvoidingView
-      style={tw`flex-1`}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <AwareScrollview
+    // style={tw`flex-1`}
+    // behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-    <ScrollView
-      style={tw`flex-1`}
-      contentContainerStyle={tw`p-4 gap-5 pb-10`}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-    >
-      {rejection ? (
-        <View style={tw`bg-red-50 border border-red-200 rounded-xl p-4`}>
-          <Text style={tw`text-xs font-bold text-red-700 uppercase mb-1`}>
-            Rejection Reason
-          </Text>
-          <Text style={tw`text-sm text-red-600`}>{rejection}</Text>
-        </View>
-      ) : null}
-
       <View
-        style={tw`bg-white rounded-2xl border border-[${Colors.divider}] p-4 gap-5`}
+        style={tw`flex-1`}
+        // contentContainerStyle={tw`p-4 gap-5 pb-10`}
+        // showsVerticalScrollIndicator={false}
+        // keyboardShouldPersistTaps="handled"
       >
-        <View style={tw`border-b border-[${Colors.divider}] pb-3`}>
-          <Text style={tw`text-base font-bold text-[${Colors.textPrimary}]`}>
-            Identity Verification
-          </Text>
-          <Text style={tw`text-xs text-[${Colors.textMuted}] mt-0.5`}>
-            Provide a valid government-issued ID and proof of address.
-          </Text>
-        </View>
+        {rejection ? (
+          <View style={tw`bg-red-50 border border-red-200 rounded-xl p-4`}>
+            <Text style={tw`text-xs font-bold text-red-700 uppercase mb-1`}>
+              Rejection Reason
+            </Text>
+            <Text style={tw`text-sm text-red-600`}>{rejection}</Text>
+          </View>
+        ) : null}
 
-        {/* ID Type */}
-        <View style={tw`gap-1.5`}>
-          <Text style={tw`text-sm font-semibold text-[${Colors.textPrimary}]`}>
-            Document Type
-          </Text>
-          <Controller
-            control={control}
-            name="idType"
-            rules={{ required: "Please select an ID type" }}
-            render={({ field: { value, onChange } }) => (
-              <View style={tw`gap-2`}>
-                {ID_TYPES.map((opt) => (
-                  <TouchableOpacity
-                    key={opt.value}
-                    onPress={() => onChange(opt.value)}
-                    activeOpacity={0.7}
-                    style={tw`flex-row items-center gap-3 border rounded-xl px-4 py-3 ${
-                      value === opt.value
-                        ? `border-[${Colors.brand}] bg-orange-50`
-                        : `border-[${Colors.inputBorder}] bg-[${Colors.inputBg}]`
-                    }`}
-                  >
-                    <View
-                      style={tw`w-4 h-4 rounded-full border-2 items-center justify-center ${
+        <View
+          style={tw`bg-white rounded-2xl border border-[${Colors.divider}] p-4 gap-5`}
+        >
+          <View style={tw`border-b border-[${Colors.divider}] pb-3`}>
+            <Text style={tw`text-base font-bold text-[${Colors.textPrimary}]`}>
+              Identity Verification
+            </Text>
+            <Text style={tw`text-xs text-[${Colors.textMuted}] mt-0.5`}>
+              Provide a valid government-issued ID and proof of address.
+            </Text>
+          </View>
+
+          {/* ID Type */}
+          <View style={tw`gap-1.5`}>
+            <Text
+              style={tw`text-sm font-semibold text-[${Colors.textPrimary}]`}
+            >
+              Document Type
+            </Text>
+            <Controller
+              control={control}
+              name="idType"
+              rules={{ required: "Please select an ID type" }}
+              render={({ field: { value, onChange } }) => (
+                <View style={tw`gap-2`}>
+                  {ID_TYPES.map((opt) => (
+                    <TouchableOpacity
+                      key={opt.value}
+                      onPress={() => onChange(opt.value)}
+                      activeOpacity={0.7}
+                      style={tw`flex-row items-center gap-3 border rounded-xl px-4 py-3 ${
                         value === opt.value
-                          ? `border-[${Colors.brand}]`
-                          : `border-[${Colors.textMuted}]`
+                          ? `border-[${Colors.brand}] bg-orange-50`
+                          : `border-[${Colors.inputBorder}] bg-[${Colors.inputBg}]`
                       }`}
                     >
-                      {value === opt.value ? (
-                        <View
-                          style={tw`w-2 h-2 rounded-full bg-[${Colors.brand}]`}
-                        />
-                      ) : null}
-                    </View>
-                    <Text style={tw`text-sm text-[${Colors.textPrimary}]`}>
-                      {opt.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+                      <View
+                        style={tw`w-4 h-4 rounded-full border-2 items-center justify-center ${
+                          value === opt.value
+                            ? `border-[${Colors.brand}]`
+                            : `border-[${Colors.textMuted}]`
+                        }`}
+                      >
+                        {value === opt.value ? (
+                          <View
+                            style={tw`w-2 h-2 rounded-full bg-[${Colors.brand}]`}
+                          />
+                        ) : null}
+                      </View>
+                      <Text style={tw`text-sm text-[${Colors.textPrimary}]`}>
+                        {opt.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            />
+            {errors.idType ? (
+              <Text style={tw`text-xs text-red-500`}>
+                {errors.idType.message}
+              </Text>
+            ) : null}
+          </View>
+
+          {/* ID Images */}
+          <View style={tw`flex-row gap-3`}>
+            <View style={tw`flex-1`}>
+              <SelectImage
+                title="Front View"
+                value={frontImage}
+                prevUrl={frontPrev}
+                onChange={(img) => {
+                  setFrontImage(img);
+                  if (!img) setFrontPrev(null);
+                }}
+              />
+            </View>
+            <View style={tw`flex-1`}>
+              <SelectImage
+                title="Back View"
+                value={backImage}
+                prevUrl={backPrev}
+                onChange={(img) => {
+                  setBackImage(img);
+                  if (!img) setBackPrev(null);
+                }}
+              />
+            </View>
+          </View>
+
+          {/* Utility Bill */}
+          <SelectImage
+            title="Proof of Address (Utility Bill)"
+            value={utilityImage}
+            prevUrl={utilityPrev}
+            onChange={(img) => {
+              setUtilityImage(img);
+              if (!img) setUtilityPrev(null);
+            }}
+          />
+
+          {/* Address */}
+          <Controller
+            control={control}
+            name="address"
+            rules={{ required: "Residential address is required" }}
+            render={({ field: { value, onChange, onBlur } }) => (
+              <FormInput
+                label="Residential Address"
+                placeholder="House Number, Street Name, City, State"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={errors.address?.message}
+              />
             )}
           />
-          {errors.idType ? (
-            <Text style={tw`text-xs text-red-500`}>
-              {errors.idType.message}
-            </Text>
-          ) : null}
+
+          {/* Submit */}
+          <TouchableOpacity
+            onPress={handleSubmit(onSubmit)}
+            disabled={mutation.isPending}
+            activeOpacity={0.8}
+            style={tw`bg-[${Colors.brand}] rounded-xl py-4 items-center ${mutation.isPending ? "opacity-60" : ""}`}
+          >
+            {mutation.isPending ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={tw`text-white font-bold text-base`}>
+                Submit Verification
+              </Text>
+            )}
+          </TouchableOpacity>
         </View>
-
-        {/* ID Images */}
-        <View style={tw`flex-row gap-3`}>
-          <View style={tw`flex-1`}>
-            <SelectImage
-              title="Front View"
-              value={frontImage}
-              prevUrl={frontPrev}
-              onChange={(img) => {
-                setFrontImage(img);
-                if (!img) setFrontPrev(null);
-              }}
-            />
-          </View>
-          <View style={tw`flex-1`}>
-            <SelectImage
-              title="Back View"
-              value={backImage}
-              prevUrl={backPrev}
-              onChange={(img) => {
-                setBackImage(img);
-                if (!img) setBackPrev(null);
-              }}
-            />
-          </View>
-        </View>
-
-        {/* Utility Bill */}
-        <SelectImage
-          title="Proof of Address (Utility Bill)"
-          value={utilityImage}
-          prevUrl={utilityPrev}
-          onChange={(img) => {
-            setUtilityImage(img);
-            if (!img) setUtilityPrev(null);
-          }}
-        />
-
-        {/* Address */}
-        <Controller
-          control={control}
-          name="address"
-          rules={{ required: "Residential address is required" }}
-          render={({ field: { value, onChange, onBlur } }) => (
-            <FormInput
-              label="Residential Address"
-              placeholder="House Number, Street Name, City, State"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.address?.message}
-            />
-          )}
-        />
-
-        {/* Submit */}
-        <TouchableOpacity
-          onPress={handleSubmit(onSubmit)}
-          disabled={mutation.isPending}
-          activeOpacity={0.8}
-          style={tw`bg-[${Colors.brand}] rounded-xl py-4 items-center ${mutation.isPending ? "opacity-60" : ""}`}
-        >
-          {mutation.isPending ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={tw`text-white font-bold text-base`}>
-              Submit Verification
-            </Text>
-          )}
-        </TouchableOpacity>
       </View>
-    </ScrollView>
-    </KeyboardAvoidingView>
+    </AwareScrollview>
   );
 }

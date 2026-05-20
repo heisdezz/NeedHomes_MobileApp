@@ -175,7 +175,7 @@ export default function ChatInputBar({
   return (
     <KeyboardAvoidingView
       behavior="padding"
-      keyboardVerticalOffset={0}
+      keyboardVerticalOffset={50}
       style={tw`bg-white dark:bg-gray-800`}
     >
       <View
@@ -204,7 +204,7 @@ export default function ChatInputBar({
         )}
 
         {/* Input Bar */}
-        <View style={tw`flex-row items-center p-3 gap-2`}>
+        <View style={tw`flex-row  items-center p-3 gap-2`}>
           {/* Image Button */}
           <TouchableOpacity
             onPress={pickImage}

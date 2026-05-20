@@ -51,5 +51,5 @@ import { Colors } from "@/constants/theme";
 // };
 
 export default function StackLayout() {
-  return <Stack />;
+  return <Stack screenOptions={{ headerShown: false }} />;
 }

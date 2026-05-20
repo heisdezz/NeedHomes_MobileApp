@@ -20,6 +20,7 @@ import SelectInput from "@/components/ui/select-input";
 import { useRegisterMutation } from "@/lib/mutations/auth";
 import { showMessage } from "react-native-flash-message";
 import { extract_message } from "@/helpers/apihelpers";
+import AwareScrollview from "@/components/KeyboardAwareScrollview";
 
 const HEAR_OPTIONS = [
   { label: "Social Media", value: "social_media" },
@@ -94,7 +95,7 @@ export default function CorporateScreen() {
         />
       </View>
 
-      <KeyboardAwareScrollView
+      <AwareScrollview
         style={tw`flex-1 bg-input-bg`}
         contentContainerStyle={tw`px-5 pt-6 pb-10`}
         showsVerticalScrollIndicator={false}
@@ -288,7 +289,7 @@ export default function CorporateScreen() {
             </Text>
           </Text>
         </View>
-      </KeyboardAwareScrollView>
+      </AwareScrollview>
     </SafeAreaView>
   );
 }
