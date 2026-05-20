@@ -85,6 +85,7 @@ export default function HomeScreen() {
     <SafeAreaView style={tw`flex-1 bg-bg-light`} edges={["top"]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        automaticallyAdjustContentInsets={false}
         contentContainerStyle={tw`pb-8`}
         refreshControl={
           <RefreshControl
@@ -143,11 +144,7 @@ export default function HomeScreen() {
                 // { s: Colors.surface },
               ]}
             >
-              <Ionicons
-                name="notifications-outline"
-                size={24}
-                color={Colors.brand}
-              />
+              <Ionicons name="notifications" size={24} color={Colors.brand} />
             </TouchableOpacity>
             <TouchableOpacity onPress={openDrawer} activeOpacity={0.7}>
               <Ionicons name="menu" size={28} color={Colors.textPrimary} />
