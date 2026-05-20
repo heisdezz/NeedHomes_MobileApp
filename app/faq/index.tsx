@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, Stack } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { Colors } from "@/constants/theme";
@@ -88,7 +88,12 @@ function FaqItem({
             { borderTopWidth: 1, borderTopColor: Colors.brand + "20" },
           ]}
         >
-          <Text style={[tw`text-sm leading-6 pt-3`, { color: Colors.textSecondary }]}>
+          <Text
+            style={[
+              tw`text-sm leading-6 pt-3`,
+              { color: Colors.textSecondary },
+            ]}
+          >
             {item.answer}
           </Text>
         </View>
@@ -113,7 +118,7 @@ export default function FAQScreen() {
   const faqs: FAQ[] = (data?.data as any) ?? [];
 
   const filtered = faqs.filter((f) =>
-    f.question.toLowerCase().includes(search.toLowerCase())
+    f.question.toLowerCase().includes(search.toLowerCase()),
   );
 
   const toggle = (idx: number) => {
@@ -122,6 +127,8 @@ export default function FAQScreen() {
   };
 
   return (
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
     <SafeAreaView
       style={[tw`flex-1`, { backgroundColor: "#fff" }]}
       edges={["top", "bottom"]}
@@ -136,7 +143,9 @@ export default function FAQScreen() {
         <TouchableOpacity onPress={() => router.back()} style={tw`mr-3`}>
           <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={[tw`text-lg font-bold flex-1`, { color: Colors.textPrimary }]}>
+        <Text
+          style={[tw`text-lg font-bold flex-1`, { color: Colors.textPrimary }]}
+        >
           FAQs
         </Text>
       </View>
@@ -161,7 +170,11 @@ export default function FAQScreen() {
             },
           ]}
         >
-          <Ionicons name="search-outline" size={16} color="rgba(255,255,255,0.6)" />
+          <Ionicons
+            name="search-outline"
+            size={16}
+            color="rgba(255,255,255,0.6)"
+          />
           <TextInput
             value={search}
             onChangeText={setSearch}
@@ -171,7 +184,11 @@ export default function FAQScreen() {
           />
           {search.length > 0 && (
             <TouchableOpacity onPress={() => setSearch("")}>
-              <Ionicons name="close-circle" size={16} color="rgba(255,255,255,0.5)" />
+              <Ionicons
+                name="close-circle"
+                size={16}
+                color="rgba(255,255,255,0.5)"
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -187,7 +204,11 @@ export default function FAQScreen() {
           <ActivityIndicator color={Colors.brand} style={tw`py-16`} />
         ) : filtered.length === 0 ? (
           <View style={tw`items-center py-16`}>
-            <Ionicons name="help-circle-outline" size={48} color={Colors.textMuted} />
+            <Ionicons
+              name="help-circle-outline"
+              size={48}
+              color={Colors.textMuted}
+            />
             <Text style={[tw`text-sm mt-3`, { color: Colors.textMuted }]}>
               {search ? "No results found." : "No FAQs available."}
             </Text>
@@ -204,5 +225,6 @@ export default function FAQScreen() {
         )}
       </ScrollView>
     </SafeAreaView>
+    </>
   );
 }
