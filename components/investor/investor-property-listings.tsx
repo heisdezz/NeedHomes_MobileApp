@@ -160,6 +160,7 @@ export default function InvestorPropertyListings() {
           keyExtractor={(item) => item.id}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={tw`px-4 gap-3`}
+          style={{ height: 270 }}
           renderItem={({ item }) => <PropertyCard {...item} />}
         />
       )}
