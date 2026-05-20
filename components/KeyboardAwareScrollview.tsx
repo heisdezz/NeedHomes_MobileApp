@@ -6,7 +6,11 @@ type Props = ComponentProps<typeof KeyboardAwareScrollView>;
 
 export default function AwareScrollview({ style, children, ...props }: Props) {
   return (
-    <KeyboardAwareScrollView style={[tw`flex-1`, style]} bottomOffset={30} {...props}>
+    <KeyboardAwareScrollView
+      style={[tw`flex-1`, style]}
+      bottomOffset={30}
+      {...props}
+    >
       {children}
     </KeyboardAwareScrollView>
   );
