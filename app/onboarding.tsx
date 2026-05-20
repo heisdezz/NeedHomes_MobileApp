@@ -73,6 +73,8 @@ function SlideItem({ item }: { item: Slide }) {
   );
 }
 
+const AUTO_SCROLL_INTERVAL = 3000;
+
 export default function OnboardingScreen() {
   const router = useRouter();
   const setHasSeenOnboarding = useOnboardingStore(
@@ -81,6 +83,48 @@ export default function OnboardingScreen() {
   const [showSplash, setShowSplash] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<Slide>>(null);
+  const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const isLast = currentIndex === SLIDES.length - 1;
+
+  const scrollTo = (index: number) => {
+    flatListRef.current?.scrollToIndex({ index, animated: true });
+    setCurrentIndex(index);
+  };
+
+  // Auto-scroll: advances every interval, stops on last slide
+  useEffect(() => {
+    if (showSplash) return;
+    if (isLast) {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+      return;
+    }
+    autoScrollRef.current = setInterval(() => {
+      setCurrentIndex((prev) => {
+        const next = prev + 1;
+        flatListRef.current?.scrollToIndex({ index: next, animated: true });
+        return next;
+      });
+    }, AUTO_SCROLL_INTERVAL);
+    return () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+    };
+  }, [showSplash, isLast]);
+
+  // Pause auto-scroll and reset timer when user swipes manually
+  const handleSwipe = (index: number) => {
+    if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+    setCurrentIndex(index);
+  };
+
+  const handleNext = () => {
+    if (!isLast) {
+      scrollTo(currentIndex + 1);
+    } else {
+      setHasSeenOnboarding(true);
+      router.replace("/auth/sign-up");
+    }
+  };
 
   if (showSplash) {
     return (
@@ -89,17 +133,6 @@ export default function OnboardingScreen() {
       </SafeAreaView>
     );
   }
-
-  const handleNext = () => {
-    if (currentIndex < SLIDES.length - 1) {
-      const next = currentIndex + 1;
-      flatListRef.current?.scrollToIndex({ index: next, animated: true });
-      setCurrentIndex(next);
-    } else {
-      setHasSeenOnboarding(true);
-      router.replace("/auth/sign-up");
-    }
-  };
 
   return (
     <SafeAreaView style={tw`flex-1 bg-[#3C3C44]`} edges={["top", "bottom"]}>
@@ -119,11 +152,15 @@ export default function OnboardingScreen() {
         keyExtractor={(item) => item.id}
         horizontal
         pagingEnabled
-        scrollEnabled={false}
+        scrollEnabled
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }: ListRenderItemInfo<Slide>) => (
           <SlideItem item={item} />
         )}
+        onMomentumScrollEnd={(e) => {
+          const index = Math.round(e.nativeEvent.contentOffset.x / width);
+          handleSwipe(index);
+        }}
         style={tw`flex-1`}
         contentContainerStyle={tw`items-center`}
       />
