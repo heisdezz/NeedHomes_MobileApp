@@ -23,6 +23,7 @@ function StatCard({ title, value, label, icon, variant }: StatCardProps) {
           backgroundColor: "#fff",
           borderWidth: 1,
           borderColor: Colors.divider,
+          minHeight: 110,
         },
       ]}
     >
