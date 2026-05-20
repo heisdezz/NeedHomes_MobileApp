@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -250,7 +251,10 @@ export default function CorporateScreen() {
                     style={tw`flex-1 text-xs text-text-secondary leading-5`}
                   >
                     By creating an account, you agree to Needhomes{" "}
-                    <Text style={tw`text-brand`}>
+                    <Text
+                      style={tw`text-brand`}
+                      onPress={() => WebBrowser.openBrowserAsync("https://needhomes-new.netlify.app/terms-and-conditions")}
+                    >
                       Privacy Policy, Terms and Conditions
                     </Text>
                   </Text>
