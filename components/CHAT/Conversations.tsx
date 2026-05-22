@@ -166,7 +166,7 @@ export default function Conversations({
   );
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
-  const userId = auth?.user.id;
+  const userId = auth?.user?.id;
 
   // Sync messages when conversation changes
   useEffect(() => {
@@ -218,11 +218,12 @@ export default function Conversations({
     };
 
     const onChatError = (error: any) => {
-      showMessage({
-        message: extract_message(error),
-        type: "default",
-      });
-      console.error("❌ Chat error:", extract_message(error));
+      const msg =
+        typeof error === "string"
+          ? error
+          : error?.message ?? "An error occurred";
+      showMessage({ message: msg, type: "danger" });
+      console.error("❌ Chat error:", error);
     };
 
     on("chat:newMessage", onNewMessage);

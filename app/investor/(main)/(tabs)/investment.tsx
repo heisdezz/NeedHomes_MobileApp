@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -7,9 +7,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 
-import apiClient, { type ApiResponse } from "@/lib/api";
+import apiClient from "@/lib/api";
 import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
+import { usePagination } from "@/hooks/usePagination";
+import Pagination from "@/components/ui/Pagination";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -177,19 +179,21 @@ function InvestmentCard({ investment, onPress }: InvestmentCardProps) {
 export default function InvestmentsListScreen() {
   const router = useRouter();
   const filterSheetRef = useRef<BottomSheet>(null);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ACTIVE");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [tempStatusFilter, setTempStatusFilter] =
-    useState<StatusFilter>("ACTIVE");
-  const [page] = useState(1);
+    useState<StatusFilter>("ALL");
   const snapPoints = ["45%"];
 
-  const query = useQuery<ApiResponse<{ data: Investment[] }>>({
+  const { page, limit, meta, setMeta, totalPages, hasNext, hasPrev, nextPage, prevPage, goToPage, reset } =
+    usePagination({ initialPage: 1, limit: 10 });
+
+  const query = useQuery({
     queryKey: ["investments", page, statusFilter],
     queryFn: async () => {
       const resp = await apiClient.get("/investments/my-investments", {
         params: {
           page,
-          limit: 50,
+          limit,
           ...(statusFilter !== "ALL" && { status: statusFilter }),
         },
       });
@@ -197,7 +201,16 @@ export default function InvestmentsListScreen() {
     },
   });
 
-  const investments = query.data?.data?.data ?? [];
+  // Sync pagination meta from API response
+  useEffect(() => {
+    const m = query.data?.data?.meta;
+    if (m) setMeta(m);
+  }, [query.data]);
+
+  // Reset to page 1 when filter changes
+  useEffect(() => { reset(); }, [statusFilter]);
+
+  const investments: Investment[] = query.data?.data?.data ?? [];
 
   const statuses: StatusFilter[] = [
     "ALL",
@@ -410,16 +423,22 @@ export default function InvestmentsListScreen() {
             contentContainerStyle={{ paddingBottom: 16 }}
             ListHeaderComponent={
               <View style={tw`mb-3`}>
-                <Text
-                  style={[
-                    tw`text-sm font-semibold`,
-                    { color: Colors.textPrimary },
-                  ]}
-                >
-                  {investments.length}{" "}
-                  {investments.length === 1 ? "Investment" : "Investments"}
+                <Text style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}>
+                  {meta?.total ?? investments.length}{" "}
+                  {(meta?.total ?? investments.length) === 1 ? "Investment" : "Investments"}
                 </Text>
               </View>
+            }
+            ListFooterComponent={
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                hasNext={hasNext}
+                hasPrev={hasPrev}
+                onNext={nextPage}
+                onPrev={prevPage}
+                onGoTo={goToPage}
+              />
             }
           />
         )}
