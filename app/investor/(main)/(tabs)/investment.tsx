@@ -177,9 +177,9 @@ function InvestmentCard({ investment, onPress }: InvestmentCardProps) {
 export default function InvestmentsListScreen() {
   const router = useRouter();
   const filterSheetRef = useRef<BottomSheet>(null);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ACTIVE");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [tempStatusFilter, setTempStatusFilter] =
-    useState<StatusFilter>("ACTIVE");
+    useState<StatusFilter>("ALL");
   const [page] = useState(1);
   const snapPoints = ["45%"];
 
