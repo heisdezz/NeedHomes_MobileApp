@@ -346,7 +346,7 @@ function SetupStep2({
       }),
       {
         loading: "Saving PIN...",
-        success: "Withdrawal PIN set up successfully.",
+        success: extract_message,
         error: extract_message as any,
       },
     );

@@ -11,7 +11,7 @@ import CorpKYCForm from "@/components/kyc/CorpKYCForm";
 export default function KYCScreen() {
   const router = useRouter();
   const auth = useAuth();
-  const verificationType = auth?.user?.verification_document?.verificationType;
+  const verificationType = auth?.user?.accountType;
   const isCorporate = verificationType === "CORPORATE";
 
   return (
@@ -32,6 +32,8 @@ export default function KYCScreen() {
         </Text>
       </View>
       <View style={[tw`h-px`, { backgroundColor: Colors.divider }]} />
+
+      {/*<Text>{auth?.user.accountType}</Text>*/}
       {isCorporate ? <CorpKYCForm /> : <KYCForm />}
     </SafeAreaView>
   );
