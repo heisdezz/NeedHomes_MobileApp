@@ -12,6 +12,7 @@ import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
 import { usePagination } from "@/hooks/usePagination";
 import Pagination from "@/components/ui/Pagination";
+import InvStatistics from "@/components/investor/inv-statistics";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -180,12 +181,22 @@ export default function InvestmentsListScreen() {
   const router = useRouter();
   const filterSheetRef = useRef<BottomSheet>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
-  const [tempStatusFilter, setTempStatusFilter] =
-    useState<StatusFilter>("ALL");
+  const [tempStatusFilter, setTempStatusFilter] = useState<StatusFilter>("ALL");
   const snapPoints = ["45%"];
 
-  const { page, limit, meta, setMeta, totalPages, hasNext, hasPrev, nextPage, prevPage, goToPage, reset } =
-    usePagination({ initialPage: 1, limit: 10 });
+  const {
+    page,
+    limit,
+    meta,
+    setMeta,
+    totalPages,
+    hasNext,
+    hasPrev,
+    nextPage,
+    prevPage,
+    goToPage,
+    reset,
+  } = usePagination({ initialPage: 1, limit: 10 });
 
   const query = useQuery({
     queryKey: ["investments", page, statusFilter],
@@ -208,7 +219,9 @@ export default function InvestmentsListScreen() {
   }, [query.data]);
 
   // Reset to page 1 when filter changes
-  useEffect(() => { reset(); }, [statusFilter]);
+  useEffect(() => {
+    reset();
+  }, [statusFilter]);
 
   const investments: Investment[] = query.data?.data?.data ?? [];
 
@@ -286,35 +299,9 @@ export default function InvestmentsListScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Statistics Placeholder */}
-      <View style={tw`px-4 py-4 bg-white mb-2`}>
-        <View
-          style={[
-            tw`rounded-xl p-6 items-center justify-center`,
-            {
-              backgroundColor: "#F9FAFB",
-              borderWidth: 1,
-              borderColor: Colors.divider,
-            },
-          ]}
-        >
-          <Ionicons
-            name="stats-chart-outline"
-            size={32}
-            color={Colors.textMuted}
-          />
-          <Text
-            style={[
-              tw`text-sm mt-2 font-medium`,
-              { color: Colors.textSecondary },
-            ]}
-          >
-            Investment Statistics
-          </Text>
-          <Text style={[tw`text-xs mt-1`, { color: Colors.textMuted }]}>
-            Coming soon
-          </Text>
-        </View>
+      {/* Investment Statistics */}
+      <View style={tw`py-4 bg-white mb-2`}>
+        <InvStatistics />
       </View>
 
       {/* Add Investment Button */}
@@ -423,9 +410,16 @@ export default function InvestmentsListScreen() {
             contentContainerStyle={{ paddingBottom: 16 }}
             ListHeaderComponent={
               <View style={tw`mb-3`}>
-                <Text style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}>
+                <Text
+                  style={[
+                    tw`text-sm font-semibold`,
+                    { color: Colors.textPrimary },
+                  ]}
+                >
                   {meta?.total ?? investments.length}{" "}
-                  {(meta?.total ?? investments.length) === 1 ? "Investment" : "Investments"}
+                  {(meta?.total ?? investments.length) === 1
+                    ? "Investment"
+                    : "Investments"}
                 </Text>
               </View>
             }
