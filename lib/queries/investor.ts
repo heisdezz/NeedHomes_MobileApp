@@ -106,6 +106,26 @@ export const useProperty = (id: string) =>
     enabled: !!id,
   });
 
+// ─── Cashflow ────────────────────────────────────────────────────────────────
+
+export interface CashflowMonth {
+  month: string;
+  year: number;
+  monthIndex: number;
+  inflow: number;
+  outflow: number;
+}
+
+export const useInvestorCashflow = () =>
+  useQuery<ApiResponse<CashflowMonth[]>>({
+    queryKey: ["investor-cashflow"],
+    queryFn: async () => {
+      const resp = await apiClient.get("/analytics/investor/cashflow");
+      return resp.data;
+    },
+    retry: 1,
+  });
+
 // ─── Investment Stats ────────────────────────────────────────────────────────
 
 export interface InvestmentStats {

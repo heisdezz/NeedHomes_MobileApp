@@ -19,6 +19,7 @@ import {
   useDepositMutation,
   useWithdrawalMutation,
   usePinStatus,
+  useInvestorCashflow,
   type WalletTransaction,
 } from "@/lib/queries/investor";
 import { extract_message } from "@/helpers/apihelpers";
@@ -230,6 +231,7 @@ export default function InvestorWallet() {
 
   const { data, isLoading, refetch } = useWallet();
   const { data: pinStatusData, isLoading: pinStatusLoading, refetch: refetchPinStatus } = usePinStatus();
+  const { data: cashflowData, isLoading: cashflowLoading } = useInvestorCashflow();
   const deposit = useDepositMutation();
   const withdraw = useWithdrawalMutation();
 
@@ -247,15 +249,9 @@ export default function InvestorWallet() {
     setModalVisible(true);
   }
 
-  const income =
-    walletData?.walletTransactions
-      .filter((t) => (t.type === "DEPOSIT" || t.type === "PROMOTION") && t.status === "SUCCESS")
-      .reduce((acc, t) => acc + t.amount, 0) ?? 0;
-
-  const withdrawals =
-    walletData?.walletTransactions
-      .filter((t) => t.type === "WITHDRAWAL" && t.status === "SUCCESS")
-      .reduce((acc, t) => acc + t.amount, 0) ?? 0;
+  const cashflowMonths = cashflowData?.data ?? [];
+  const income = cashflowMonths.reduce((acc, m) => acc + m.inflow, 0) / 100;
+  const withdrawals = cashflowMonths.reduce((acc, m) => acc + m.outflow, 0) / 100;
 
   async function handleConfirm(amount: number, pin: string) {
     if (modalType === "deposit") {
@@ -317,15 +313,23 @@ export default function InvestorWallet() {
           </View>
         </View>
 
-        {/* Income / Withdrawal row */}
+        {/* Inflow / Outflow row */}
         <View style={tw`flex-row gap-3 px-4 py-4`}>
           <View style={[tw`flex-1 rounded-xl p-3`, { backgroundColor: "#D1FAE5", borderWidth: 1, borderColor: "#A7F3D0" }]}>
             <Text style={[tw`text-xs font-semibold uppercase mb-1`, { color: Colors.textSecondary }]}>Income</Text>
-            <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>₦{(income / 100).toLocaleString()}</Text>
+            {cashflowLoading ? (
+              <ActivityIndicator size="small" color={Colors.success} />
+            ) : (
+              <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>₦{income.toLocaleString()}</Text>
+            )}
           </View>
           <View style={[tw`flex-1 rounded-xl p-3`, { backgroundColor: "#FEE2E2", borderWidth: 1, borderColor: "#FECACA" }]}>
-            <Text style={[tw`text-xs font-semibold uppercase mb-1`, { color: Colors.textSecondary }]}>Withdrawn</Text>
-            <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>₦{(withdrawals / 100).toLocaleString()}</Text>
+            <Text style={[tw`text-xs font-semibold uppercase mb-1`, { color: Colors.textSecondary }]}>Withdraw</Text>
+            {cashflowLoading ? (
+              <ActivityIndicator size="small" color={Colors.error} />
+            ) : (
+              <Text style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}>₦{withdrawals.toLocaleString()}</Text>
+            )}
           </View>
         </View>
 
