@@ -56,4 +56,3 @@ export const clear_kyc = () => useAuthStore.getState().clearKyc();
 export const useAuth = () => useAuthStore((s) => s.auth);
 export const useKyc = () => useAuthStore((s) => s.kyc);
 export const useTempUser = () => useAuthStore((s) => s.tempUser);
-
