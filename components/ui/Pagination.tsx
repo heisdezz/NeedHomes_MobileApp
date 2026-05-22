@@ -39,9 +39,7 @@ export default function Pagination({
   onPrev,
   onGoTo,
 }: PaginationProps) {
-  if (totalPages <= 1) return null;
-
-  const pages = getPageNumbers(page, totalPages);
+  const pages = getPageNumbers(Math.max(page, 1), Math.max(totalPages, 1));
 
   return (
     <View style={tw`items-center py-4`}>
@@ -75,7 +73,10 @@ export default function Pagination({
         {/* Page numbers */}
         {pages.map((p, i) =>
           p === "…" ? (
-            <View key={`ellipsis-${i}`} style={tw`w-9 h-9 items-center justify-center`}>
+            <View
+              key={`ellipsis-${i}`}
+              style={tw`w-9 h-9 items-center justify-center`}
+            >
               <Text style={[tw`text-sm`, { color: Colors.textMuted }]}>…</Text>
             </View>
           ) : (
