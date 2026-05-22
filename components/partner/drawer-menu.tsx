@@ -2,15 +2,15 @@ import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { useAuth } from "@/store";
-import { logout } from "@/lib/mutations/auth";
+import { useLogout } from "@/lib/mutations/auth";
 import tw from "@/lib/tw";
 
 type MenuItem = {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
-  onPress?: () => void;
 };
 
 const MENU_ITEMS: MenuItem[] = [
@@ -38,11 +38,21 @@ function IconCircle({ name }: { name: keyof typeof Ionicons.glyphMap }) {
 }
 
 export default function DrawerContent({ navigation }: DrawerContentComponentProps) {
+  const router = useRouter();
   const auth = useAuth();
   const user = auth?.user;
+  const { doLogout } = useLogout();
   const fullName = user
     ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
     : "Partner";
+
+  const handlePress = (label: string) => {
+    navigation.closeDrawer();
+    if (label === "Transactions") router.push("/partner/transactions");
+    else if (label === "Properties") router.push("/investor/properties");
+    else if (label === "Chat") router.push("/partner/message");
+    else if (label === "Promotions") router.push("/partner/promotions");
+  };
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={["top", "bottom"]}>
@@ -82,9 +92,9 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
           {MENU_ITEMS.map((item) => (
             <TouchableOpacity
               key={item.label}
-              onPress={() => { item.onPress?.(); navigation.closeDrawer(); }}
+              onPress={() => handlePress(item.label)}
               activeOpacity={0.7}
-              style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
+              style={tw`flex-row items-center gap-4 px-2 py-1.5 rounded-xl`}
             >
               <IconCircle name={item.icon} />
               <Text style={tw`text-text-primary text-sm font-medium`}>
@@ -100,17 +110,18 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
         {/* Bottom */}
         <View style={tw`px-4 gap-1`}>
           <TouchableOpacity
+            onPress={() => { navigation.closeDrawer(); }}
             activeOpacity={0.7}
-            style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
+            style={tw`flex-row items-center gap-4 px-2 py-1.5 rounded-xl`}
           >
             <IconCircle name="settings-outline" />
             <Text style={tw`text-text-primary text-sm font-medium`}>Settings</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => { navigation.closeDrawer(); logout(); }}
+            onPress={() => { navigation.closeDrawer(); doLogout(); }}
             activeOpacity={0.7}
-            style={tw`flex-row items-center gap-4 px-2 py-3 rounded-xl`}
+            style={tw`flex-row items-center gap-4 px-2 py-1.5 rounded-xl`}
           >
             <View
               style={[
