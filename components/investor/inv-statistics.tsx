@@ -16,7 +16,7 @@ function StatCard({ label, value, icon, iconBg, iconColor }: StatItem) {
   return (
     <View
       style={[
-        tw`flex-row items-center gap-3 p-3 rounded-xl`,
+        tw`flex-row items-center gap-3 p-3 rounded-xl overflow-hidden`,
         { backgroundColor: "#fff", borderWidth: 1, borderColor: Colors.divider },
       ]}
     >
@@ -28,11 +28,16 @@ function StatCard({ label, value, icon, iconBg, iconColor }: StatItem) {
       >
         <Ionicons name={icon} size={20} color={iconColor} />
       </View>
-      <View>
+      <View style={tw`flex-1`}>
         <Text style={[tw`text-[10px] font-semibold uppercase tracking-wide`, { color: Colors.textMuted }]}>
           {label}
         </Text>
-        <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
+        <Text
+          style={[tw`font-bold`, { color: Colors.textPrimary }]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.6}
+        >
           {value}
         </Text>
       </View>
