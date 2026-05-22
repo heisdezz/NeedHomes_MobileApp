@@ -120,7 +120,7 @@ export default function AccountScreen() {
             {/* Name + email */}
             <View style={tw`flex-1`}>
               {user?.accountType === "CORPORATE" &&
-              (user as any)?.companyName ? (
+              (kyc as any)?.companyName ? (
                 <>
                   <Text
                     style={[
@@ -128,12 +128,7 @@ export default function AccountScreen() {
                       { color: Colors.textPrimary },
                     ]}
                   >
-                    {(user as any).companyName}
-                  </Text>
-                  <Text
-                    style={[tw`text-xs mt-0.5`, { color: Colors.textMuted }]}
-                  >
-                    {`${user.firstName} ${user.lastName}`}
+                    {(kyc as any).companyName}
                   </Text>
                 </>
               ) : (
@@ -320,7 +315,7 @@ export default function AccountScreen() {
               {
                 icon: "help-circle-outline" as const,
                 label: "Help & Support",
-                onPress: () => {},
+                onPress: () => router.push("/investor/message"),
               },
             ] as const
           ).map(({ icon, label, onPress }, i, arr) => (

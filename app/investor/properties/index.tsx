@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -23,6 +23,8 @@ import PageLoader from "@/components/layout/PageLoader";
 import PriceLocationModal, {
   type PropertyFilters,
 } from "@/components/investor/price-location-modal";
+import { usePagination } from "@/hooks/usePagination";
+import Pagination from "@/components/ui/Pagination";
 import tw from "@/lib/tw";
 
 const COLUMN_GAP = 12;

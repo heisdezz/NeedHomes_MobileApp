@@ -114,7 +114,8 @@ export default function HomeScreen() {
               <Text
                 style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
               >
-                {user?.firstName ?? "Investor"}
+                {/*{JSON.stringify(user, null, 2)}*/}
+                {kyc?.companyName ?? user?.firstName ?? "Investor"}
               </Text>
               {badge ? (
                 <View

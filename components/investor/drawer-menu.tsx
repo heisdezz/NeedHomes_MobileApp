@@ -55,11 +55,15 @@ export default function DrawerContent({
   const kyc = useKyc();
   const { doLogout } = useLogout();
   const badge = KYC_BADGE[kyc?.account_verification_status as string] ?? null;
-  const fullName =
-    (kyc as any)?.companyName ??
-    `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
-    "Investor";
 
+  // const fullName =
+  //   ((kyc as any)?.companyName ??
+  //     `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()) ||
+  //   "Investor";
+  const fullName =
+    kyc?.companyName ??
+    `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ??
+    "Investor";
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={["top", "bottom"]}>
       <ScrollView
