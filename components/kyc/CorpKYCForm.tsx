@@ -156,7 +156,7 @@ export default function CorpKYCForm() {
       }),
       {
         loading: "Uploading documents and submitting KYC...",
-        success: "Corporate KYC submitted successfully!",
+        success: () => "Corporate KYC submitted successfully!",
         error: (err) => extract_message(err) || "Failed to submit KYC.",
       },
     );
