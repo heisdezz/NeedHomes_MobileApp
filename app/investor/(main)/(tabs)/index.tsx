@@ -9,6 +9,7 @@ import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { DrawerActions } from "@react-navigation/native";
 import { useAuth, useKyc } from "@/store";
 import apiClient from "@/lib/api";
@@ -185,6 +186,11 @@ export default function HomeScreen() {
             label="Our Policies"
             bg="#4F6473"
             textColor="#fff"
+            onPress={() =>
+              WebBrowser.openBrowserAsync(
+                "https://needhomes-new.netlify.app/privacy-policy",
+              )
+            }
           />
         </View>
       </ScrollView>

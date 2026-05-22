@@ -51,7 +51,7 @@ function StatCard({ title, value, label, icon, variant }: StatCardProps) {
 
       {/* Body */}
       <View
-        style={[tw`px-3 pt-3 pb-4 h-[100px]`, { backgroundColor: "#F5F5F5" }]}
+        style={[tw`px-3 pt-3 pb-4 h-[100px]`, { backgroundColor: "#F7F7F7" }]}
       >
         <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
           {value}
