@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Image, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -119,7 +119,13 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => { navigation.closeDrawer(); doLogout(); }}
+            onPress={() => {
+              navigation.closeDrawer();
+              Alert.alert("Log Out", "Are you sure you want to log out?", [
+                { text: "Cancel", style: "cancel" },
+                { text: "Log Out", style: "destructive", onPress: doLogout },
+              ]);
+            }}
             activeOpacity={0.7}
             style={tw`flex-row items-center gap-4 px-2 py-1.5 rounded-xl`}
           >
