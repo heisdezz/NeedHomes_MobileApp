@@ -24,12 +24,18 @@ export default function ProfileInfoScreen() {
         <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
           <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={[tw`text-base font-bold flex-1`, { color: Colors.textPrimary }]}>
+        <Text
+          style={[
+            tw`text-base font-bold flex-1`,
+            { color: Colors.textPrimary },
+          ]}
+        >
           Profile Info
         </Text>
       </View>
 
       <View style={tw`flex-1 px-5 pt-6`}>
+        <Text>{JSON.stringify(accountType)}</Text>
         {accountType === "CORPORATE" ? (
           <CorporateProfile />
         ) : (

@@ -106,6 +106,26 @@ export const useProperty = (id: string) =>
     enabled: !!id,
   });
 
+// ─── Cashflow ────────────────────────────────────────────────────────────────
+
+export interface CashflowMonth {
+  month: string;
+  year: number;
+  monthIndex: number;
+  inflow: number;
+  outflow: number;
+}
+
+export const useInvestorCashflow = () =>
+  useQuery<ApiResponse<CashflowMonth[]>>({
+    queryKey: ["investor-cashflow"],
+    queryFn: async () => {
+      const resp = await apiClient.get("/analytics/investor/cashflow");
+      return resp.data;
+    },
+    retry: 1,
+  });
+
 // ─── Investment Stats ────────────────────────────────────────────────────────
 
 export interface InvestmentStats {
@@ -131,7 +151,7 @@ export interface WalletTransaction {
   id: string;
   walletId: string;
   amount: number;
-  type: "DEPOSIT" | "WITHDRAWAL";
+  type: "DEPOSIT" | "WITHDRAWAL" | "PROMOTION";
   status: "PENDING" | "SUCCESS" | "FAILED";
   reference: string;
   createdAt: string;
@@ -315,7 +335,7 @@ export interface Transaction {
   id: string;
   walletId: string;
   amount: number;
-  type: "INVESTMENT" | "DEPOSIT" | "WITHDRAWAL";
+  type: "INVESTMENT" | "DEPOSIT" | "WITHDRAWAL" | "PROMOTION";
   status: "SUCCESS" | "PENDING" | "FAILED";
   reference: string;
   createdAt: string;

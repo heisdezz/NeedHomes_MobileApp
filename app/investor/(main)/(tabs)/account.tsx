@@ -119,11 +119,33 @@ export default function AccountScreen() {
 
             {/* Name + email */}
             <View style={tw`flex-1`}>
-              <Text
-                style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
-              >
-                {user ? `${user.firstName} ${user.lastName}` : "—"}
-              </Text>
+              {user?.accountType === "CORPORATE" &&
+              (user as any)?.companyName ? (
+                <>
+                  <Text
+                    style={[
+                      tw`text-base font-bold`,
+                      { color: Colors.textPrimary },
+                    ]}
+                  >
+                    {(user as any).companyName}
+                  </Text>
+                  <Text
+                    style={[tw`text-xs mt-0.5`, { color: Colors.textMuted }]}
+                  >
+                    {`${user.firstName} ${user.lastName}`}
+                  </Text>
+                </>
+              ) : (
+                <Text
+                  style={[
+                    tw`text-base font-bold`,
+                    { color: Colors.textPrimary },
+                  ]}
+                >
+                  {user ? `${user.firstName} ${user.lastName}` : "—"}
+                </Text>
+              )}
               <Text
                 style={[tw`text-sm mt-0.5`, { color: Colors.textSecondary }]}
               >

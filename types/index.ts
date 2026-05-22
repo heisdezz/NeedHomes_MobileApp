@@ -1,4 +1,4 @@
-export type AccountType = 'INVESTOR' | 'PARTNER' | 'INDIVIDUAL' | 'ADMIN';
+export type AccountType = "INDIVIDUAL" | "PARTNER" | "CORPORATE" | "ADMIN";
 
 export interface USER {
   id: string;
@@ -8,12 +8,13 @@ export interface USER {
   accountType: AccountType;
   phoneNumber?: string;
   createdAt?: string;
+  companyName?: string;
 }
 
 export interface USER_KYC {
   id: string;
   userId: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   submittedAt?: string;
   reviewedAt?: string;
 }
