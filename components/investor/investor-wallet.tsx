@@ -6,9 +6,8 @@ import {
   Modal,
   TextInput,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { toast } from "sonner-native";
@@ -125,7 +124,7 @@ function AmountModal({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
-      <KeyboardAvoidingView style={tw`flex-1`} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <KeyboardAvoidingView style={tw`flex-1`} behavior="padding">
         <TouchableOpacity style={[tw`flex-1`, { backgroundColor: "rgba(0,0,0,0.5)" }]} activeOpacity={1} onPress={handleClose} />
         <View style={[tw`rounded-t-3xl px-5 pt-6 pb-10`, { backgroundColor: "#fff" }]}>
           <View style={[tw`w-10 h-1 rounded-full self-center mb-5`, { backgroundColor: Colors.divider }]} />
