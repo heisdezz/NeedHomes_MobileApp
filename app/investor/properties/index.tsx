@@ -94,17 +94,29 @@ export default function PropertiesScreen() {
   );
   const hasAnyFilter = hasActiveFilters || activeSearch;
 
+  const { page, limit, meta, setMeta, totalPages, hasNext, hasPrev, nextPage, prevPage, goToPage, reset } =
+    usePagination({ initialPage: 1, limit: 12 });
+
   const params: PropertiesParams = {
+    page,
+    limit,
     ...(activeSearch && { search: activeSearch }),
     ...(filters.propertyType && { propertyType: filters.propertyType }),
-    ...(filters.investmentModel && {
-      investmentModel: filters.investmentModel,
-    }),
+    ...(filters.investmentModel && { investmentModel: filters.investmentModel }),
     ...(filters.minPrice && { minPrice: filters.minPrice * 100 }),
     ...(filters.maxPrice && { maxPrice: filters.maxPrice * 100 }),
   };
 
-  const query = useProperties(Object.keys(params).length ? params : undefined);
+  const query = useProperties(params);
+
+  // Sync pagination meta from API response
+  useEffect(() => {
+    const m = query.data?.data?.meta;
+    if (m) setMeta(m);
+  }, [query.data]);
+
+  // Reset to page 1 when search or filters change
+  useEffect(() => { reset(); }, [activeSearch, filters]);
 
   const handleSearchChange = useCallback((text: string) => {
     setSearch(text);
@@ -138,23 +150,6 @@ export default function PropertiesScreen() {
     filters.maxPrice ? `Max: ₦${filters.maxPrice.toLocaleString()}` : null,
     filters.location ? `📍 ${filters.location}` : null,
   ].filter(Boolean) as string[];
-
-  const array = new Array(10).fill("soso");
-  // return (
-  //   <>
-  //     <SafeAreaView style={tw`bg-bg-light flex-1`} edges={["bottom", "top"]}>
-  //       <ScrollView style={tw`flex-1`}>
-  //         {array.map((_) => {
-  //           return (
-  //             <>
-  //               <View style={tw`h-120 bg-red-200 m`}></View>
-  //             </>
-  //           );
-  //         })}
-  //       </ScrollView>
-  //     </SafeAreaView>
-  //   </>
-  // );
 
   return (
     <SafeAreaView style={tw`flex-1 bg-bg-light`} edges={["top", "bottom"]}>
@@ -276,7 +271,6 @@ export default function PropertiesScreen() {
       )}
       {/* Content */}
       <View style={tw`flex-1`}>
-        {/*<Text>testing</Text>*/}
         <PageLoader query={query} loadingText="Loading properties...">
           {(data) => {
             const properties = (data.data?.data ?? []).map(mapToCard);
@@ -299,22 +293,34 @@ export default function PropertiesScreen() {
             }
 
             return (
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                  paddingHorizontal: 16,
-                  paddingBottom: 80,
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: COLUMN_GAP,
-                }}
-              >
-                {properties.map((item) => (
-                  <View key={item.id} style={{ width: cardWidth }}>
-                    <PropertyCard {...item} cardWidth={cardWidth} />
-                  </View>
-                ))}
-              </ScrollView>
+              <View style={tw`flex-1`}>
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{
+                    paddingHorizontal: 16,
+                    paddingTop: 4,
+                    paddingBottom: 8,
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: COLUMN_GAP,
+                  }}
+                >
+                  {properties.map((item) => (
+                    <View key={item.id} style={{ width: cardWidth }}>
+                      <PropertyCard {...item} cardWidth={cardWidth} />
+                    </View>
+                  ))}
+                </ScrollView>
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  hasNext={hasNext}
+                  hasPrev={hasPrev}
+                  onNext={nextPage}
+                  onPrev={prevPage}
+                  onGoTo={goToPage}
+                />
+              </View>
             );
           }}
         </PageLoader>
