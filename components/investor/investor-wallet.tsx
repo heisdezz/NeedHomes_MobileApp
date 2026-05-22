@@ -28,9 +28,12 @@ import tw from "@/lib/tw";
 // ─── Transaction row ──────────────────────────────────────────────────────────
 
 function TxRow({ tx }: { tx: WalletTransaction }) {
-  const isDeposit = tx.type === "DEPOSIT";
-  const iconName = isDeposit ? "arrow-down-circle" : "arrow-up-circle";
-  const iconColor = isDeposit ? Colors.success : Colors.error;
+  const isWithdrawal = tx.type === "WITHDRAWAL";
+  const isPromotion = tx.type === "PROMOTION";
+  const iconName = isWithdrawal ? "arrow-up-circle" : "arrow-down-circle";
+  const iconColor = isWithdrawal ? Colors.error : isPromotion ? "#9333EA" : Colors.success;
+  const iconBg = isWithdrawal ? "#FEE2E2" : isPromotion ? "#F3E8FF" : "#D1FAE5";
+  const label = isWithdrawal ? "Withdrawal" : isPromotion ? "Promotion Reward" : "Deposit";
   const statusColor =
     tx.status === "SUCCESS"
       ? Colors.success
@@ -40,16 +43,16 @@ function TxRow({ tx }: { tx: WalletTransaction }) {
 
   return (
     <View style={[tw`flex-row items-center gap-3 p-3 rounded-xl mb-2`, { backgroundColor: Colors.inputBg }]}>
-      <View style={[tw`w-10 h-10 rounded-full items-center justify-center`, { backgroundColor: isDeposit ? "#D1FAE5" : "#FEE2E2" }]}>
+      <View style={[tw`w-10 h-10 rounded-full items-center justify-center`, { backgroundColor: iconBg }]}>
         <Ionicons name={iconName} size={22} color={iconColor} />
       </View>
       <View style={tw`flex-1`}>
-        <Text style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}>{isDeposit ? "Deposit" : "Withdrawal"}</Text>
+        <Text style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}>{label}</Text>
         <Text style={[tw`text-xs mt-0.5`, { color: Colors.textMuted }]}>{new Date(tx.createdAt).toLocaleDateString()}</Text>
       </View>
       <View style={tw`items-end`}>
         <Text style={[tw`text-sm font-bold`, { color: Colors.textPrimary }]}>
-          {isDeposit ? "+" : "−"} ₦{(tx.amount / 100).toLocaleString()}
+          {isWithdrawal ? "−" : "+"} ₦{(tx.amount / 100).toLocaleString()}
         </Text>
         <Text style={[tw`text-xs mt-0.5 font-medium`, { color: statusColor }]}>
           {tx.status.charAt(0) + tx.status.slice(1).toLowerCase()}
@@ -226,7 +229,7 @@ export default function InvestorWallet() {
   const kycApproved = kyc?.account_verification_status === "VERIFIED";
 
   const { data, isLoading, refetch } = useWallet();
-  const { data: pinStatusData, isLoading: pinStatusLoading } = usePinStatus();
+  const { data: pinStatusData, isLoading: pinStatusLoading, refetch: refetchPinStatus } = usePinStatus();
   const deposit = useDepositMutation();
   const withdraw = useWithdrawalMutation();
 
@@ -246,7 +249,7 @@ export default function InvestorWallet() {
 
   const income =
     walletData?.walletTransactions
-      .filter((t) => t.type === "DEPOSIT" && t.status === "SUCCESS")
+      .filter((t) => (t.type === "DEPOSIT" || t.type === "PROMOTION") && t.status === "SUCCESS")
       .reduce((acc, t) => acc + t.amount, 0) ?? 0;
 
   const withdrawals =
@@ -266,12 +269,15 @@ export default function InvestorWallet() {
         toast.error(extract_message(e as any) ?? "Deposit failed");
       }
     } else {
-      toast.promise(withdraw.mutateAsync({ amount, pin }), {
-        loading: "Processing…",
-        success: () => "Withdrawal successful",
-        error: extract_message as any,
-      });
       setModalVisible(false);
+      try {
+        await withdraw.mutateAsync({ amount, pin });
+        toast.success("Withdrawal successful");
+        refetch();
+      } catch (e) {
+        refetchPinStatus();
+        toast.error(extract_message(e as any) ?? "Withdrawal failed");
+      }
     }
   }
 
@@ -367,7 +373,7 @@ export default function InvestorWallet() {
           {isLoading ? (
             <ActivityIndicator color={Colors.brand} style={tw`py-4`} />
           ) : walletData && walletData.walletTransactions.length > 0 ? (
-            walletData.walletTransactions.slice(0, 3).map((tx) => <TxRow key={tx.id} tx={tx} />)
+            walletData.walletTransactions.slice(0, 5).map((tx) => <TxRow key={tx.id} tx={tx} />)
           ) : (
             <Text style={[tw`text-xs text-center py-4`, { color: Colors.textMuted }]}>No recent activity</Text>
           )}

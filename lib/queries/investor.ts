@@ -131,7 +131,7 @@ export interface WalletTransaction {
   id: string;
   walletId: string;
   amount: number;
-  type: "DEPOSIT" | "WITHDRAWAL";
+  type: "DEPOSIT" | "WITHDRAWAL" | "PROMOTION";
   status: "PENDING" | "SUCCESS" | "FAILED";
   reference: string;
   createdAt: string;
@@ -315,7 +315,7 @@ export interface Transaction {
   id: string;
   walletId: string;
   amount: number;
-  type: "INVESTMENT" | "DEPOSIT" | "WITHDRAWAL";
+  type: "INVESTMENT" | "DEPOSIT" | "WITHDRAWAL" | "PROMOTION";
   status: "SUCCESS" | "PENDING" | "FAILED";
   reference: string;
   createdAt: string;
