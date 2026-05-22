@@ -186,7 +186,11 @@ export default function HomeScreen() {
             label="Our Policies"
             bg="#4F6473"
             textColor="#fff"
-            onPress={() => WebBrowser.openBrowserAsync("https://needhomes-new.netlify.app/privacy-policy")}
+            onPress={() =>
+              WebBrowser.openBrowserAsync(
+                "https://needhomes-new.netlify.app/privacy-policy",
+              )
+            }
           />
         </View>
       </ScrollView>
