@@ -35,7 +35,7 @@ export default function ProfileInfoScreen() {
       </View>
 
       <View style={tw`flex-1 px-5 pt-6`}>
-        <Text>{JSON.stringify(accountType)}</Text>
+        {/*<Text>{JSON.stringify(accountType)}</Text>*/}
         {accountType === "CORPORATE" ? (
           <CorporateProfile />
         ) : (
