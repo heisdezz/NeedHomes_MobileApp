@@ -1,9 +1,9 @@
-import { View, ActivityIndicator } from "react-native";
+import { useEffect } from "react";
+import { View, Image } from "react-native";
 import { Redirect } from "expo-router";
 import { useOnboardingStore } from "@/store";
 import { useAuth } from "@/store/auth-store";
 import { useHydration } from "@/hooks/use-hydration";
-import tw from "@/lib/tw";
 
 export default function Index() {
   const hydrated = useHydration();
@@ -12,8 +12,18 @@ export default function Index() {
 
   if (!hydrated) {
     return (
-      <View style={tw`flex-1 items-center justify-center bg-[#3C3C44]`}>
-        <ActivityIndicator color="#F56821" />
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#3C3C44",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Image
+          source={require("@/assets/need/logo.png")}
+          style={{ width: 180, height: 80, resizeMode: "contain" }}
+        />
       </View>
     );
   }
