@@ -49,7 +49,9 @@ function AvatarPicker({
           {uri ? (
             <Image source={{ uri }} style={tw`w-24 h-24`} resizeMode="cover" />
           ) : (
-            <Text style={[tw`text-3xl font-bold`, { color: Colors.textSecondary }]}>
+            <Text
+              style={[tw`text-3xl font-bold`, { color: Colors.textSecondary }]}
+            >
               {initials}
             </Text>
           )}
@@ -90,12 +92,19 @@ export default function IndividualProfile() {
     phone: String(user?.phone ?? ""),
   });
   const [errors, setErrors] = useState<Partial<ProfileForm>>({});
-  const [avatarUri, setAvatarUri] = useState<string | null>(user?.profilePicture ?? null);
-  const [stagedAvatar, setStagedAvatar] = useState<{ uri: string; fileName?: string; mimeType?: string } | null>(null);
+  const [avatarUri, setAvatarUri] = useState<string | null>(
+    user?.profilePicture ?? null,
+  );
+  const [stagedAvatar, setStagedAvatar] = useState<{
+    uri: string;
+    fileName?: string;
+    mimeType?: string;
+  } | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
   const initials =
-    `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase() || "?";
+    `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase() ||
+    "?";
 
   const mutation = useMutation({
     mutationFn: async (data: ProfileForm & { profilePicture?: string }) => {
@@ -122,7 +131,11 @@ export default function IndividualProfile() {
     });
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
-      setStagedAvatar({ uri: asset.uri, fileName: asset.fileName ?? undefined, mimeType: asset.mimeType ?? undefined });
+      setStagedAvatar({
+        uri: asset.uri,
+        fileName: asset.fileName ?? undefined,
+        mimeType: asset.mimeType ?? undefined,
+      });
       setAvatarUri(asset.uri);
     }
   }
@@ -142,7 +155,11 @@ export default function IndividualProfile() {
     if (stagedAvatar) {
       setAvatarUploading(true);
       try {
-        const res = await uploadImage(stagedAvatar.uri, stagedAvatar.fileName, stagedAvatar.mimeType);
+        const res = await uploadImage(
+          stagedAvatar.uri,
+          stagedAvatar.fileName,
+          stagedAvatar.mimeType,
+        );
         profilePicture = res.data.url;
         setStagedAvatar(null);
       } catch {
@@ -159,7 +176,10 @@ export default function IndividualProfile() {
   const busy = mutation.isPending || avatarUploading;
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
       <AvatarPicker
         uri={avatarUri}
         initials={initials}
@@ -176,7 +196,8 @@ export default function IndividualProfile() {
               value={form.firstName}
               onChangeText={(t) => {
                 setForm((f) => ({ ...f, firstName: t }));
-                if (errors.firstName) setErrors((e) => ({ ...e, firstName: undefined }));
+                if (errors.firstName)
+                  setErrors((e) => ({ ...e, firstName: undefined }));
               }}
               error={errors.firstName}
             />
@@ -188,7 +209,8 @@ export default function IndividualProfile() {
               value={form.lastName}
               onChangeText={(t) => {
                 setForm((f) => ({ ...f, lastName: t }));
-                if (errors.lastName) setErrors((e) => ({ ...e, lastName: undefined }));
+                if (errors.lastName)
+                  setErrors((e) => ({ ...e, lastName: undefined }));
               }}
               error={errors.lastName}
             />

@@ -13,7 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner-native";
 import { Colors } from "@/constants/theme";
 import { useAuth, useKyc } from "@/store";
-import { set_user_value } from "@/store/auth-store";
+import { set_kyc_value, set_user_value } from "@/store/auth-store";
 import apiClient, { type ApiResponse } from "@/lib/api";
 import { uploadImage } from "@/lib/imageApi";
 import FormInput from "@/components/ui/form-input";
@@ -48,7 +48,9 @@ function AvatarPicker({
           {uri ? (
             <Image source={{ uri }} style={tw`w-24 h-24`} resizeMode="cover" />
           ) : (
-            <Text style={[tw`text-3xl font-bold`, { color: Colors.textSecondary }]}>
+            <Text
+              style={[tw`text-3xl font-bold`, { color: Colors.textSecondary }]}
+            >
               {initials}
             </Text>
           )}
@@ -89,12 +91,21 @@ export default function CorporateProfile() {
     phone: String(user?.phone ?? ""),
   });
   const [errors, setErrors] = useState<Partial<ProfileForm>>({});
-  const [avatarUri, setAvatarUri] = useState<string | null>(user?.profilePicture ?? null);
-  const [stagedAvatar, setStagedAvatar] = useState<{ uri: string; fileName?: string; mimeType?: string } | null>(null);
+  const [avatarUri, setAvatarUri] = useState<string | null>(
+    user?.profilePicture ?? null,
+  );
+  const [stagedAvatar, setStagedAvatar] = useState<{
+    uri: string;
+    fileName?: string;
+    mimeType?: string;
+  } | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
-  const initials =
-    (kyc?.companyName?.[0] ?? user?.firstName?.[0] ?? "C").toUpperCase();
+  const initials = (
+    kyc?.companyName?.[0] ??
+    user?.firstName?.[0] ??
+    "C"
+  ).toUpperCase();
 
   const mutation = useMutation({
     mutationFn: async (data: ProfileForm & { profilePicture?: string }) => {
@@ -102,7 +113,9 @@ export default function CorporateProfile() {
       return resp.data;
     },
     onSuccess: (resp) => {
+      console.log(resp);
       if (auth) set_user_value({ ...auth, user: resp.data });
+      if (kyc) set_kyc_value({ ...kyc, ...resp.data });
       toast.success("Profile updated successfully");
     },
     onError: (err: any) => {
@@ -121,7 +134,11 @@ export default function CorporateProfile() {
     });
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
-      setStagedAvatar({ uri: asset.uri, fileName: asset.fileName ?? undefined, mimeType: asset.mimeType ?? undefined });
+      setStagedAvatar({
+        uri: asset.uri,
+        fileName: asset.fileName ?? undefined,
+        mimeType: asset.mimeType ?? undefined,
+      });
       setAvatarUri(asset.uri);
     }
   }
@@ -140,7 +157,11 @@ export default function CorporateProfile() {
     if (stagedAvatar) {
       setAvatarUploading(true);
       try {
-        const res = await uploadImage(stagedAvatar.uri, stagedAvatar.fileName, stagedAvatar.mimeType);
+        const res = await uploadImage(
+          stagedAvatar.uri,
+          stagedAvatar.fileName,
+          stagedAvatar.mimeType,
+        );
         profilePicture = res.data.url;
         setStagedAvatar(null);
       } catch {
@@ -157,7 +178,10 @@ export default function CorporateProfile() {
   const busy = mutation.isPending || avatarUploading;
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
       <AvatarPicker
         uri={avatarUri}
         initials={initials}
@@ -172,7 +196,8 @@ export default function CorporateProfile() {
           value={form.companyName}
           onChangeText={(t) => {
             setForm((f) => ({ ...f, companyName: t }));
-            if (errors.companyName) setErrors((e) => ({ ...e, companyName: undefined }));
+            if (errors.companyName)
+              setErrors((e) => ({ ...e, companyName: undefined }));
           }}
           error={errors.companyName}
         />
