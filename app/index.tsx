@@ -1,24 +1,25 @@
 import { useEffect } from "react";
+import { View, Image } from "react-native";
 import { Redirect } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
 import { useOnboardingStore } from "@/store";
 import { useAuth } from "@/store/auth-store";
 import { useHydration } from "@/hooks/use-hydration";
-
-SplashScreen.preventAutoHideAsync();
 
 export default function Index() {
   const hydrated = useHydration();
   const hasSeenOnboarding = useOnboardingStore((s) => s.hasSeenOnboarding);
   const auth = useAuth();
 
-  useEffect(() => {
-    if (hydrated) {
-      SplashScreen.hideAsync();
-    }
-  }, [hydrated]);
-
-  if (!hydrated) return null;
+  if (!hydrated) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#3C3C44", alignItems: "center", justifyContent: "center" }}>
+        <Image
+          source={require("@/assets/need/logo.png")}
+          style={{ width: 180, height: 80, resizeMode: "contain" }}
+        />
+      </View>
+    );
+  }
 
   if (!hasSeenOnboarding) {
     return <Redirect href="/onboarding" />;
