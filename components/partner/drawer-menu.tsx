@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, Alert } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,7 +6,9 @@ import { useRouter } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { useAuth } from "@/store";
 import { useLogout } from "@/lib/mutations/auth";
+import LogoutModal from "@/components/ui/LogoutModal";
 import tw from "@/lib/tw";
+import { useState } from "react";
 
 type MenuItem = {
   label: string;
@@ -42,6 +44,7 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
   const auth = useAuth();
   const user = auth?.user;
   const { doLogout } = useLogout();
+  const [logoutVisible, setLogoutVisible] = useState(false);
   const fullName = user
     ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
     : "Partner";
@@ -56,6 +59,11 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={["top", "bottom"]}>
+      <LogoutModal
+        visible={logoutVisible}
+        onCancel={() => setLogoutVisible(false)}
+        onConfirm={() => { setLogoutVisible(false); doLogout(); }}
+      />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={tw`pb-8`}>
         {/* Header */}
         <View style={tw`flex-row items-center justify-between px-6 pt-6 pb-6`}>
@@ -121,10 +129,7 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
           <TouchableOpacity
             onPress={() => {
               navigation.closeDrawer();
-              Alert.alert("Log Out", "Are you sure you want to log out?", [
-                { text: "Cancel", style: "cancel" },
-                { text: "Log Out", style: "destructive", onPress: doLogout },
-              ]);
+              setLogoutVisible(true);
             }}
             activeOpacity={0.7}
             style={tw`flex-row items-center gap-4 px-2 py-1.5 rounded-xl`}
