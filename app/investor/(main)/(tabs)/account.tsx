@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Alert, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -108,13 +108,17 @@ export default function AccountScreen() {
             {/* Avatar */}
             <View
               style={[
-                tw`w-16 h-16 rounded-full items-center justify-center`,
+                tw`w-16 h-16 rounded-full overflow-hidden items-center justify-center`,
                 { backgroundColor: Colors.brand + "20" },
               ]}
             >
-              <Text style={[tw`text-2xl font-bold`, { color: Colors.brand }]}>
-                {initials}
-              </Text>
+              {user?.profilePicture ? (
+                <Image source={{ uri: user.profilePicture }} style={tw`w-16 h-16`} />
+              ) : (
+                <Text style={[tw`text-2xl font-bold`, { color: Colors.brand }]}>
+                  {initials}
+                </Text>
+              )}
             </View>
 
             {/* Name + email */}
