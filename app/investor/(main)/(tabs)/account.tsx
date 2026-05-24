@@ -1,11 +1,13 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth, useKyc, useAuthStore } from "@/store/auth-store";
 import { Colors } from "@/constants/theme";
 import PrimaryButton from "@/components/primary-button";
+import LogoutModal from "@/components/ui/LogoutModal";
 import tw from "@/lib/tw";
+import { useState } from "react";
 
 const KYC_CONFIG: Record<
   string,
@@ -52,6 +54,7 @@ export default function AccountScreen() {
   const kyc = useKyc();
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const clearKyc = useAuthStore((s) => s.clearKyc);
+  const [logoutVisible, setLogoutVisible] = useState(false);
 
   const user = auth?.user;
   const kycStatus = (kyc as any)?.account_verification_status as
@@ -65,23 +68,20 @@ export default function AccountScreen() {
       .join("")
       .toUpperCase() || "?";
 
-  function handleLogout() {
-    Alert.alert("Log Out", "Are you sure you want to log out?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Log Out",
-        style: "destructive",
-        onPress: () => {
-          clearAuth();
-          clearKyc();
-          router.replace("/auth/login");
-        },
-      },
-    ]);
+  function handleLogoutConfirm() {
+    setLogoutVisible(false);
+    clearAuth();
+    clearKyc();
+    router.replace("/auth/login");
   }
 
   return (
     <SafeAreaView style={tw`flex-1 bg-bg-light`} edges={["top"]}>
+      <LogoutModal
+        visible={logoutVisible}
+        onCancel={() => setLogoutVisible(false)}
+        onConfirm={handleLogoutConfirm}
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={tw`pb-10`}
@@ -358,7 +358,7 @@ export default function AccountScreen() {
         {/* Logout */}
         <View style={tw`mx-4 mt-4`}>
           <TouchableOpacity
-            onPress={handleLogout}
+            onPress={() => setLogoutVisible(true)}
             activeOpacity={0.8}
             style={[
               tw`flex-row items-center justify-center gap-2 py-4 rounded-2xl`,
