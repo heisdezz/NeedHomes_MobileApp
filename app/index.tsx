@@ -12,7 +12,14 @@ export default function Index() {
 
   if (!hydrated) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#3C3C44", alignItems: "center", justifyContent: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#3C3C44",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <Image
           source={require("@/assets/need/logo.png")}
           style={{ width: 180, height: 80, resizeMode: "contain" }}
