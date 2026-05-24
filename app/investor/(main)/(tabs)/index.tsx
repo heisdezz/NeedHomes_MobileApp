@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   RefreshControl,
+  Image,
 } from "react-native";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -102,11 +103,15 @@ export default function HomeScreen() {
           <View style={tw`flex-row items-center gap-3`}>
             <View
               style={[
-                tw`w-10 h-10 rounded-full items-center justify-center`,
+                tw`w-10 h-10 rounded-full overflow-hidden items-center justify-center`,
                 { backgroundColor: Colors.surface },
               ]}
             >
-              <Ionicons name="person" size={20} color={Colors.textMuted} />
+              {user?.profilePicture ? (
+                <Image source={{ uri: user.profilePicture }} style={tw`w-10 h-10`} />
+              ) : (
+                <Ionicons name="person" size={20} color={Colors.textMuted} />
+              )}
             </View>
             <View>
               <Text style={[tw`text-xs`, { color: Colors.textMuted }]}>
