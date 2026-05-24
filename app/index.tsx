@@ -1,22 +1,24 @@
-import { View, ActivityIndicator } from "react-native";
+import { useEffect } from "react";
 import { Redirect } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { useOnboardingStore } from "@/store";
 import { useAuth } from "@/store/auth-store";
 import { useHydration } from "@/hooks/use-hydration";
-import tw from "@/lib/tw";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function Index() {
   const hydrated = useHydration();
   const hasSeenOnboarding = useOnboardingStore((s) => s.hasSeenOnboarding);
   const auth = useAuth();
 
-  if (!hydrated) {
-    return (
-      <View style={tw`flex-1 items-center justify-center bg-[#3C3C44]`}>
-        <ActivityIndicator color="#F56821" />
-      </View>
-    );
-  }
+  useEffect(() => {
+    if (hydrated) {
+      SplashScreen.hideAsync();
+    }
+  }, [hydrated]);
+
+  if (!hydrated) return null;
 
   if (!hasSeenOnboarding) {
     return <Redirect href="/onboarding" />;
