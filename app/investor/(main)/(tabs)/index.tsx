@@ -150,10 +150,8 @@ export default function HomeScreen() {
           <View style={tw`flex-row items-center gap-3`}>
             <TouchableOpacity
               activeOpacity={0.7}
-              style={[
-                tw`w-9 h-9 rounded-full items-center justify-center`,
-                // { s: Colors.surface },
-              ]}
+              onPress={() => router.push("/investor/notifications")}
+              style={tw`w-9 h-9 rounded-full items-center justify-center`}
             >
               <Ionicons name="notifications" size={24} color={Colors.brand} />
             </TouchableOpacity>

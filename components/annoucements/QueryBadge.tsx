@@ -10,7 +10,7 @@ export default function QueryBadge() {
     queryKey: ["announcements-mine"],
     queryFn: async () => {
       const resp = await apiClient.get("/announcements/mine");
-      return resp.data?.data ?? [];
+      return resp.data?.data?.data ?? [];
     },
     staleTime: 1000 * 60 * 2,
   });

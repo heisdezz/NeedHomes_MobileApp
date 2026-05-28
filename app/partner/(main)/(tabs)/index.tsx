@@ -1,7 +1,7 @@
 import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 import { useAuth } from "@/store";
 import { Colors } from "@/constants/theme";
@@ -13,6 +13,7 @@ import tw from "@/lib/tw";
 
 export default function PartnerHomeScreen() {
   const navigation = useNavigation();
+  const router = useRouter();
   const openDrawer = () => navigation.dispatch(DrawerActions.openDrawer());
   const auth = useAuth();
   const user = auth?.user;
@@ -46,6 +47,7 @@ export default function PartnerHomeScreen() {
           <View style={tw`flex-row items-center gap-3`}>
             <TouchableOpacity
               activeOpacity={0.7}
+              onPress={() => router.push("/partner/notifications")}
               style={[
                 tw`w-9 h-9 rounded-full items-center justify-center`,
                 { backgroundColor: Colors.brand + "15" },

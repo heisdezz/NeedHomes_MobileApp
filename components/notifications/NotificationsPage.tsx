@@ -6,10 +6,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { toast } from "sonner-native";
 
-import apiClient from "@/lib/api";
+import apiClient, { ApiResponseV2 } from "@/lib/api";
 import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
 import { extract_message } from "@/helpers/apihelpers";
+import PageLoader from "@/components/layout/PageLoader";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -234,12 +235,11 @@ export default function NotificationsPage({
   const [filter, setFilter] = useState<FilterType>("all");
   const [selected, setSelected] = useState<Notification | null>(null);
 
-  const query = useQuery<Notification[]>({
+  const query = useQuery<ApiResponseV2<Notification[]>>({
     queryKey: [`notifications-${userType}`],
     queryFn: async () => {
       const resp = await apiClient.get("/notifications");
-      console.log("nots", resp);
-      return resp.data?.data ?? [];
+      return resp.data;
     },
   });
 
@@ -254,7 +254,7 @@ export default function NotificationsPage({
   });
 
   const markAllMutation = useMutation({
-    mutationFn: () => apiClient.post("/notifications/read-all"),
+    mutationFn: () => apiClient.patch("/notifications/read-all"),
     onSuccess: invalidate,
   });
 
@@ -271,13 +271,10 @@ export default function NotificationsPage({
     });
   };
 
-  const list: Notification[] = Array.isArray(query.data) ? query.data : [];
-  const filtered = list.filter((n) => {
-    if (filter === "unread") return !n.isRead;
-    if (filter === "read") return n.isRead;
-    return true;
-  });
-  const unreadCount = list.filter((n) => !n.isRead).length;
+  const list: Notification[] = query.data?.data?.data ?? [];
+  const unreadCount: number =
+    (query.data?.data as any)?.unreadCount ??
+    list.filter((n) => !n.isRead).length;
 
   const FILTERS: { key: FilterType; label: string }[] = [
     { key: "all", label: "All" },
@@ -373,81 +370,66 @@ export default function NotificationsPage({
       </View>
 
       {/* List / states */}
-      {query.isLoading ? (
-        <View style={tw`flex-1 items-center justify-center`}>
-          <Ionicons name="reload-outline" size={32} color={Colors.brand} />
-          <Text style={[tw`text-sm mt-3`, { color: Colors.textMuted }]}>
-            Loading notifications...
-          </Text>
-        </View>
-      ) : query.isError ? (
-        <View style={tw`flex-1 items-center justify-center px-6`}>
-          <Ionicons
-            name="alert-circle-outline"
-            size={48}
-            color={Colors.error}
-          />
-          <Text
-            style={[
-              tw`text-base font-bold mt-3 text-center`,
-              { color: Colors.textPrimary },
-            ]}
-          >
-            Failed to load
-          </Text>
-          <TouchableOpacity
-            onPress={() => query.refetch()}
-            style={[
-              tw`mt-4 px-6 py-2 rounded-lg`,
-              { backgroundColor: Colors.brand },
-            ]}
-          >
-            <Text style={tw`text-white text-sm font-semibold`}>Try Again</Text>
-          </TouchableOpacity>
-        </View>
-      ) : filtered.length === 0 ? (
-        <View style={tw`flex-1 items-center justify-center px-6`}>
-          <View
-            style={[
-              tw`w-16 h-16 rounded-full items-center justify-center mb-4`,
-              { backgroundColor: Colors.inputBg },
-            ]}
-          >
-            <Ionicons
-              name="notifications-off-outline"
-              size={32}
-              color={Colors.textMuted}
+      <PageLoader query={query} loadingText="Loading notifications...">
+        {(data) => {
+          const items: Notification[] = data?.data?.data ?? [];
+          const filtered = items.filter((n) => {
+            if (filter === "unread") return !n.isRead;
+            if (filter === "read") return n.isRead;
+            return true;
+          });
+
+          if (filtered.length === 0) {
+            return (
+              <View style={tw`flex-1 items-center justify-center px-6`}>
+                <View
+                  style={[
+                    tw`w-16 h-16 rounded-full items-center justify-center mb-4`,
+                    { backgroundColor: Colors.inputBg },
+                  ]}
+                >
+                  <Ionicons
+                    name="notifications-off-outline"
+                    size={32}
+                    color={Colors.textMuted}
+                  />
+                </View>
+                <Text
+                  style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}
+                >
+                  No notifications
+                </Text>
+                <Text
+                  style={[
+                    tw`text-sm text-center mt-1`,
+                    { color: Colors.textSecondary },
+                  ]}
+                >
+                  {filter === "unread"
+                    ? "You're all caught up!"
+                    : "Nothing here yet."}
+                </Text>
+              </View>
+            );
+          }
+
+          return (
+            <FlatList
+              data={filtered}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <NotificationCard
+                  notification={item}
+                  onPress={() => handleOpen(item)}
+                />
+              )}
+              style={tw`bg-white flex-1`}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 24 }}
             />
-          </View>
-          <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
-            No notifications
-          </Text>
-          <Text
-            style={[
-              tw`text-sm text-center mt-1`,
-              { color: Colors.textSecondary },
-            ]}
-          >
-            {filter === "unread"
-              ? "You're all caught up!"
-              : "Nothing here yet."}
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <NotificationCard
-              notification={item}
-              onPress={() => handleOpen(item)}
-            />
-          )}
-          style={tw`bg-white flex-1`}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 24 }}
-        />
-      )}
+          );
+        }}
+      </PageLoader>
 
       <NotificationDetail
         notification={selected}
