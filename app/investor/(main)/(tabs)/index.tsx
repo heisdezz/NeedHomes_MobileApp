@@ -100,7 +100,11 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={tw`flex-row items-center justify-between px-5 py-4`}>
-          <View style={tw`flex-row items-center gap-3`}>
+          <TouchableOpacity
+            style={tw`flex-row items-center gap-3`}
+            activeOpacity={0.7}
+            onPress={() => router.push("/investor/(main)/(tabs)/account")}
+          >
             <View
               style={[
                 tw`w-10 h-10 rounded-full overflow-hidden items-center justify-center`,
@@ -141,7 +145,7 @@ export default function HomeScreen() {
                 </View>
               ) : null}
             </View>
-          </View>
+          </TouchableOpacity>
 
           <View style={tw`flex-row items-center gap-3`}>
             <TouchableOpacity
