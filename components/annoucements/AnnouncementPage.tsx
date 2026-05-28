@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
   FlatList,
   Modal,
 } from "react-native";
@@ -15,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import apiClient from "@/lib/api";
 import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
+import PageLoader from "@/components/layout/PageLoader";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -283,11 +283,11 @@ export default function AnnouncementsPage({
     useState<Announcement | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const query = useQuery({
+  const query = useQuery<Announcement[]>({
     queryKey: [`announcements-${userType}`],
     queryFn: async () => {
       const resp = await apiClient.get("/announcements/mine");
-      return resp.data?.data ?? [];
+      return resp.data?.data?.data ?? [];
     },
   });
 
@@ -310,9 +310,7 @@ export default function AnnouncementsPage({
     }
   };
 
-  const announcements: Announcement[] = Array.isArray(query.data)
-    ? query.data
-    : [];
+  const announcements: Announcement[] = Array.isArray(query.data) ? query.data : [];
   const unreadCount = announcements.filter((a) => !a.isRead).length;
 
   return (
@@ -358,93 +356,49 @@ export default function AnnouncementsPage({
 
       {/* Content */}
       <View style={tw`flex-1 px-4 pt-4`}>
-        {query.isLoading ? (
-          <View style={tw`flex-1 items-center justify-center`}>
-            <ActivityIndicator size="large" color={Colors.brand} />
-            <Text
-              style={[tw`text-sm mt-3`, { color: Colors.textMuted }]}
-            >
-              Loading announcements...
-            </Text>
-          </View>
-        ) : query.isError ? (
-          <View style={tw`flex-1 items-center justify-center`}>
-            <Ionicons
-              name="alert-circle-outline"
-              size={48}
-              color={Colors.error}
-            />
-            <Text
-              style={[
-                tw`text-base font-bold mt-3`,
-                { color: Colors.textPrimary },
-              ]}
-            >
-              Failed to Load
-            </Text>
-            <Text
-              style={[tw`text-sm text-center mt-1`, { color: Colors.textSecondary }]}
-            >
-              Could not retrieve announcements
-            </Text>
-            <TouchableOpacity
-              onPress={() => query.refetch()}
-              style={[
-                tw`mt-4 px-6 py-2 rounded-lg`,
-                { backgroundColor: Colors.brand },
-              ]}
-            >
-              <Text style={tw`text-white text-sm font-semibold`}>
-                Try Again
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : announcements.length === 0 ? (
-          <View style={tw`flex-1 items-center justify-center`}>
-            <View
-              style={[
-                tw`w-16 h-16 rounded-full items-center justify-center mb-4`,
-                { backgroundColor: Colors.inputBg },
-              ]}
-            >
-              <Ionicons
-                name="notifications-off-outline"
-                size={32}
-                color={Colors.textMuted}
+        <PageLoader query={query} loadingText="Loading announcements...">
+          {(data) => {
+            if (data.length === 0) {
+              return (
+                <View style={tw`flex-1 items-center justify-center`}>
+                  <View
+                    style={[
+                      tw`w-16 h-16 rounded-full items-center justify-center mb-4`,
+                      { backgroundColor: Colors.inputBg },
+                    ]}
+                  >
+                    <Ionicons
+                      name="notifications-off-outline"
+                      size={32}
+                      color={Colors.textMuted}
+                    />
+                  </View>
+                  <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
+                    No Announcements
+                  </Text>
+                  <Text style={[tw`text-sm text-center mt-1`, { color: Colors.textSecondary }]}>
+                    You're all caught up! New announcements will appear here.
+                  </Text>
+                </View>
+              );
+            }
+            return (
+              <FlatList
+                data={data}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <AnnouncementCard
+                    announcement={item}
+                    onPress={() => handleViewAnnouncement(item)}
+                  />
+                )}
+                scrollEnabled
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 20 }}
               />
-            </View>
-            <Text
-              style={[
-                tw`text-lg font-bold`,
-                { color: Colors.textPrimary },
-              ]}
-            >
-              No Announcements
-            </Text>
-            <Text
-              style={[
-                tw`text-sm text-center mt-1`,
-                { color: Colors.textSecondary },
-              ]}
-            >
-              You're all caught up! New announcements will appear here.
-            </Text>
-          </View>
-        ) : (
-          <FlatList
-            data={announcements}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <AnnouncementCard
-                announcement={item}
-                onPress={() => handleViewAnnouncement(item)}
-              />
-            )}
-            scrollEnabled
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
-        )}
+            );
+          }}
+        </PageLoader>
       </View>
 
       {/* Detail Modal */}
