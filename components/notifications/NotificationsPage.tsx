@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  Modal,
-} from "react-native";
+import { View, Text, TouchableOpacity, FlatList, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -41,21 +35,34 @@ function getIcon(type: NotificationType, size = 20) {
     case "alert":
       return <Ionicons name="warning-outline" size={size} color="#EF4444" />;
     case "success":
-      return <Ionicons name="checkmark-circle-outline" size={size} color="#22C55E" />;
+      return (
+        <Ionicons name="checkmark-circle-outline" size={size} color="#22C55E" />
+      );
     case "update":
       return <Ionicons name="time-outline" size={size} color="#3B82F6" />;
     case "INFO":
     default:
-      return <Ionicons name="information-circle-outline" size={size} color={Colors.brand} />;
+      return (
+        <Ionicons
+          name="information-circle-outline"
+          size={size}
+          color={Colors.brand}
+        />
+      );
   }
 }
 
 function getIconBg(type: NotificationType): string {
   switch (type) {
-    case "alert": return "#FEE2E2";
-    case "success": return "#DCFCE7";
-    case "update": return "#DBEAFE";
-    case "INFO": default: return "#FEF3E2";
+    case "alert":
+      return "#FEE2E2";
+    case "success":
+      return "#DCFCE7";
+    case "update":
+      return "#DBEAFE";
+    case "INFO":
+    default:
+      return "#FEF3E2";
   }
 }
 
@@ -92,7 +99,11 @@ function NotificationCard({
           <Text
             style={[
               tw`text-sm font-semibold flex-1`,
-              { color: notification.isRead ? Colors.textSecondary : Colors.textPrimary },
+              {
+                color: notification.isRead
+                  ? Colors.textSecondary
+                  : Colors.textPrimary,
+              },
             ]}
             numberOfLines={1}
           >
@@ -112,7 +123,10 @@ function NotificationCard({
 
       {!notification.isRead && (
         <View
-          style={[tw`w-2 h-2 rounded-full mt-1.5 shrink-0`, { backgroundColor: "#3B82F6" }]}
+          style={[
+            tw`w-2 h-2 rounded-full mt-1.5 shrink-0`,
+            { backgroundColor: "#3B82F6" },
+          ]}
         />
       )}
     </TouchableOpacity>
@@ -140,10 +154,18 @@ function NotificationDetail({
       onRequestClose={onClose}
     >
       <View style={[tw`flex-1 justify-end`, { backgroundColor: "#00000044" }]}>
-        <View style={[tw`bg-white rounded-t-3xl px-5 pt-5 pb-10`, { minHeight: 300 }]}>
+        <View
+          style={[
+            tw`bg-white rounded-t-3xl px-5 pt-5 pb-10`,
+            { minHeight: 300 },
+          ]}
+        >
           {/* Handle */}
           <View
-            style={[tw`w-10 h-1 rounded-full self-center mb-5`, { backgroundColor: "#E5E7EB" }]}
+            style={[
+              tw`w-10 h-1 rounded-full self-center mb-5`,
+              { backgroundColor: "#E5E7EB" },
+            ]}
           />
 
           {/* Type badge */}
@@ -155,7 +177,10 @@ function NotificationDetail({
           >
             {getIcon(notification.type, 16)}
             <Text
-              style={[tw`text-xs font-semibold uppercase tracking-wider`, { color: Colors.textSecondary }]}
+              style={[
+                tw`text-xs font-semibold uppercase tracking-wider`,
+                { color: Colors.textSecondary },
+              ]}
             >
               {notification.type}
             </Text>
@@ -165,12 +190,16 @@ function NotificationDetail({
           </View>
 
           {/* Title */}
-          <Text style={[tw`text-lg font-bold mb-3`, { color: Colors.textPrimary }]}>
+          <Text
+            style={[tw`text-lg font-bold mb-3`, { color: Colors.textPrimary }]}
+          >
             {notification.title}
           </Text>
 
           {/* Content */}
-          <Text style={[tw`text-sm leading-6`, { color: Colors.textSecondary }]}>
+          <Text
+            style={[tw`text-sm leading-6`, { color: Colors.textSecondary }]}
+          >
             {notification.content}
           </Text>
 
@@ -178,7 +207,10 @@ function NotificationDetail({
           <TouchableOpacity
             onPress={onClose}
             activeOpacity={0.8}
-            style={[tw`mt-8 py-3 rounded-2xl items-center`, { backgroundColor: Colors.brand }]}
+            style={[
+              tw`mt-8 py-3 rounded-2xl items-center`,
+              { backgroundColor: Colors.brand },
+            ]}
           >
             <Text style={tw`text-sm font-semibold text-white`}>Close</Text>
           </TouchableOpacity>
@@ -194,7 +226,9 @@ interface NotificationsPageProps {
   userType: "investor" | "partner";
 }
 
-export default function NotificationsPage({ userType }: NotificationsPageProps) {
+export default function NotificationsPage({
+  userType,
+}: NotificationsPageProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<FilterType>("all");
@@ -204,6 +238,7 @@ export default function NotificationsPage({ userType }: NotificationsPageProps) 
     queryKey: [`notifications-${userType}`],
     queryFn: async () => {
       const resp = await apiClient.get("/notifications");
+      console.log("nots", resp);
       return resp.data?.data ?? [];
     },
   });
@@ -251,7 +286,10 @@ export default function NotificationsPage({ userType }: NotificationsPageProps) 
   ];
 
   return (
-    <SafeAreaView style={[tw`flex-1`, { backgroundColor: "#F9FAFB" }]} edges={["top", "bottom"]}>
+    <SafeAreaView
+      style={[tw`flex-1`, { backgroundColor: "#F9FAFB" }]}
+      edges={["top", "bottom"]}
+    >
       {/* Header */}
       <View
         style={[
@@ -261,14 +299,21 @@ export default function NotificationsPage({ userType }: NotificationsPageProps) 
       >
         <View style={tw`flex-row items-center gap-3`}>
           <TouchableOpacity onPress={() => router.back()} style={tw`p-2 -ml-2`}>
-            <Ionicons name="chevron-back" size={24} color={Colors.textPrimary} />
+            <Ionicons
+              name="chevron-back"
+              size={24}
+              color={Colors.textPrimary}
+            />
           </TouchableOpacity>
           <View>
-            <Text style={[tw`text-xl font-bold`, { color: Colors.textPrimary }]}>
+            <Text
+              style={[tw`text-xl font-bold`, { color: Colors.textPrimary }]}
+            >
               Notifications
             </Text>
             <Text style={[tw`text-xs`, { color: Colors.textSecondary }]}>
-              {list.length} total{unreadCount > 0 ? ` · ${unreadCount} unread` : ""}
+              {list.length} total
+              {unreadCount > 0 ? ` · ${unreadCount} unread` : ""}
             </Text>
           </View>
         </View>
@@ -283,7 +328,11 @@ export default function NotificationsPage({ userType }: NotificationsPageProps) 
               { backgroundColor: Colors.inputBg },
             ]}
           >
-            <Ionicons name="checkmark-done-outline" size={16} color={Colors.brand} />
+            <Ionicons
+              name="checkmark-done-outline"
+              size={16}
+              color={Colors.brand}
+            />
             <Text style={[tw`text-xs font-semibold`, { color: Colors.brand }]}>
               Mark all read
             </Text>
@@ -305,7 +354,10 @@ export default function NotificationsPage({ userType }: NotificationsPageProps) 
             activeOpacity={0.7}
             style={[
               tw`px-4 py-1.5 rounded-lg`,
-              { backgroundColor: filter === f.key ? Colors.textPrimary : Colors.inputBg },
+              {
+                backgroundColor:
+                  filter === f.key ? Colors.textPrimary : Colors.inputBg,
+              },
             ]}
           >
             <Text
@@ -330,13 +382,25 @@ export default function NotificationsPage({ userType }: NotificationsPageProps) 
         </View>
       ) : query.isError ? (
         <View style={tw`flex-1 items-center justify-center px-6`}>
-          <Ionicons name="alert-circle-outline" size={48} color={Colors.error} />
-          <Text style={[tw`text-base font-bold mt-3 text-center`, { color: Colors.textPrimary }]}>
+          <Ionicons
+            name="alert-circle-outline"
+            size={48}
+            color={Colors.error}
+          />
+          <Text
+            style={[
+              tw`text-base font-bold mt-3 text-center`,
+              { color: Colors.textPrimary },
+            ]}
+          >
             Failed to load
           </Text>
           <TouchableOpacity
             onPress={() => query.refetch()}
-            style={[tw`mt-4 px-6 py-2 rounded-lg`, { backgroundColor: Colors.brand }]}
+            style={[
+              tw`mt-4 px-6 py-2 rounded-lg`,
+              { backgroundColor: Colors.brand },
+            ]}
           >
             <Text style={tw`text-white text-sm font-semibold`}>Try Again</Text>
           </TouchableOpacity>
@@ -349,13 +413,24 @@ export default function NotificationsPage({ userType }: NotificationsPageProps) 
               { backgroundColor: Colors.inputBg },
             ]}
           >
-            <Ionicons name="notifications-off-outline" size={32} color={Colors.textMuted} />
+            <Ionicons
+              name="notifications-off-outline"
+              size={32}
+              color={Colors.textMuted}
+            />
           </View>
           <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
             No notifications
           </Text>
-          <Text style={[tw`text-sm text-center mt-1`, { color: Colors.textSecondary }]}>
-            {filter === "unread" ? "You're all caught up!" : "Nothing here yet."}
+          <Text
+            style={[
+              tw`text-sm text-center mt-1`,
+              { color: Colors.textSecondary },
+            ]}
+          >
+            {filter === "unread"
+              ? "You're all caught up!"
+              : "Nothing here yet."}
           </Text>
         </View>
       ) : (
@@ -363,7 +438,10 @@ export default function NotificationsPage({ userType }: NotificationsPageProps) 
           data={filtered}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <NotificationCard notification={item} onPress={() => handleOpen(item)} />
+            <NotificationCard
+              notification={item}
+              onPress={() => handleOpen(item)}
+            />
           )}
           style={tw`bg-white flex-1`}
           showsVerticalScrollIndicator={false}
