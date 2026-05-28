@@ -44,6 +44,8 @@ components/
   kyc/                  # KYC form components
   CHAT/                 # Chat/messaging components
   layout/               # Layout helpers
+  annoucements/         # AnnouncementPage + drawer badges (QueryBadge, NotificationsBadge, ChatBadge)
+  notifications/        # NotificationsPage shared component
 
 constants/
   theme.ts              # Colors — single source of truth
@@ -82,10 +84,12 @@ types/
 - `/(main)/(tabs)/` — tab bar: Home, Investments, Messages, Account
 - `/properties/[propertyId]/invest/` — investment flows (co-dev, fractional-ownership, land-banking, outright-purchase, save-to-own)
 - `/kyc`, `/wallet-pin`, `/settings`, `/profile-info`, `/BankDetails`, `/transactions`
+- `/announcements`, `/notifications`
 
 ### Partner routes (`app/partner/`)
 - `/(main)/(tabs)/` — tab bar: Home, Add, Messages, Account, Promotions
 - `/transactions`, `/promotions`, `/message`
+- `/announcements`, `/notifications`
 
 ### Auth routes (`app/auth/`)
 - `/sign-up`, `/login`, `/verify`
@@ -110,6 +114,7 @@ Imperative helpers (safe outside React): `get_user_value()`, `set_user_value()`,
 **`useOnboardingStore`** — persisted, holds `hasSeenOnboarding: boolean`
 
 **`useSocketStore`** — in-memory Socket.io connection, `connect()` / `disconnect()` / `emit()` helpers
+- Also tracks `chatUnreadCount` — incremented on `chat:newMessage` socket event; cleared via `clearChatUnread()` when user navigates to chat
 
 ### Hydration
 Use `useHydration()` from `hooks/use-hydration.ts` whenever routing decisions depend on persisted state. It waits for both auth and onboarding stores to finish loading from SecureStore.

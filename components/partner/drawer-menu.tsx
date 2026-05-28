@@ -9,6 +9,10 @@ import { useLogout } from "@/lib/mutations/auth";
 import LogoutModal from "@/components/ui/LogoutModal";
 import tw from "@/lib/tw";
 import { useState } from "react";
+import QueryBadge from "@/components/annoucements/QueryBadge";
+import NotificationsBadge from "@/components/annoucements/NotificationsBadge";
+import ChatBadge from "@/components/annoucements/ChatBadge";
+import { useSocketStore } from "@/store/socket-store";
 
 type MenuItem = {
   label: string;
@@ -45,6 +49,7 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
   const user = auth?.user;
   const { doLogout } = useLogout();
   const [logoutVisible, setLogoutVisible] = useState(false);
+  const clearChatUnread = useSocketStore((s) => s.clearChatUnread);
   const fullName = user
     ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
     : "Partner";
@@ -53,8 +58,10 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
     navigation.closeDrawer();
     if (label === "Transactions") router.push("/partner/transactions");
     else if (label === "Properties") router.push("/investor/properties");
-    else if (label === "Chat") router.push("/partner/message");
+    else if (label === "Chat") { clearChatUnread(); router.push("/partner/message"); }
     else if (label === "Promotions") router.push("/partner/promotions");
+    else if (label === "Announcements") router.push("/partner/announcements");
+    else if (label === "Notifications") router.push("/partner/notifications");
   };
 
   return (
@@ -108,6 +115,22 @@ export default function DrawerContent({ navigation }: DrawerContentComponentProp
               <Text style={tw`text-text-primary text-sm font-medium`}>
                 {item.label}
               </Text>
+
+              {item.label === "Announcements" && (
+                <View style={tw`ml-auto`}>
+                  <QueryBadge />
+                </View>
+              )}
+              {item.label === "Notifications" && (
+                <View style={tw`ml-auto`}>
+                  <NotificationsBadge />
+                </View>
+              )}
+              {item.label === "Chat" && (
+                <View style={tw`ml-auto`}>
+                  <ChatBadge />
+                </View>
+              )}
             </TouchableOpacity>
           ))}
         </View>
