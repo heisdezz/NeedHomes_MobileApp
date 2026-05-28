@@ -1,0 +1,27 @@
+import React from "react";
+import { View, Text } from "react-native";
+import tw from "@/lib/tw";
+import { Colors } from "@/constants/theme";
+import { useQuery } from "@tanstack/react-query";
+import apiClient from "@/lib/api";
+
+export default function QueryBadge() {
+  const { data = [] } = useQuery({
+    queryKey: ["announcements-mine"],
+    queryFn: async () => {
+      const resp = await apiClient.get("/announcements/mine");
+      return resp.data?.data ?? [];
+    },
+    staleTime: 1000 * 60 * 2,
+  });
+
+  const unread = Array.isArray(data) ? data.filter((a: any) => !a.isRead).length : 0;
+  if (!unread) return null;
+  const label = unread > 99 ? "99+" : String(unread);
+
+  return (
+    <View style={[tw`px-2 py-0.5 rounded-full`, { backgroundColor: Colors.brand }]}> 
+      <Text style={[tw`text-xs font-semibold text-white`]}>{label}</Text>
+    </View>
+  );
+}

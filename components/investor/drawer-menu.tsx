@@ -9,6 +9,10 @@ import { useLogout } from "@/lib/mutations/auth";
 import LogoutModal from "@/components/ui/LogoutModal";
 import tw from "@/lib/tw";
 import { useState } from "react";
+import QueryBadge from "@/components/annoucements/QueryBadge";
+import NotificationsBadge from "@/components/annoucements/NotificationsBadge";
+import ChatBadge from "@/components/annoucements/ChatBadge";
+import { useSocketStore } from "@/store/socket-store";
 
 type MenuItem = {
   label: string;
@@ -57,6 +61,7 @@ export default function DrawerContent({
   const kyc = useKyc();
   const { doLogout } = useLogout();
   const [logoutVisible, setLogoutVisible] = useState(false);
+  const clearChatUnread = useSocketStore((s) => s.clearChatUnread);
   const badge = KYC_BADGE[kyc?.account_verification_status as string] ?? null;
 
   // const fullName =
@@ -152,7 +157,12 @@ export default function DrawerContent({
                 } else if (item.label === "My Investments") {
                   router.push("/investor/investment");
                 } else if (item.label === "Chat") {
+                  clearChatUnread();
                   router.push("/investor/message");
+                } else if (item.label === "Announcements") {
+                  router.push("/investor/announcements");
+                } else if (item.label === "Notifications") {
+                  router.push("/investor/notifications");
                 } else {
                   item.onPress?.();
                 }
@@ -164,6 +174,22 @@ export default function DrawerContent({
               <Text style={tw`text-text-primary text-sm font-medium`}>
                 {item.label}
               </Text>
+
+              {item.label === "Announcements" && (
+                <View style={tw`ml-auto`}>
+                  <QueryBadge />
+                </View>
+              )}
+              {item.label === "Notifications" && (
+                <View style={tw`ml-auto`}>
+                  <NotificationsBadge />
+                </View>
+              )}
+              {item.label === "Chat" && (
+                <View style={tw`ml-auto`}>
+                  <ChatBadge />
+                </View>
+              )}
             </TouchableOpacity>
           ))}
         </View>

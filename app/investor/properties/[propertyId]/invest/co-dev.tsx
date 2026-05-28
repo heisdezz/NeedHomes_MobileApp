@@ -82,6 +82,7 @@ export default function CoDevInvestment() {
       return resp.data as ApiResponse<InstallmentInvestmentResponse>;
     },
     onSuccess: (data) => {
+      toast.success("Investment successful!");
       router.replace(`/investor/invesment/${data.data.id}`);
     },
     onError: (error: AxiosError<ApiResponse>) => {
@@ -310,58 +311,123 @@ export default function CoDevInvestment() {
                   <View
                     style={[
                       tw`rounded-xl p-4 mb-6`,
-                      { backgroundColor: "#F9FAFB", borderWidth: 1, borderColor: Colors.divider },
+                      {
+                        backgroundColor: "#F9FAFB",
+                        borderWidth: 1,
+                        borderColor: Colors.divider,
+                      },
                     ]}
                   >
-                    <View style={tw`flex-row items-center justify-between mb-1`}>
-                      <Text style={[tw`text-sm font-bold`, { color: Colors.textPrimary }]}>
+                    <View
+                      style={tw`flex-row items-center justify-between mb-1`}
+                    >
+                      <Text
+                        style={[
+                          tw`text-sm font-bold`,
+                          { color: Colors.textPrimary },
+                        ]}
+                      >
                         Number of Units
                       </Text>
                       {property.availableUnits != null && (
-                        <View style={[tw`px-2 py-0.5 rounded-full`, { backgroundColor: Colors.brand + "15" }]}>
-                          <Text style={[tw`text-xs font-semibold`, { color: Colors.brand }]}>
+                        <View
+                          style={[
+                            tw`px-2 py-0.5 rounded-full`,
+                            { backgroundColor: Colors.brand + "15" },
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              tw`text-xs font-semibold`,
+                              { color: Colors.brand },
+                            ]}
+                          >
                             Max: {property.availableUnits}
                           </Text>
                         </View>
                       )}
                     </View>
-                    <View style={tw`flex-row items-center justify-between mt-3`}>
+                    <View
+                      style={tw`flex-row items-center justify-between mt-3`}
+                    >
                       <TouchableOpacity
-                        onPress={() => { if (quantity > 1) form.setValue("quantity", quantity - 1); }}
+                        onPress={() => {
+                          if (quantity > 1)
+                            form.setValue("quantity", quantity - 1);
+                        }}
                         disabled={quantity <= 1}
                         style={[
                           tw`w-10 h-10 rounded-xl items-center justify-center border`,
                           {
-                            borderColor: quantity <= 1 ? Colors.divider : Colors.brand,
-                            backgroundColor: quantity <= 1 ? "#F9FAFB" : Colors.brand + "10",
+                            borderColor:
+                              quantity <= 1 ? Colors.divider : Colors.brand,
+                            backgroundColor:
+                              quantity <= 1 ? "#F9FAFB" : Colors.brand + "10",
                           },
                         ]}
                       >
-                        <Ionicons name="remove" size={20} color={quantity <= 1 ? Colors.textMuted : Colors.brand} />
+                        <Ionicons
+                          name="remove"
+                          size={20}
+                          color={
+                            quantity <= 1 ? Colors.textMuted : Colors.brand
+                          }
+                        />
                       </TouchableOpacity>
-                      <Text style={[tw`text-2xl font-bold`, { color: Colors.textPrimary }]}>{quantity}</Text>
+                      <Text
+                        style={[
+                          tw`text-2xl font-bold`,
+                          { color: Colors.textPrimary },
+                        ]}
+                      >
+                        {quantity}
+                      </Text>
                       <TouchableOpacity
                         onPress={() => {
-                          if (property.availableUnits == null || quantity < property.availableUnits)
+                          if (
+                            property.availableUnits == null ||
+                            quantity < property.availableUnits
+                          )
                             form.setValue("quantity", quantity + 1);
                         }}
-                        disabled={property.availableUnits != null && quantity >= property.availableUnits}
+                        disabled={
+                          property.availableUnits != null &&
+                          quantity >= property.availableUnits
+                        }
                         style={[
                           tw`w-10 h-10 rounded-xl items-center justify-center border`,
                           {
-                            borderColor: property.availableUnits != null && quantity >= property.availableUnits ? Colors.divider : Colors.brand,
-                            backgroundColor: property.availableUnits != null && quantity >= property.availableUnits ? "#F9FAFB" : Colors.brand + "10",
+                            borderColor:
+                              property.availableUnits != null &&
+                              quantity >= property.availableUnits
+                                ? Colors.divider
+                                : Colors.brand,
+                            backgroundColor:
+                              property.availableUnits != null &&
+                              quantity >= property.availableUnits
+                                ? "#F9FAFB"
+                                : Colors.brand + "10",
                           },
                         ]}
                       >
                         <Ionicons
                           name="add"
                           size={20}
-                          color={property.availableUnits != null && quantity >= property.availableUnits ? Colors.textMuted : Colors.brand}
+                          color={
+                            property.availableUnits != null &&
+                            quantity >= property.availableUnits
+                              ? Colors.textMuted
+                              : Colors.brand
+                          }
                         />
                       </TouchableOpacity>
                     </View>
-                    <Text style={[tw`text-xs text-center mt-2`, { color: Colors.textSecondary }]}>
+                    <Text
+                      style={[
+                        tw`text-xs text-center mt-2`,
+                        { color: Colors.textSecondary },
+                      ]}
+                    >
                       Subtotal: {formatCurrency(unitTotal)}
                     </Text>
                   </View>
@@ -490,22 +556,6 @@ export default function CoDevInvestment() {
                           </Text>
                         </View>
                       )}
-
-                      <View style={tw`flex-row justify-between`}>
-                        <Text
-                          style={[tw`text-sm`, { color: Colors.textSecondary }]}
-                        >
-                          Platform Charge ({systemChargePercentage}%)
-                        </Text>
-                        <Text
-                          style={[
-                            tw`text-sm font-semibold`,
-                            { color: Colors.textPrimary },
-                          ]}
-                        >
-                          {formatCurrency(systemCharge)}
-                        </Text>
-                      </View>
 
                       <View
                         style={[

@@ -374,13 +374,6 @@ export default function InvestmentDetails({
                 }
               />
             )}
-            <DetailRow
-              label="Platform Charge"
-              value={`${
-                property.systemCharges?.platformChargePercentage ?? 0
-              }%`}
-              last
-            />
           </DetailsCard>
         </View>
       );

@@ -60,6 +60,7 @@ export default function SaveToOwnInvestment() {
       return resp.data as ApiResponse<{ id: string }>;
     },
     onSuccess: (data) => {
+      toast.success("Investment successful!");
       router.replace(`/investor/invesment/${data.data.id}`);
     },
     onError: (error: AxiosError<ApiResponse>) => {

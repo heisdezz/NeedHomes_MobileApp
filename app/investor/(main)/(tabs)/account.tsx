@@ -312,6 +312,11 @@ export default function AccountScreen() {
           {(
             [
               {
+                icon: "notifications-outline" as const,
+                label: "Announcements",
+                onPress: () => router.push("/investor/announcements"),
+              },
+              {
                 icon: "settings-outline" as const,
                 label: "Settings",
                 onPress: () => router.push("/investor/settings"),

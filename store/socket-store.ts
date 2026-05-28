@@ -7,9 +7,12 @@ interface SocketState {
   socket: Socket | null;
   isConnected: boolean;
   conversationId: string | null;
+  chatUnreadCount: number;
   connect: () => void;
   disconnect: () => void;
   setConversationId: (id: string | null) => void;
+  incrementChatUnread: () => void;
+  clearChatUnread: () => void;
   emit: (event: string, data?: any) => void;
   on: (event: string, callback: (...args: any[]) => void) => void;
   off: (event: string, callback?: (...args: any[]) => void) => void;
@@ -19,6 +22,10 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   isConnected: false,
   conversationId: null,
+  chatUnreadCount: 0,
+
+  incrementChatUnread: () => set((s) => ({ chatUnreadCount: s.chatUnreadCount + 1 })),
+  clearChatUnread: () => set({ chatUnreadCount: 0 }),
 
   connect: () => {
     const state = get();
@@ -52,6 +59,10 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     socket.on("connected", (data) => {
       console.log("👤 User connected:", data);
+    });
+
+    socket.on("chat:newMessage", () => {
+      get().incrementChatUnread();
     });
 
     set({ socket });
