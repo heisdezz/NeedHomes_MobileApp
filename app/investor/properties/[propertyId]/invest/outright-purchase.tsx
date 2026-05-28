@@ -46,7 +46,10 @@ export default function OutrightPurchase() {
       const resp = await apiClient.post("/investments/", data);
       return resp.data as ApiResponse<{ id: string }>;
     },
-    onSuccess: (data) => router.replace(`/investor/invesment/${data.data.id}`),
+    onSuccess: (data) => {
+      toast.success("Investment successful!");
+      router.replace(`/investor/invesment/${data.data.id}`);
+    },
     onError: (error: AxiosError<ApiResponse>) =>
       toast.error(extract_message(error)),
   });
