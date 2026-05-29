@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { useTransactions, type Transaction } from "@/lib/queries/investor";
 import tw from "@/lib/tw";
+import Pagination from "@/components/ui/Pagination";
 
 const TYPE_FILTERS = ["ALL", "DEPOSIT", "INVESTMENT", "WITHDRAWAL"] as const;
 const STATUS_FILTERS = ["ALL", "SUCCESS", "PENDING", "FAILED"] as const;
@@ -21,6 +22,7 @@ const TYPE_COLORS: Record<Transaction["type"], { bg: string; text: string }> = {
   DEPOSIT:    { bg: "#D1FAE5", text: "#065F46" },
   INVESTMENT: { bg: "#DBEAFE", text: "#1E40AF" },
   WITHDRAWAL: { bg: "#FEE2E2", text: "#7F1D1D" },
+  PROMOTION:  { bg: "#F3E8FF", text: "#7C3AED" },
 };
 
 const STATUS_COLORS: Record<Transaction["status"], { bg: string; text: string; dot: string }> = {
@@ -123,11 +125,13 @@ export default function TransactionsScreen() {
     ...(search && { search }),
   };
 
-  const { data, isLoading, isFetching } = useTransactions(params);
+  const { data, isLoading } = useTransactions(params);
   const transactions: Transaction[] = data?.data?.data ?? [];
-  const meta = data?.data?.meta;
+  const meta = data?.data?.meta ?? {};
   const total = meta?.total ?? transactions.length;
-  const hasMore = transactions.length < total;
+  const totalPages: number = meta.totalPages ?? 1;
+  const hasNext: boolean = meta.hasNext ?? page < totalPages;
+  const hasPrev: boolean = meta.hasPrev ?? page > 1;
 
   const hasFilters = !!(type || status || search);
 
@@ -221,17 +225,16 @@ export default function TransactionsScreen() {
           )
         }
         ListFooterComponent={
-          hasMore ? (
-            <TouchableOpacity
-              onPress={() => setPage((p) => p + 1)}
-              disabled={isFetching}
-              activeOpacity={0.7}
-              style={[tw`py-3.5 rounded-xl items-center mt-2`, { borderWidth: 1, borderColor: Colors.divider, backgroundColor: "#fff" }]}
-            >
-              {isFetching
-                ? <ActivityIndicator color={Colors.brand} size="small" />
-                : <Text style={[tw`text-sm font-semibold`, { color: Colors.textPrimary }]}>Load More</Text>}
-            </TouchableOpacity>
+          totalPages > 1 ? (
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              hasNext={hasNext}
+              hasPrev={hasPrev}
+              onNext={() => setPage((p) => p + 1)}
+              onPrev={() => setPage((p) => p - 1)}
+              onGoTo={setPage}
+            />
           ) : null
         }
       />

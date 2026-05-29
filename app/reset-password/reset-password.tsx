@@ -112,7 +112,7 @@ export default function ResetPasswordScreen() {
           </View>
 
           <TouchableOpacity
-            onPress={handleSubmit(mutate)}
+            onPress={handleSubmit((data) => mutate(data))}
             disabled={isPending}
             activeOpacity={0.85}
             style={tw`bg-brand rounded-xl py-4 items-center mt-8 ${isPending ? "opacity-70" : ""}`}

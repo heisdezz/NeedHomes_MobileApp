@@ -11,6 +11,8 @@ import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
 import { extract_message } from "@/helpers/apihelpers";
 import PageLoader from "@/components/layout/PageLoader";
+import Pagination from "@/components/ui/Pagination";
+import { useSocketStore } from "@/store/socket-store";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -233,19 +235,22 @@ export default function NotificationsPage({
   const router = useRouter();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<FilterType>("all");
+  const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Notification | null>(null);
 
   const query = useQuery<ApiResponseV2<Notification[]>>({
-    queryKey: [`notifications-${userType}`],
+    queryKey: [`notifications-${userType}`, page],
     queryFn: async () => {
-      const resp = await apiClient.get("/notifications");
+      const resp = await apiClient.get("/notifications", { params: { page } });
       return resp.data;
     },
   });
 
+  const fetchUnreadCounts = useSocketStore((s) => s.fetchUnreadCounts);
+
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: [`notifications-${userType}`] });
-    queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] });
+    fetchUnreadCounts();
   };
 
   const markReadMutation = useMutation({
@@ -347,7 +352,10 @@ export default function NotificationsPage({
         {FILTERS.map((f) => (
           <TouchableOpacity
             key={f.key}
-            onPress={() => setFilter(f.key)}
+            onPress={() => {
+              setFilter(f.key);
+              setPage(1);
+            }}
             activeOpacity={0.7}
             style={[
               tw`px-4 py-1.5 rounded-lg`,
@@ -373,6 +381,11 @@ export default function NotificationsPage({
       <PageLoader query={query} loadingText="Loading notifications...">
         {(data) => {
           const items: Notification[] = data?.data?.data ?? [];
+          const meta = data?.data?.meta ?? {};
+          const totalPages: number = meta.totalPages ?? 1;
+          const hasNext: boolean = meta.hasNext ?? page < totalPages;
+          const hasPrev: boolean = meta.hasPrev ?? page > 1;
+
           const filtered = items.filter((n) => {
             if (filter === "unread") return !n.isRead;
             if (filter === "read") return n.isRead;
@@ -425,7 +438,20 @@ export default function NotificationsPage({
               )}
               style={tw`bg-white flex-1`}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingBottom: 24 }}
+              contentContainerStyle={{ paddingBottom: 8 }}
+              ListFooterComponent={
+                totalPages > 1 ? (
+                  <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    hasNext={hasNext}
+                    hasPrev={hasPrev}
+                    onNext={() => setPage((p) => p + 1)}
+                    onPrev={() => setPage((p) => p - 1)}
+                    onGoTo={setPage}
+                  />
+                ) : null
+              }
             />
           );
         }}

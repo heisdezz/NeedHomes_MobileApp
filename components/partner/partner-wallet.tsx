@@ -12,6 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { toast } from "sonner-native";
+import { extract_message } from "@/helpers/apihelpers";
 import { Colors } from "@/constants/theme";
 import {
   useWallet,
@@ -164,7 +165,7 @@ export default function PartnerWallet() {
     toast.promise(withdraw.mutateAsync({ amount, pin }), {
       loading: "Processing…",
       success: () => "Withdrawal successful",
-      error: (e) => e?.response?.data?.message ?? "Withdrawal failed",
+      error: (e) => extract_message(e) || "Withdrawal failed",
     });
     setModalVisible(false);
   };

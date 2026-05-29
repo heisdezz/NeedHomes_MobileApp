@@ -77,6 +77,13 @@ const TYPE_CONFIG: Record<
     iconColor: "#DC2626",
     accent: Colors.brand,
   },
+  PROMOTION: {
+    label: "Promotion",
+    icon: "pricetag-outline",
+    iconBg: "#F3E8FF",
+    iconColor: "#7C3AED",
+    accent: "#7C3AED",
+  },
 };
 
 const STATUS_CONFIG: Record<
