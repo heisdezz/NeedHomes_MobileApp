@@ -29,7 +29,7 @@ Codebase context for AI agents working on this project. Read this before making 
 
 ```
 app/                    # Expo Router pages (file = route)
-  _layout.tsx           # Root layout — providers, StatusBar
+  _layout.tsx           # Root layout — providers, StatusBar, socket connection & global notification listeners
   index.tsx             # Entry: hydrates store, redirects to correct section
   onboarding.tsx
   auth/                 # Sign-up, login, verify, KYC registration
@@ -40,6 +40,7 @@ app/                    # Expo Router pages (file = route)
 components/
   ui/                   # Reusable primitives (FormInput, Pagination, LogoutModal…)
   investor/             # Investor-specific components
+    investments/        # Sub-components for investment detail: ExitStrategy, FractionalInfo, InstallmentSchedule, InvPropDetails, Resell
   partner/              # Partner-specific components
   kyc/                  # KYC form components
   CHAT/                 # Chat/messaging components
@@ -91,6 +92,7 @@ types/
 ### Investor routes (`app/investor/`)
 - `/(main)/(tabs)/` — tab bar: Home, Investments, Messages, Account
 - `/properties/[propertyId]/invest/` — investment flows (co-dev, fractional-ownership, land-banking, outright-purchase, save-to-own)
+- `/invesment/[id]/` — investment detail screen (note: folder name has typo — "invesment", not "investment")
 - `/kyc`, `/wallet-pin`, `/settings`, `/profile-info`, `/BankDetails`, `/transactions`
 - `/announcements`, `/notifications`
 
@@ -125,7 +127,11 @@ Imperative helpers (safe outside React): `get_user_value()`, `set_user_value()`,
 **`useOnboardingStore`** — persisted, holds `hasSeenOnboarding: boolean`
 
 **`useSocketStore`** — in-memory Socket.io connection, `connect()` / `disconnect()` / `emit()` helpers
-- Also tracks `chatUnreadCount` — incremented on `chat:newMessage` socket event; cleared via `clearChatUnread()` when user navigates to chat
+- Tracks `chatUnreadCount` and `notificationUnreadCount`.
+- Listeners for `chat:newMessage` and `notification:new` increment these counts.
+- `fetchUnreadCounts()` fetches initial unread counts for both domains from the API; called automatically on `connect()`.
+- Manual clearing/setting: `clearChatUnread()`, `clearNotificationUnread()`, `setChatUnread(n)`, `setNotificationUnread(n)`.
+- Global listeners in `app/_layout.tsx` use the socket instance to trigger `toast.info` for announcements, notifications, and chat.
 
 ### Hydration
 Use `useHydration()` from `hooks/use-hydration.ts` whenever routing decisions depend on persisted state. It waits for both auth and onboarding stores to finish loading from SecureStore.
