@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  Modal,
-} from "react-native";
+import { View, Text, TouchableOpacity, FlatList, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +10,7 @@ import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
 import PageLoader from "@/components/layout/PageLoader";
 import Pagination from "@/components/ui/Pagination";
+import { useSocketStore } from "@/store/socket-store";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -115,25 +110,18 @@ function AnnouncementCard({
       <View style={tw`flex-1`}>
         {/* Date and Time */}
         <View style={tw`flex-row items-center gap-2 mb-1`}>
-          <Text
-            style={[tw`text-xs`, { color: Colors.textSecondary }]}
-          >
+          <Text style={[tw`text-xs`, { color: Colors.textSecondary }]}>
             {formatDate(announcement.createdAt)}
           </Text>
           <Text style={[tw`text-xs`, { color: Colors.textMuted }]}>•</Text>
-          <Text
-            style={[tw`text-xs`, { color: Colors.textSecondary }]}
-          >
+          <Text style={[tw`text-xs`, { color: Colors.textSecondary }]}>
             {getTimeAgo(announcement.createdAt)}
           </Text>
         </View>
 
         {/* Title */}
         <Text
-          style={[
-            tw`text-sm font-bold mb-1`,
-            { color: Colors.textPrimary },
-          ]}
+          style={[tw`text-sm font-bold mb-1`, { color: Colors.textPrimary }]}
           numberOfLines={1}
         >
           {announcement.title || "Update"}
@@ -158,11 +146,7 @@ function AnnouncementCard({
             ]}
           />
         )}
-        <Ionicons
-          name="chevron-forward"
-          size={18}
-          color={Colors.textMuted}
-        />
+        <Ionicons name="chevron-forward" size={18} color={Colors.textMuted} />
       </View>
     </TouchableOpacity>
   );
@@ -200,11 +184,7 @@ function AnnouncementDetail({
             Announcement
           </Text>
           <TouchableOpacity onPress={onClose} style={tw`p-2 -mr-2`}>
-            <Ionicons
-              name="close-circle"
-              size={28}
-              color={Colors.textMuted}
-            />
+            <Ionicons name="close-circle" size={28} color={Colors.textMuted} />
           </TouchableOpacity>
         </View>
 
@@ -223,9 +203,7 @@ function AnnouncementDetail({
                     size={14}
                     color={Colors.textMuted}
                   />
-                  <Text
-                    style={[tw`text-xs`, { color: Colors.textSecondary }]}
-                  >
+                  <Text style={[tw`text-xs`, { color: Colors.textSecondary }]}>
                     {formatDate(announcement.createdAt)}
                   </Text>
                 </View>
@@ -235,9 +213,7 @@ function AnnouncementDetail({
                     size={14}
                     color={Colors.textMuted}
                   />
-                  <Text
-                    style={[tw`text-xs`, { color: Colors.textSecondary }]}
-                  >
+                  <Text style={[tw`text-xs`, { color: Colors.textSecondary }]}>
                     {formatTime(announcement.createdAt)}
                   </Text>
                 </View>
@@ -255,7 +231,10 @@ function AnnouncementDetail({
 
               {/* Content */}
               <Text
-                style={[tw`text-base leading-6`, { color: Colors.textSecondary }]}
+                style={[
+                  tw`text-base leading-6`,
+                  { color: Colors.textSecondary },
+                ]}
               >
                 {announcement.content.replace(/<[^>]*>/g, "")}
               </Text>
@@ -275,9 +254,7 @@ interface AnnouncementPageProps {
   userType: "investor" | "partner";
 }
 
-export default function AnnouncementsPage({
-  userType,
-}: AnnouncementPageProps) {
+export default function AnnouncementsPage({ userType }: AnnouncementPageProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -288,10 +265,14 @@ export default function AnnouncementsPage({
   const query = useQuery<ApiResponseV2<Announcement[]>>({
     queryKey: [`announcements-${userType}`, page],
     queryFn: async () => {
-      const resp = await apiClient.get("/announcements/mine", { params: { page } });
+      const resp = await apiClient.get("/announcements/mine", {
+        params: { page },
+      });
       return resp.data;
     },
   });
+
+  const fetchUnreadCounts = useSocketStore((s) => s.fetchUnreadCounts);
 
   const markAsReadMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -301,6 +282,7 @@ export default function AnnouncementsPage({
       queryClient.invalidateQueries({
         queryKey: [`announcements-${userType}`],
       });
+      fetchUnreadCounts();
     },
   });
 
@@ -328,26 +310,19 @@ export default function AnnouncementsPage({
         ]}
       >
         <TouchableOpacity onPress={() => router.back()} style={tw`p-2 -ml-2`}>
-          <Ionicons
-            name="chevron-back"
-            size={24}
-            color={Colors.textPrimary}
-          />
+          <Ionicons name="chevron-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
         <View style={tw`flex-1`}>
-          <Text
-            style={[tw`text-xl font-bold`, { color: Colors.textPrimary }]}
-          >
+          <Text style={[tw`text-xl font-bold`, { color: Colors.textPrimary }]}>
             Announcements
           </Text>
           <Text style={[tw`text-xs`, { color: Colors.textSecondary }]}>
-            {announcements.length} {announcements.length === 1 ? "update" : "updates"}
+            {announcements.length}{" "}
+            {announcements.length === 1 ? "update" : "updates"}
             {unreadCount > 0 && ` • ${unreadCount} new`}
           </Text>
         </View>
-        <View
-          style={[tw`p-2 rounded-lg`, { backgroundColor: Colors.inputBg }]}
-        >
+        <View style={[tw`p-2 rounded-lg`, { backgroundColor: Colors.inputBg }]}>
           <Ionicons
             name="notifications-outline"
             size={20}
@@ -381,10 +356,20 @@ export default function AnnouncementsPage({
                       color={Colors.textMuted}
                     />
                   </View>
-                  <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
+                  <Text
+                    style={[
+                      tw`text-lg font-bold`,
+                      { color: Colors.textPrimary },
+                    ]}
+                  >
                     No Announcements
                   </Text>
-                  <Text style={[tw`text-sm text-center mt-1`, { color: Colors.textSecondary }]}>
+                  <Text
+                    style={[
+                      tw`text-sm text-center mt-1`,
+                      { color: Colors.textSecondary },
+                    ]}
+                  >
                     You're all caught up! New announcements will appear here.
                   </Text>
                 </View>

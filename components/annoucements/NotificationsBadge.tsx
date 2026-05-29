@@ -2,25 +2,18 @@ import React from "react";
 import { View, Text } from "react-native";
 import tw from "@/lib/tw";
 import { Colors } from "@/constants/theme";
-import { useQuery } from "@tanstack/react-query";
-import apiClient from "@/lib/api";
+import { useSocketStore } from "@/store/socket-store";
 
 export default function NotificationsBadge() {
-  const { data } = useQuery({
-    queryKey: ["notifications-unread-count"],
-    queryFn: async () => {
-      const resp = await apiClient.get("/notifications/unread-count");
-      return resp.data?.data as { unreadCount: number };
-    },
-    staleTime: 1000 * 60 * 2,
-  });
+  const unread = useSocketStore((s) => s.notificationUnreadCount);
 
-  const unread = data?.unreadCount ?? 0;
   if (!unread) return null;
   const label = unread > 99 ? "99+" : String(unread);
 
   return (
-    <View style={[tw`px-2 py-0.5 rounded-full`, { backgroundColor: Colors.brand }]}>
+    <View
+      style={[tw`px-2 py-0.5 rounded-full`, { backgroundColor: Colors.brand }]}
+    >
       <Text style={tw`text-xs font-semibold text-white`}>{label}</Text>
     </View>
   );

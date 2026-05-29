@@ -12,6 +12,7 @@ import tw from "@/lib/tw";
 import { extract_message } from "@/helpers/apihelpers";
 import PageLoader from "@/components/layout/PageLoader";
 import Pagination from "@/components/ui/Pagination";
+import { useSocketStore } from "@/store/socket-store";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -245,9 +246,11 @@ export default function NotificationsPage({
     },
   });
 
+  const fetchUnreadCounts = useSocketStore((s) => s.fetchUnreadCounts);
+
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: [`notifications-${userType}`] });
-    queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] });
+    fetchUnreadCounts();
   };
 
   const markReadMutation = useMutation({
@@ -349,7 +352,10 @@ export default function NotificationsPage({
         {FILTERS.map((f) => (
           <TouchableOpacity
             key={f.key}
-            onPress={() => { setFilter(f.key); setPage(1); }}
+            onPress={() => {
+              setFilter(f.key);
+              setPage(1);
+            }}
             activeOpacity={0.7}
             style={[
               tw`px-4 py-1.5 rounded-lg`,
