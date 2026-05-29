@@ -179,13 +179,12 @@ export default function CorpKYCForm() {
       : null;
 
   return (
-    <AwareScrollview>
-      <View
-        style={tw`flex-1`}
-        contentContainerStyle={tw`p-4 gap-5 pb-10`}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
+    <AwareScrollview
+      contentContainerStyle={tw`p-4 gap-5 pb-10`}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={tw`flex-1`}>
         {rejection ? (
           <View style={tw`bg-red-50 border border-red-200 rounded-xl p-4`}>
             <Text style={tw`text-xs font-bold text-red-700 uppercase mb-1`}>

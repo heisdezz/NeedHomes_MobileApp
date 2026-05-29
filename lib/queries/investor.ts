@@ -40,6 +40,7 @@ export interface PropertiesParams {
 }
 
 export interface AdditionalFee {
+  id?: string;
   label: string;
   amount: number; // in kobo
 }

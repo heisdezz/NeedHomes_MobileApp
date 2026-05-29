@@ -49,9 +49,7 @@ const schema = z
     password: z.string().min(8, "Minimum 8 characters"),
     confirmPassword: z.string(),
     hearAboutUs: z.string().min(1, "Please select an option"),
-    agreed: z.literal(true, {
-      errorMap: () => ({ message: "You must agree to the terms" }),
-    }),
+    agreed: z.literal(true, { message: "You must agree to the terms" }),
     // Next of kin
     nokFullName: z.string().min(1, "Full name is required"),
     nokEmail: z.string().email("Invalid email address"),

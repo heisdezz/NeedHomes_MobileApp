@@ -21,6 +21,7 @@ const TYPE_COLORS: Record<Transaction["type"], { bg: string; text: string }> = {
   DEPOSIT:    { bg: "#D1FAE5", text: "#065F46" },
   INVESTMENT: { bg: "#DBEAFE", text: "#1E40AF" },
   WITHDRAWAL: { bg: "#FEE2E2", text: "#7F1D1D" },
+  PROMOTION:  { bg: "#F3E8FF", text: "#7C3AED" },
 };
 
 const STATUS_COLORS: Record<Transaction["status"], { bg: string; text: string; dot: string }> = {

@@ -47,12 +47,11 @@ export const uploadImage = async (
   // Create FormData for React Native
   const formData = new FormData();
 
-  // @ts-ignore - React Native's FormData accepts this format
   formData.append("file", {
     uri: imageUri,
     name: fileName || defaultFileName,
     type: mimeType,
-  });
+  } as any);
 
   const resp = await apiClient.post("multimedia/upload", formData, {
     headers: {

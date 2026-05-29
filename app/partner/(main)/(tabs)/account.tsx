@@ -64,25 +64,21 @@ export default function PartnerAccountScreen() {
                 },
               ]}
             >
-              <Text
-                style={[
-                  tw`text-2xl font-bold`,
-                  { color: Colors.brand },
-                ]}
-              >
+              <Text style={[tw`text-2xl font-bold`, { color: Colors.brand }]}>
                 {initials}
               </Text>
             </View>
 
             <View style={tw`flex-1 justify-center`}>
               <Text
-                style={[tw`text-lg font-bold mb-0.5`, { color: Colors.textPrimary }]}
+                style={[
+                  tw`text-lg font-bold mb-0.5`,
+                  { color: Colors.textPrimary },
+                ]}
               >
                 {user?.firstName} {user?.lastName}
               </Text>
-              <Text
-                style={[tw`text-sm`, { color: Colors.textSecondary }]}
-              >
+              <Text style={[tw`text-sm`, { color: Colors.textSecondary }]}>
                 {user?.email ?? "—"}
               </Text>
               {user?.phoneNumber ? (

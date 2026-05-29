@@ -101,7 +101,7 @@ export default function SignUpScreen() {
         {/* Cards */}
         <View style={tw`gap-4`}>
           <AccountCard
-            type="investor"
+            type="INVESTOR"
             selected
             icon={require("@/assets/sign-up/investor.png")}
             title="Investor"
@@ -109,7 +109,7 @@ export default function SignUpScreen() {
             onPress={() => router.push("/auth/investor/individual")}
           />
           <AccountCard
-            type="partner"
+            type="PARTNER"
             selected={false}
             icon={require("@/assets/sign-up/partner.png")}
             title="Partner"

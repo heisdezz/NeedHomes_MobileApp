@@ -1,9 +1,11 @@
+export type AccountType = "INDIVIDUAL" | "INVESTOR" | "PARTNER" | "CORPORATE" | "ADMIN";
+
 export interface USER {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  accountType: "INDIVIDUAL" | "INVESTOR" | "PARTNER" | "ADMIN";
+  accountType: AccountType;
   isEmailVerified: boolean;
   roles: string[];
   permissions: string[];

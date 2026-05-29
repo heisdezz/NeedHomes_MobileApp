@@ -27,7 +27,7 @@ import SelectInput from "@/components/ui/select-input";
 import PrimaryButton from "@/components/primary-button";
 import tw from "@/lib/tw";
 
-type View = "status" | "setup-1" | "setup-2" | "reset-verify" | "reset-pin";
+type PinView = "status" | "setup-1" | "setup-2" | "reset-verify" | "reset-pin";
 
 function useCountdown(lockedUntil?: string) {
   const [remaining, setRemaining] = useState("");
@@ -607,7 +607,7 @@ function ResetPinView({
 
     toast.promise(resetMutation.mutateAsync({ resetToken, newPin }), {
       loading: "Saving new PIN...",
-      success: "Withdrawal PIN reset successfully.",
+      success: () => "Withdrawal PIN reset successfully.",
       error: extract_message as any,
     });
   }
@@ -699,7 +699,7 @@ function ResetPinView({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function WalletPinScreen() {
-  const [view, setView] = useState<View>("status");
+  const [view, setView] = useState<PinView>("status");
   const [setupPin, setSetupPin] = useState("");
   const [resetToken, setResetToken] = useState<string | null>(null);
   const { data: statusData } = usePinStatus();

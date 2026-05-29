@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { toast } from "sonner-native";
+import { extract_message } from "@/helpers/apihelpers";
 import { Colors } from "@/constants/theme";
 import {
   useBanks,
@@ -231,7 +232,7 @@ export default function BankDetailsScreen() {
           setAccountName(res.data.account_name);
           return `Account resolved: ${res.data.account_name}`;
         },
-        error: (err) => err?.response?.data?.message ?? "Failed to resolve account",
+        error: (err) => extract_message(err) || "Failed to resolve account",
       }
     );
   }
