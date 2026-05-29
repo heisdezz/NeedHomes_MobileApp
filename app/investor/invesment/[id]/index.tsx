@@ -19,6 +19,7 @@ import tw from "@/lib/tw";
 import InstallmentSchedule from "@/components/investor/investments/InstallmentSchedule";
 import ExitStrategy from "@/components/investor/investments/ExitStrategy";
 import InvPropDetails from "@/components/investor/investments/InvPropDetails";
+import Resell from "@/components/investor/investments/Resell";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -29,8 +30,8 @@ interface Investment {
   amountPaid: number;
   unitsBought: number;
   sharesBought: number | null;
-  paymentOption: "OUTRIGHT" | "INSTALLMENT";
-  status: "ACTIVE" | "PENDING" | "COMPLETED";
+  paymentOption: "OUTRIGHT" | "INSTALLMENT" | "FULL_PAYMENT";
+  status: "ACTIVE" | "PENDING" | "COMPLETED" | "EXITED" | "CANCELLED" | "RESOLD";
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -39,11 +40,25 @@ interface Investment {
   returnPercentage: number;
   totalAmount: number;
   totalReturns: number;
+  customId?: string;
+  costBasis?: number;
+  selectedReturnDays?: number | null;
+  investmentStartDate?: string | null;
+  investmentEndDate?: string | null;
   property?: {
+    propertyTitle?: string;
     investmentModel: string;
+    location?: string;
+    coverImage?: string;
+    basePrice?: number;
+    pricePerShare?: number | null;
+    pricePerPlot?: number | null;
+    totalShares?: number | null;
     exitWindow?: string | null;
     fractionalHoldingPeriodDays?: number | null;
+    returnTiers?: Record<string, number> | null;
   };
+  exitRequest?: any | null;
 }
 
 // ─── Helper Functions ────────────────────────────────────────────────────────
@@ -61,7 +76,7 @@ function formatDate(dateString: string): string {
   });
 }
 
-// ─── Copy Button Component ───────────────────────────────────────────────────
+// ─── Copy Button ─────────────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -69,11 +84,7 @@ function CopyButton({ text }: { text: string }) {
   const handleCopy = async () => {
     await Clipboard.setStringAsync(text);
     setCopied(true);
-    showMessage({
-      message: "Copied to clipboard",
-      type: "success",
-      duration: 2000,
-    });
+    showMessage({ message: "Copied to clipboard", type: "success", duration: 2000 });
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -88,7 +99,86 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-// ─── Main Component ──────────────────────────────────────────────────────────
+// ─── Fractional Info ─────────────────────────────────────────────────────────
+
+function FractionalInfo({
+  investment,
+}: {
+  investment: Investment;
+}) {
+  if (investment.property?.investmentModel !== "FRACTIONAL_OWNERSHIP") return null;
+
+  const amountPaid = investment.amountPaid;
+  const returnRate = investment.returnPercentage;
+  const expectedPayout = Math.round(amountPaid * (1 + returnRate / 100));
+
+  const rows = [
+    investment.selectedReturnDays != null && {
+      label: "Selected Duration",
+      value: `${investment.selectedReturnDays} days`,
+    },
+    investment.investmentStartDate && {
+      label: "Investment Date",
+      value: formatDate(investment.investmentStartDate),
+    },
+    investment.investmentEndDate && {
+      label: "Maturity Date",
+      value: formatDate(investment.investmentEndDate),
+    },
+    {
+      label: "Expected Payout",
+      value: formatCurrency(expectedPayout),
+      highlight: true,
+    },
+    investment.property?.fractionalHoldingPeriodDays != null && {
+      label: "Min. Holding Period",
+      value: `${investment.property.fractionalHoldingPeriodDays} days`,
+    },
+  ].filter(Boolean) as { label: string; value: string; highlight?: boolean }[];
+
+  return (
+    <View style={tw`bg-white rounded-xl mb-4 overflow-hidden`}>
+      <View
+        style={[
+          tw`px-4 py-3 border-b`,
+          { backgroundColor: "#EFF6FF", borderBottomColor: "#DBEAFE" },
+        ]}
+      >
+        <Text
+          style={[
+            tw`text-xs font-semibold uppercase tracking-wide`,
+            { color: "#1E40AF" },
+          ]}
+        >
+          Fractional Details
+        </Text>
+      </View>
+      <View>
+        {rows.map(({ label, value, highlight }, index, arr) => (
+          <View
+            key={label}
+            style={[
+              tw`flex-row items-center justify-between px-4 py-3`,
+              index < arr.length - 1 && { borderBottomWidth: 1, borderBottomColor: "#F9FAFB" },
+            ]}
+          >
+            <Text style={[tw`text-sm`, { color: Colors.textSecondary }]}>{label}</Text>
+            <Text
+              style={[
+                tw`text-sm font-bold`,
+                { color: highlight ? "#059669" : Colors.textPrimary },
+              ]}
+            >
+              {value}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+// ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function InvestmentDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -105,10 +195,7 @@ export default function InvestmentDetailsScreen() {
 
   if (query.isLoading) {
     return (
-      <SafeAreaView
-        style={[tw`flex-1`, { backgroundColor: "#F9FAFB" }]}
-        edges={["top"]}
-      >
+      <SafeAreaView style={[tw`flex-1`, { backgroundColor: "#F9FAFB" }]} edges={["top"]}>
         <View style={tw`flex-1 items-center justify-center`}>
           <ActivityIndicator size="large" color={Colors.brand} />
           <Text style={[tw`text-sm mt-3`, { color: Colors.textMuted }]}>
@@ -121,31 +208,18 @@ export default function InvestmentDetailsScreen() {
 
   if (query.isError || !query.data?.data) {
     return (
-      <SafeAreaView
-        style={[tw`flex-1`, { backgroundColor: "#F9FAFB" }]}
-        edges={["top"]}
-      >
+      <SafeAreaView style={[tw`flex-1`, { backgroundColor: "#F9FAFB" }]} edges={["top"]}>
         <View style={tw`flex-1 items-center justify-center p-6`}>
           <Ionicons name="alert-circle" size={64} color="#DC2626" />
-          <Text
-            style={[tw`text-lg font-bold mt-4`, { color: Colors.textPrimary }]}
-          >
+          <Text style={[tw`text-lg font-bold mt-4`, { color: Colors.textPrimary }]}>
             Failed to Load Investment
           </Text>
-          <Text
-            style={[
-              tw`text-sm text-center mt-2`,
-              { color: Colors.textSecondary },
-            ]}
-          >
+          <Text style={[tw`text-sm text-center mt-2`, { color: Colors.textSecondary }]}>
             Could not retrieve investment details
           </Text>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={[
-              tw`mt-6 px-6 py-3 rounded-xl`,
-              { backgroundColor: Colors.brand },
-            ]}
+            style={[tw`mt-6 px-6 py-3 rounded-xl`, { backgroundColor: Colors.brand }]}
           >
             <Text style={tw`text-white font-semibold`}>Go Back</Text>
           </TouchableOpacity>
@@ -156,21 +230,17 @@ export default function InvestmentDetailsScreen() {
 
   const investment = query.data.data;
   const isInstallment = investment.paymentOption === "INSTALLMENT";
+  const isFractional = investment.property?.investmentModel === "FRACTIONAL_OWNERSHIP";
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return { bg: "#D1FAE5", text: "#059669" };
-      case "COMPLETED":
-        return { bg: "#DBEAFE", text: "#1D4ED8" };
-      case "PENDING":
-        return { bg: "#FEF3C7", text: "#D97706" };
-      default:
-        return { bg: "#F3F4F6", text: "#6B7280" };
-    }
+  const STATUS_STYLE: Record<string, { bg: string; text: string }> = {
+    ACTIVE:    { bg: "#DBEAFE", text: "#1D4ED8" },
+    PENDING:   { bg: "#FEF3C7", text: "#D97706" },
+    COMPLETED: { bg: "#D1FAE5", text: "#059669" },
+    EXITED:    { bg: "#FFEDD5", text: "#EA580C" },
+    CANCELLED: { bg: "#FEE2E2", text: "#DC2626" },
+    RESOLD:    { bg: "#F3E8FF", text: "#7C3AED" },
   };
-
-  const statusColor = getStatusColor(investment.status);
+  const statusColor = STATUS_STYLE[investment.status] ?? { bg: "#F3F4F6", text: "#6B7280" };
 
   return (
     <SafeAreaView
@@ -187,9 +257,7 @@ export default function InvestmentDetailsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={tw`mr-3`}>
           <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
-        <Text
-          style={[tw`text-lg font-bold flex-1`, { color: Colors.textPrimary }]}
-        >
+        <Text style={[tw`text-lg font-bold flex-1`, { color: Colors.textPrimary }]}>
           Investment Details
         </Text>
       </View>
@@ -201,64 +269,28 @@ export default function InvestmentDetailsScreen() {
       >
         {/* Hero Card */}
         <View style={tw`bg-white rounded-xl mb-4 overflow-hidden shadow-sm`}>
-          {/* Accent Bar */}
-          <View
-            style={{
-              height: 6,
-              backgroundColor: Colors.brand,
-            }}
-          />
+          <View style={{ height: 6, backgroundColor: Colors.brand }} />
 
           <View style={tw`p-4`}>
             {/* Title & Status */}
             <View style={tw`flex-row items-start justify-between mb-4`}>
               <View style={tw`flex-1`}>
                 <View style={tw`flex-row items-center gap-3 mb-2`}>
-                  <View
-                    style={[
-                      tw`p-2.5 rounded-xl`,
-                      { backgroundColor: "#D1FAE5" },
-                    ]}
-                  >
+                  <View style={[tw`p-2.5 rounded-xl`, { backgroundColor: "#D1FAE5" }]}>
                     <Ionicons name="trending-up" size={20} color="#059669" />
                   </View>
                   <View>
-                    <Text
-                      style={[
-                        tw`text-xl font-bold`,
-                        { color: Colors.textPrimary },
-                      ]}
-                    >
+                    <Text style={[tw`text-xl font-bold`, { color: Colors.textPrimary }]}>
                       Investment
                     </Text>
                     <View style={tw`flex-row items-center gap-2 mt-1`}>
-                      <View
-                        style={[
-                          tw`px-2.5 py-0.5 rounded-full`,
-                          { backgroundColor: statusColor.bg },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            tw`text-xs font-semibold`,
-                            { color: statusColor.text },
-                          ]}
-                        >
+                      <View style={[tw`px-2.5 py-0.5 rounded-full`, { backgroundColor: statusColor.bg }]}>
+                        <Text style={[tw`text-xs font-semibold`, { color: statusColor.text }]}>
                           {investment.status}
                         </Text>
                       </View>
-                      <View
-                        style={[
-                          tw`px-2.5 py-0.5 rounded-full`,
-                          { backgroundColor: "#F3F4F6" },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            tw`text-xs font-medium`,
-                            { color: "#6B7280" },
-                          ]}
-                        >
+                      <View style={[tw`px-2.5 py-0.5 rounded-full`, { backgroundColor: "#F3F4F6" }]}>
+                        <Text style={[tw`text-xs font-medium`, { color: "#6B7280" }]}>
                           {investment.paymentOption}
                         </Text>
                       </View>
@@ -270,18 +302,10 @@ export default function InvestmentDetailsScreen() {
                 <View
                   style={[
                     tw`rounded-lg px-3 py-2.5 flex-row items-center gap-2`,
-                    {
-                      backgroundColor: "#F9FAFB",
-                      borderWidth: 1,
-                      borderColor: "#E5E7EB",
-                    },
+                    { backgroundColor: "#F9FAFB", borderWidth: 1, borderColor: "#E5E7EB" },
                   ]}
                 >
-                  <Ionicons
-                    name="key-outline"
-                    size={14}
-                    color={Colors.textMuted}
-                  />
+                  <Ionicons name="key-outline" size={14} color={Colors.textMuted} />
                   <View style={tw`flex-1`}>
                     <Text
                       style={[
@@ -289,36 +313,24 @@ export default function InvestmentDetailsScreen() {
                         { color: Colors.textSecondary },
                       ]}
                     >
-                      Investment ID
+                      {investment.customId ? "Investment Ref" : "Investment ID"}
                     </Text>
                     <Text
-                      style={[
-                        tw`text-xs font-mono font-semibold`,
-                        { color: Colors.textPrimary },
-                      ]}
+                      style={[tw`text-xs font-mono font-semibold`, { color: Colors.textPrimary }]}
                       numberOfLines={1}
                     >
-                      {investment.id}
+                      {investment.customId ?? investment.id}
                     </Text>
                   </View>
-                  <CopyButton text={investment.id} />
+                  <CopyButton text={investment.customId ?? investment.id} />
                 </View>
 
-                {/* Property ID */}
+                {/* Property ref */}
                 <View style={tw`flex-row items-center gap-2 mt-2`}>
-                  <Ionicons
-                    name="location-outline"
-                    size={12}
-                    color={Colors.textMuted}
-                  />
-                  <Text style={[tw`text-xs`, { color: Colors.textSecondary }]}>
-                    Property:
-                  </Text>
+                  <Ionicons name="location-outline" size={12} color={Colors.textMuted} />
+                  <Text style={[tw`text-xs`, { color: Colors.textSecondary }]}>Property:</Text>
                   <Text
-                    style={[
-                      tw`text-xs font-mono`,
-                      { color: Colors.textPrimary },
-                    ]}
+                    style={[tw`text-xs font-mono`, { color: Colors.textPrimary }]}
                     numberOfLines={1}
                   >
                     {investment.propertyId.slice(0, 12)}...
@@ -328,24 +340,15 @@ export default function InvestmentDetailsScreen() {
               </View>
             </View>
 
-            {/* Current Value Card */}
+            {/* Current Value */}
             <View
               style={[
                 tw`rounded-xl px-4 py-3`,
-                {
-                  background:
-                    "linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)",
-                  backgroundColor: "#FFF7ED",
-                  borderWidth: 1,
-                  borderColor: "#FDBA74",
-                },
+                { backgroundColor: "#FFF7ED", borderWidth: 1, borderColor: "#FDBA74" },
               ]}
             >
               <Text
-                style={[
-                  tw`text-xs uppercase tracking-wide font-medium mb-1`,
-                  { color: "#9A3412" },
-                ]}
+                style={[tw`text-xs uppercase tracking-wide font-medium mb-1`, { color: "#9A3412" }]}
               >
                 Current Value
               </Text>
@@ -365,50 +368,24 @@ export default function InvestmentDetailsScreen() {
         {/* Stats Grid */}
         <View style={tw`flex-row flex-wrap gap-3 mb-4`}>
           {/* Amount Paid */}
-          <View
-            style={[tw`bg-white rounded-xl p-4 flex-1`, { minWidth: "45%" }]}
-          >
-            <View
-              style={[
-                tw`p-2 rounded-lg mb-2`,
-                { backgroundColor: "#DBEAFE", alignSelf: "flex-start" },
-              ]}
-            >
+          <View style={[tw`bg-white rounded-xl p-4 flex-1`, { minWidth: "45%" }]}>
+            <View style={[tw`p-2 rounded-lg mb-2`, { backgroundColor: "#DBEAFE", alignSelf: "flex-start" }]}>
               <Ionicons name="cash-outline" size={16} color="#1D4ED8" />
             </View>
-            <Text
-              style={[
-                tw`text-xs uppercase tracking-wide font-medium mb-1`,
-                { color: Colors.textSecondary },
-              ]}
-            >
+            <Text style={[tw`text-xs uppercase tracking-wide font-medium mb-1`, { color: Colors.textSecondary }]}>
               Amount Paid
             </Text>
-            <Text
-              style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}
-            >
+            <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
               {formatCurrency(investment.amountPaid)}
             </Text>
           </View>
 
           {/* Total Returns */}
-          <View
-            style={[tw`bg-white rounded-xl p-4 flex-1`, { minWidth: "45%" }]}
-          >
-            <View
-              style={[
-                tw`p-2 rounded-lg mb-2`,
-                { backgroundColor: "#D1FAE5", alignSelf: "flex-start" },
-              ]}
-            >
+          <View style={[tw`bg-white rounded-xl p-4 flex-1`, { minWidth: "45%" }]}>
+            <View style={[tw`p-2 rounded-lg mb-2`, { backgroundColor: "#D1FAE5", alignSelf: "flex-start" }]}>
               <Ionicons name="trending-up" size={16} color="#059669" />
             </View>
-            <Text
-              style={[
-                tw`text-xs uppercase tracking-wide font-medium mb-1`,
-                { color: Colors.textSecondary },
-              ]}
-            >
+            <Text style={[tw`text-xs uppercase tracking-wide font-medium mb-1`, { color: Colors.textSecondary }]}>
               Total Returns
             </Text>
             <Text style={[tw`text-lg font-bold`, { color: "#059669" }]}>
@@ -416,56 +393,51 @@ export default function InvestmentDetailsScreen() {
             </Text>
           </View>
 
-          {/* Units Bought */}
-          <View
-            style={[tw`bg-white rounded-xl p-4 flex-1`, { minWidth: "45%" }]}
-          >
-            <View
-              style={[
-                tw`p-2 rounded-lg mb-2`,
-                { backgroundColor: "#E9D5FF", alignSelf: "flex-start" },
-              ]}
-            >
+          {/* Shares / Slots */}
+          <View style={[tw`bg-white rounded-xl p-4 flex-1`, { minWidth: "45%" }]}>
+            <View style={[tw`p-2 rounded-lg mb-2`, { backgroundColor: "#E9D5FF", alignSelf: "flex-start" }]}>
               <Ionicons name="bar-chart-outline" size={16} color="#7C3AED" />
             </View>
-            <Text
-              style={[
-                tw`text-xs uppercase tracking-wide font-medium mb-1`,
-                { color: Colors.textSecondary },
-              ]}
-            >
-              Units Bought
-            </Text>
-            <Text
-              style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}
-            >
-              {investment.unitsBought}
-            </Text>
+            {investment.sharesBought != null ? (
+              <>
+                <Text style={[tw`text-xs uppercase tracking-wide font-medium mb-1`, { color: Colors.textSecondary }]}>
+                  Shares Bought
+                </Text>
+                <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
+                  {investment.sharesBought}
+                  {investment.property?.totalShares != null && (
+                    <Text style={[tw`text-sm font-normal`, { color: Colors.textMuted }]}>
+                      {" "}/ {investment.property.totalShares}
+                    </Text>
+                  )}
+                </Text>
+                {investment.property?.pricePerShare != null && (
+                  <Text style={[tw`text-xs mt-1`, { color: Colors.textMuted }]}>
+                    {formatCurrency(investment.property.pricePerShare)} per share
+                  </Text>
+                )}
+              </>
+            ) : (
+              <>
+                <Text style={[tw`text-xs uppercase tracking-wide font-medium mb-1`, { color: Colors.textSecondary }]}>
+                  Slots Bought
+                </Text>
+                <Text style={[tw`text-lg font-bold`, { color: Colors.textPrimary }]}>
+                  {investment.unitsBought}
+                </Text>
+              </>
+            )}
           </View>
 
           {/* Date Invested */}
-          <View
-            style={[tw`bg-white rounded-xl p-4 flex-1`, { minWidth: "45%" }]}
-          >
-            <View
-              style={[
-                tw`p-2 rounded-lg mb-2`,
-                { backgroundColor: "#FED7AA", alignSelf: "flex-start" },
-              ]}
-            >
+          <View style={[tw`bg-white rounded-xl p-4 flex-1`, { minWidth: "45%" }]}>
+            <View style={[tw`p-2 rounded-lg mb-2`, { backgroundColor: "#FED7AA", alignSelf: "flex-start" }]}>
               <Ionicons name="calendar-outline" size={16} color="#EA580C" />
             </View>
-            <Text
-              style={[
-                tw`text-xs uppercase tracking-wide font-medium mb-1`,
-                { color: Colors.textSecondary },
-              ]}
-            >
+            <Text style={[tw`text-xs uppercase tracking-wide font-medium mb-1`, { color: Colors.textSecondary }]}>
               Date Invested
             </Text>
-            <Text
-              style={[tw`text-sm font-bold`, { color: Colors.textPrimary }]}
-            >
+            <Text style={[tw`text-sm font-bold`, { color: Colors.textPrimary }]}>
               {new Date(investment.createdAt).toLocaleDateString("en-NG", {
                 month: "short",
                 day: "numeric",
@@ -474,6 +446,16 @@ export default function InvestmentDetailsScreen() {
             </Text>
           </View>
         </View>
+
+        {/* Installment Schedule */}
+        {isInstallment && (
+          <View style={tw`mb-4`}>
+            <InstallmentSchedule id={id} propertyId={investment.propertyId} />
+          </View>
+        )}
+
+        {/* Fractional Details */}
+        {isFractional && <FractionalInfo investment={investment} />}
 
         {/* Investment Information */}
         <View style={tw`bg-white rounded-xl mb-4 overflow-hidden`}>
@@ -484,25 +466,18 @@ export default function InvestmentDetailsScreen() {
             ]}
           >
             <Text
-              style={[
-                tw`text-xs font-semibold uppercase tracking-wide`,
-                { color: Colors.textPrimary },
-              ]}
+              style={[tw`text-xs font-semibold uppercase tracking-wide`, { color: Colors.textPrimary }]}
             >
               Investment Information
             </Text>
             <TouchableOpacity
-              onPress={() =>
-                router.push(`/investor/properties/${investment.propertyId}`)
-              }
+              onPress={() => router.push(`/investor/properties/${investment.propertyId}`)}
               style={[
                 tw`flex-row items-center gap-1 px-3 py-1.5 rounded-lg`,
                 { backgroundColor: Colors.textPrimary },
               ]}
             >
-              <Text style={tw`text-white text-xs font-semibold`}>
-                View Property
-              </Text>
+              <Text style={tw`text-white text-xs font-semibold`}>View Property</Text>
               <Ionicons name="arrow-forward" size={12} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -521,10 +496,7 @@ export default function InvestmentDetailsScreen() {
                   ? formatDate(investment.lastValuationDate)
                   : "N/A",
               },
-              {
-                label: "Last Updated",
-                value: formatDate(investment.updatedAt),
-              },
+              { label: "Last Updated", value: formatDate(investment.updatedAt) },
             ].map(({ label, value, bold }, index, arr) => (
               <View
                 key={label}
@@ -536,9 +508,7 @@ export default function InvestmentDetailsScreen() {
                   },
                 ]}
               >
-                <Text style={[tw`text-sm`, { color: Colors.textSecondary }]}>
-                  {label}
-                </Text>
+                <Text style={[tw`text-sm`, { color: Colors.textSecondary }]}>{label}</Text>
                 <Text
                   style={[
                     tw`text-sm`,
@@ -554,47 +524,18 @@ export default function InvestmentDetailsScreen() {
           </View>
         </View>
 
-        {/* Property */}
+        {/* Resell */}
         <View style={tw`mb-4`}>
-          <InvPropDetails propertyId={investment.propertyId} />
+          <Resell investment={investment as any} />
         </View>
 
-        {/* Installment Schedule */}
-        {isInstallment && (
-          <InstallmentSchedule id={id} propertyId={investment.propertyId} />
-        )}
-
         {/* Exit Strategy */}
-        <ExitStrategy
-          investment={investment}
-          propertyId={investment.propertyId}
-        />
+        <ExitStrategy investment={investment} propertyId={investment.propertyId} />
 
-        {/* Resell Component - placeholder for now */}
-        {investment.status === "COMPLETED" && (
-          <View
-            style={[
-              tw`bg-white rounded-xl p-4 my-4`,
-              { borderWidth: 1, borderColor: Colors.divider },
-            ]}
-          >
-            <View style={tw`flex-row items-center gap-2 mb-2`}>
-              <Ionicons
-                name="sync-outline"
-                size={20}
-                color={Colors.textPrimary}
-              />
-              <Text
-                style={[tw`text-base font-bold`, { color: Colors.textPrimary }]}
-              >
-                Resell Listing
-              </Text>
-            </View>
-            <Text style={[tw`text-sm`, { color: Colors.textSecondary }]}>
-              Resell feature coming soon
-            </Text>
-          </View>
-        )}
+        {/* Property Details */}
+        <View style={tw`mt-4`}>
+          <InvPropDetails propertyId={investment.propertyId} />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
