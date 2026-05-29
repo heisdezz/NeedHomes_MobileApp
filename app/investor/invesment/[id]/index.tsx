@@ -205,8 +205,6 @@ export default function InvestmentDetailsScreen() {
           <View
             style={{
               height: 6,
-              background:
-                "linear-gradient(to right, #34D399, #10B981, #14B8A6)",
               backgroundColor: Colors.brand,
             }}
           />
