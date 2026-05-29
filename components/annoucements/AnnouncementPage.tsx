@@ -11,10 +11,11 @@ import { useRouter } from "expo-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 
-import apiClient from "@/lib/api";
+import apiClient, { ApiResponseV2 } from "@/lib/api";
 import { Colors } from "@/constants/theme";
 import tw from "@/lib/tw";
 import PageLoader from "@/components/layout/PageLoader";
+import Pagination from "@/components/ui/Pagination";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -279,15 +280,16 @@ export default function AnnouncementsPage({
 }: AnnouncementPageProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
   const [selectedAnnouncement, setSelectedAnnouncement] =
     useState<Announcement | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const query = useQuery<Announcement[]>({
-    queryKey: [`announcements-${userType}`],
+  const query = useQuery<ApiResponseV2<Announcement[]>>({
+    queryKey: [`announcements-${userType}`, page],
     queryFn: async () => {
-      const resp = await apiClient.get("/announcements/mine");
-      return resp.data?.data?.data ?? [];
+      const resp = await apiClient.get("/announcements/mine", { params: { page } });
+      return resp.data;
     },
   });
 
@@ -310,7 +312,7 @@ export default function AnnouncementsPage({
     }
   };
 
-  const announcements: Announcement[] = Array.isArray(query.data) ? query.data : [];
+  const announcements: Announcement[] = query.data?.data?.data ?? [];
   const unreadCount = announcements.filter((a) => !a.isRead).length;
 
   return (
@@ -358,7 +360,13 @@ export default function AnnouncementsPage({
       <View style={tw`flex-1 px-4 pt-4`}>
         <PageLoader query={query} loadingText="Loading announcements...">
           {(data) => {
-            if (data.length === 0) {
+            const items: Announcement[] = data.data?.data ?? [];
+            const meta = data.data?.meta ?? {};
+            const totalPages: number = meta.totalPages ?? 1;
+            const hasNext: boolean = meta.hasNext ?? page < totalPages;
+            const hasPrev: boolean = meta.hasPrev ?? page > 1;
+
+            if (items.length === 0) {
               return (
                 <View style={tw`flex-1 items-center justify-center`}>
                   <View
@@ -384,7 +392,7 @@ export default function AnnouncementsPage({
             }
             return (
               <FlatList
-                data={data}
+                data={items}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <AnnouncementCard
@@ -394,7 +402,20 @@ export default function AnnouncementsPage({
                 )}
                 scrollEnabled
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 20 }}
+                contentContainerStyle={{ paddingBottom: 8 }}
+                ListFooterComponent={
+                  totalPages > 1 ? (
+                    <Pagination
+                      page={page}
+                      totalPages={totalPages}
+                      hasNext={hasNext}
+                      hasPrev={hasPrev}
+                      onNext={() => setPage((p) => p + 1)}
+                      onPrev={() => setPage((p) => p - 1)}
+                      onGoTo={setPage}
+                    />
+                  ) : null
+                }
               />
             );
           }}
